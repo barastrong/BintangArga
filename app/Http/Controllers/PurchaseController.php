@@ -33,7 +33,8 @@ class PurchaseController extends Controller
             'size_id' => 'required|exists:sizes,id',
             'quantity' => 'required|integer|min:1',
             'shipping_address' => 'required|string',
-            'phone_number' => 'required|string'
+            'phone_number' => 'required|string',
+            'description' => 'string'
         ]);
 
         try {
@@ -56,6 +57,7 @@ class PurchaseController extends Controller
                 'size_id' => $request->size_id,
                 'quantity' => $request->quantity,
                 'total_price' => $total_price,
+                'description' => $request->description,
                 'shipping_address' => $request->shipping_address,
                 'phone_number' => $request->phone_number
             ]);
@@ -88,14 +90,12 @@ class PurchaseController extends Controller
 
     public function cancel(Purchase $purchase)
     {
-    // Check if current user owns this purchase
     if (Auth::id() !== $purchase->user_id) {
         abort(403, 'Unauthorized action.');
     }
         try {
             DB::beginTransaction();
 
-            // Only allow cancellation of pending orders
             if ($purchase->status !== 'pending') {
                 throw new \Exception('Pesanan tidak dapat dibatalkan');
             }
@@ -121,32 +121,33 @@ class PurchaseController extends Controller
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
+
     public function rate(Request $request, Purchase $purchase)
-{
-    // Authorize - only the purchaser can rate
-    if ($purchase->user_id !== auth()->id()) {
-        abort(403, 'Unauthorized action.');
-    }
-    
-    // Validate only completed purchases can be rated
-    if ($purchase->status !== 'pending') {
+    {
+        // Authorize - only the purchaser can rate
+        if ($purchase->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
+        
+        // Validate only completed purchases can be rated
+        if ($purchase->status !== 'pending') {
+            return redirect()->back()
+                ->with('error', 'Hanya pembelian yang telah selesai yang dapat diberi rating.');
+        }
+        
+        // Validate input
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'nullable|string|max:500'
+        ]);
+        
+        // Save the rating and review
+        $purchase->update([
+            'rating' => $validated['rating'],
+            'review' => $validated['review']
+        ]);
+        
         return redirect()->back()
-            ->with('error', 'Hanya pembelian yang telah selesai yang dapat diberi rating.');
+            ->with('success', 'Terima kasih! Rating dan ulasan Anda telah disimpan.');
     }
-    
-    // Validate input
-    $validated = $request->validate([
-        'rating' => 'required|integer|min:1|max:5',
-        'review' => 'nullable|string|max:500'
-    ]);
-    
-    // Save the rating and review
-    $purchase->update([
-        'rating' => $validated['rating'],
-        'review' => $validated['review']
-    ]);
-    
-    return redirect()->back()
-        ->with('success', 'Terima kasih! Rating dan ulasan Anda telah disimpan.');
-}
 }

@@ -242,17 +242,31 @@
         
         .address {
             flex: 1;
+            margin-top: 3%;
             padding: 20px;
             min-width: 300px;
         }
         
         .address h3 {
             margin-top: 0;
-            font-size: 20px;
+            font-size: 45px;
         }
         
         .address p {
             margin: 5px 0;
+            font-size: 30px;
+        }
+        .seller-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+
+        .seller-info i {
+            color: #666;
         }
     </style>
 </head>
@@ -335,6 +349,10 @@
                 <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
                 <h3>{{ $product->nama_barang }}</h3>
                 <p>{{ Str::limit($product->description, 50) }}</p>
+                <div class="seller-info">
+                    <i class="fas fa-user"></i>
+                    <span>{{ $product->user->name }}</span>
+                </div>
                 <div class="rating">
                     @php
                         $rating = $product->ratings->avg('rating') ?? 0;

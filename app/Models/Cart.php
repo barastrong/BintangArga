@@ -5,21 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Purchase extends Model
+class Cart extends Model
 {
     use HasFactory;
-    protected $table = 'purchases';
+    protected $table = 'carts';
     protected $fillable = [
         'user_id',
         'product_id',
         'size_id',
-        'quantity',
-        'total_price',
-        'status',
-        'payment_status',
-        'shipping_address',
-        'phone_number',
-        'description',
+        'quantity'
     ];
 
     public function user()

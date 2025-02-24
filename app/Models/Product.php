@@ -9,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
     protected $table = 'products';
-    protected $fillable = ['category_id', 'nama_barang', 'description', 'gambar','alamat_lengkap','lokasi'];
+    protected $fillable = ['category_id', 'nama_barang', 'description', 'gambar','alamat_lengkap','lokasi', 'user_id', 'status'];
 
     public function category()
     {
@@ -41,7 +41,12 @@ class Product extends Model
         return $this->sizes->sum('stock');
     }
     public function purchases()
-{
-    return $this->hasMany(Purchase::class);
-}
+    {
+        return $this->hasMany(Purchase::class);
+    }
+    // app/Models/Product.php
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

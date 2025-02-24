@@ -7,13 +7,14 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Size;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with(['category', 'sizes', 'ratings'])
+        $products = Product::with(['category', 'sizes', 'ratings', 'user'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -46,8 +47,9 @@ class ProductController extends Controller
             // Upload gambar produk
             $gambarPath = $request->file('gambar')->store('products', 'public');
 
-            // Simpan produk
+            // Simpan produk dengan user_id
             $product = Product::create([
+                'user_id' => Auth::id(),
                 'category_id' => $request->category_id,
                 'nama_barang' => $request->nama_barang,
                 'description' => $request->description,
@@ -99,6 +101,7 @@ class ProductController extends Controller
                 ->withInput();
         }
     }
+
     public function show($id)
     {
         $product = Product::with(['sizes', 'ratings'])->findOrFail($id);

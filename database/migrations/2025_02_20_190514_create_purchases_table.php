@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('payment_status')->default('unpaid'); // unpaid, paid
             $table->string('shipping_address');
             $table->string('phone_number');
+            $table->string('description');
             $table->timestamps();
         });
     }
