@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Document</title>
+</head>
+<body>
 <div class="container mx-auto px-4 py-8">
     <!-- Back Button -->
     <div class="mb-4">
@@ -185,9 +194,6 @@
                     
                     <!-- Product Details -->
                     <div class="mb-6">
-                    <img src="{{ Storage::url($product->gambar) }}" 
-                         alt="{{ $product->nama_barang }}"
-                         class="w-full h-full object-cover rounded-lg">
                         <h4 class="font-semibold mb-2">{{ $product->nama_barang }}</h4>
                         <p class="text-gray-600">Size: <span id="selectedSize"></span></p>
                         <p class="text-gray-600">Harga: Rp <span id="selectedPrice"></span></p>
@@ -239,24 +245,22 @@
 
                     <!-- Submit Button -->
                     <div class="flex space-x-4">
-                        <!-- Add to Cart Button -->
-                        @if($size->stock > 0)
-                        <button onclick="addToCart('{{ $size->id }}', '{{ $size->size }}', {{ $size->harga }}, {{ $size->stock }}, '{{ $product->id }}')" 
-                                class="bg-white border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-50 px-4 py-2 rounded-lg inline-block transition shadow flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            Keranjang
-                        </button>
-                        
-                        <!-- Buy Button -->
-                        <button onclick="openPurchaseModal('{{ $size->id }}', '{{ $size->size }}', {{ $size->harga }}, {{ $size->stock }}, '{{ $product->id }}')" 
-                                class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg inline-block transition shadow flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            Beli
-                        </button>
+                    @if($size->stock > 0)
+                    <button type="button" onclick="addToCart()" 
+                        class="flex-1 bg-white border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-50 px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Keranjang
+                    </button>
+                    
+                    <button type="submit" 
+                        class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Beli Sekarang
+                    </button>
                         @else
                         <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg cursor-not-allowed">
                             Out of Stock
@@ -268,136 +272,182 @@
         </div>
     </div>
 </div>
-
+</body>
 <script>
     function updateMainImage(imageUrl) {
         document.getElementById('mainImage').src = imageUrl;
     }
 
     let currentSizeId = null;
-let currentStock = 0;
-let currentPrice = 0;
+    let currentStock = 0;
+    let currentPrice = 0;
 
-function openPurchaseModal(sizeId, sizeName, price, stock, productId) {
-    currentSizeId = sizeId;
-    currentStock = stock;
-    currentPrice = price;
-    
-    document.getElementById('sizeId').value = sizeId;
-    document.getElementById('productId').value = productId;
-    document.getElementById('selectedSize').textContent = sizeName;
-    document.getElementById('selectedPrice').textContent = formatPrice(price);
-    document.getElementById('availableStock').textContent = stock;
-    document.getElementById('quantity').value = 1;
-    updateSubtotal();
-    
-    document.getElementById('purchaseModal').classList.remove('hidden');
-}
-
-function closePurchaseModal() {
-    document.getElementById('purchaseModal').classList.add('hidden');
-    document.getElementById('purchaseForm').reset();
-}
-
-function updateQuantity(delta) {
-    const quantityInput = document.getElementById('quantity');
-    const currentQty = parseInt(quantityInput.value);
-    const newQty = currentQty + delta;
-    
-    if (newQty >= 1 && newQty <= currentStock) {
-        quantityInput.value = newQty;
+    function openPurchaseModal(sizeId, sizeName, price, stock, productId) {
+        currentSizeId = sizeId;
+        currentStock = stock;
+        currentPrice = price;
+        
+        document.getElementById('sizeId').value = sizeId;
+        document.getElementById('productId').value = productId;
+        document.getElementById('selectedSize').textContent = sizeName;
+        document.getElementById('selectedPrice').textContent = formatPrice(price);
+        document.getElementById('availableStock').textContent = stock;
+        document.getElementById('quantity').value = 1;
         updateSubtotal();
+        
+        document.getElementById('purchaseModal').classList.remove('hidden');
     }
-}
 
-function updateSubtotal() {
-    const quantity = parseInt(document.getElementById('quantity').value);
-    const subtotal = quantity * currentPrice;
-    document.getElementById('subtotal').textContent = formatPrice(subtotal);
-}
-
-function formatPrice(price) {
-    return new Intl.NumberFormat('id-ID').format(price);
-}
-
-// Close modal when clicking outside
-document.getElementById('purchaseModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closePurchaseModal();
+    function closePurchaseModal() {
+        document.getElementById('purchaseModal').classList.add('hidden');
+        document.getElementById('purchaseForm').reset();
     }
-});
 
-// Form validation before submit
-document.getElementById('purchaseForm').addEventListener('submit', function(e) {
-    const requiredFields = ['shipping_address', 'phone_number', 'description'];
-    let isValid = true;
+    function updateQuantity(delta) {
+        const quantityInput = document.getElementById('quantity');
+        const currentQty = parseInt(quantityInput.value);
+        const newQty = currentQty + delta;
+        
+        if (newQty >= 1 && newQty <= currentStock) {
+            quantityInput.value = newQty;
+            updateSubtotal();
+        }
+    }
 
-    requiredFields.forEach(field => {
-        const element = document.getElementById(field);
-        if (!element.value.trim()) {
-            isValid = false;
-            element.classList.add('border-red-500');
-        } else {
-            element.classList.remove('border-red-500');
+    function updateSubtotal() {
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const subtotal = quantity * currentPrice;
+        document.getElementById('subtotal').textContent = formatPrice(subtotal);
+    }
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('id-ID').format(price);
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('purchaseModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closePurchaseModal();
         }
     });
 
-    if (!isValid) {
-        e.preventDefault();
-        alert('Mohon lengkapi semua data yang diperlukan');
-    }
-});
+    // Form validation before submit
+    document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+        // Add hidden status_pembelian field with value 'beli'
+        const statusInput = document.createElement('input');
+        statusInput.type = 'hidden';
+        statusInput.name = 'status_pembelian';
+        statusInput.value = 'beli';
+        this.appendChild(statusInput);
+        
+        const requiredFields = ['shipping_address', 'phone_number', 'description'];
+        let isValid = true;
 
-function addToCart(sizeId, sizeName, price, stock, productId) {
-    const quantity = document.getElementById('quantity').value;
-    
-    fetch('/cart/add', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({
-            product_id: productId,
-            size_id: sizeId,
-            quantity: parseInt(quantity)
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Show success notification
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg';
-            notification.textContent = 'Item added to cart successfully!';
-            document.body.appendChild(notification);
-            
-            // Remove notification after 3 seconds
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-            
-            // Update cart count if you have one in the navbar
-            updateCartCount();
-        } else {
-            alert(data.message || 'Error adding item to cart');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error adding item to cart');
-    });
-}
-
-function updateCartCount() {
-    fetch('/cart/count')
-        .then(response => response.json())
-        .then(data => {
-            const cartCount = document.getElementById('cartCount');
-            if (cartCount) {
-                cartCount.textContent = data.count;
+        requiredFields.forEach(field => {
+            const element = document.getElementById(field);
+            if (!element.value.trim()) {
+                isValid = false;
+                element.classList.add('border-red-500');
+            } else {
+                element.classList.remove('border-red-500');
             }
         });
-};
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Mohon lengkapi semua data yang diperlukan');
+        }
+    });
+
+    function addToCart() {
+    // Get form values
+    const productId = document.getElementById('productId').value;
+    const sizeId = document.getElementById('sizeId').value;
+    const quantity = document.getElementById('quantity').value;
+    
+    // Validate required fields are present
+    if (!productId || !sizeId || !quantity) {
+        alert('Missing required product information');
+        return;
+    }
+    
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // Use FormData for a traditional form submit
+    const formData = new FormData();
+    formData.append('product_id', productId);
+    formData.append('size_id', sizeId);
+    formData.append('quantity', quantity);
+    formData.append('payment', 'Temporary');
+    formData.append('status_pembelian', 'keranjang');
+    formData.append('payment_method', 'pending');
+    formData.append('shipping_address', 'Temporary'); 
+    formData.append('phone_number', 'Temporary');     
+    formData.append('description', 'Added to cart');
+    formData.append('_token', csrfToken);
+    
+    // Send AJAX request
+    fetch('{{ route("purchases.store") }}', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',  // Important to identify AJAX request
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: formData
+    })
+    .then(response => {
+        // Check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json().then(data => {
+                if (!response.ok) {
+                    return Promise.reject(data);
+                }
+                return data;
+            });
+        } else {
+            // If not JSON, there's an error - the server returned HTML
+            return Promise.reject({
+                message: 'Server returned an unexpected response format. Please try again later.'
+            });
+        }
+    })
+    .then(data => {
+        // Success message
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.textContent = 'Item ditambahkan ke keranjang!';
+        document.body.appendChild(notification);
+        
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+        
+        // Update cart count
+        updateCartCount();
+        
+        // Close the modal
+        closePurchaseModal();
+    })
+    .catch(error => {
+        window.location.href = "{{ route('login') }}"
+        console.error('Error:', error);
+        alert('Error menambahkan item ke keranjang: ' + (error.message || 'Unknown error'));
+    });
+}
+
+    function updateCartCount() {
+        fetch('{{ route("cart.count") }}')
+            .then(response => response.json())
+            .then(data => {
+                const cartCount = document.getElementById('cartCount');
+                if (cartCount) {
+                    cartCount.textContent = data.count;
+                }
+            });
+    }
 </script>
+</html>
 @endsection

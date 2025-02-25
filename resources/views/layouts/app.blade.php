@@ -29,6 +29,7 @@
                         <div class="md:flex items-center space-x-8">
                             <a href="{{ route('products.index') }}" class="text-gray-600 hover:text-gray-900 font-medium">Home</a>
                             <a href="{{ route('shop') }}" class="text-gray-600 hover:text-gray-900 font-medium">Shop</a>
+                            <a href="{{ route('purchases.index') }}" class="text-gray-600 hover:text-gray-900 font-medium">Status Pemsenan</a>
                         </div>
 
                         <!-- Auth Links -->
@@ -58,8 +59,8 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('purchases.index')">
-                            Checkout
+                        <x-dropdown-link :href="route('cart.index')">
+                            Keranjang
                         </x-dropdown-link>
                         <x-dropdown-link :href="route('products.create')">
                             Membuat Product

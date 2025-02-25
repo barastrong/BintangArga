@@ -20,7 +20,6 @@ return new class extends Migration
             $table->string('gambar');
             $table->string('lokasi');
             $table->string('alamat_lengkap');
-            $table->enum('status', ['beli', 'keranjang'])->default('beli');
             $table->timestamps();
         });
     }

@@ -18,11 +18,13 @@ return new class extends Migration
             $table->foreignId('size_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('total_price', 12, 2);
-            $table->string('status')->default('pending', 'processing', 'completed', 'canceled'); // pending, processing, completed, cancelled
-            $table->string('payment_status')->default('unpaid'); // unpaid, paid
+            $table->string('status')->default('pending', 'processing', 'completed', 'canceled');
+            $table->string('payment_method');
+            $table->string('payment_status')->default('unpaid','paid');
             $table->string('shipping_address');
             $table->string('phone_number');
             $table->string('description');
+            $table->enum('status_pembelian', ['beli', 'keranjang'])->default('beli');
             $table->timestamps();
         });
     }

@@ -1,9 +1,16 @@
-<!-- resources/views/cart/index.blade.php -->
 @extends('layouts.app')
 
 @section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-8">Shopping Cart</h1>
+    <h1 class="text-2xl font-bold mb-8">KERANJANG</h1>
 
     @if($cartItems->isEmpty())
         <div class="bg-gray-50 rounded-lg p-8 text-center">
@@ -13,105 +20,59 @@
             </a>
         </div>
     @else
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Cart Items -->
-            <div class="lg:col-span-2">
+        <form action="{{ route('cart.checkout') }}" method="POST">
+            @csrf
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach($cartItems as $item)
-                    <div class="bg-white rounded-lg shadow-sm mb-4 p-4">
-                        <div class="flex items-center">
+                    <div class="bg-white rounded border p-4 relative">
+                        <div class="absolute top-2 left-2">
+                            <input type="checkbox" name="cart_items[]" value="{{ $item->id }}" class="w-5 h-5">
+                        </div>
+                        
+                        <div class="flex flex-col items-center text-center">
                             <img src="{{ Storage::url($item->product->sizes->first()->gambar_size) }}" 
                                  alt="{{ $item->product->nama_barang }}" 
-                                 class="w-24 h-24 object-cover rounded-lg">
+                                 class="w-32 h-40 object-cover mb-2">
                             
-                            <div class="ml-4 flex-grow">
-                                <h3 class="font-semibold">{{ $item->product->nama_barang }}</h3>
-                                <p class="text-gray-600">Size: {{ $item->size->size }}</p>
-                                <p class="text-gray-600">Rp {{ number_format($item->size->harga, 0, ',', '.') }}</p>
-                                
-                                <div class="flex items-center mt-2">
-                                    <div class="flex items-center border rounded">
-                                        <button onclick="updateQuantity({{ $item->id }}, -1)" 
-                                                class="px-3 py-1 border-r hover:bg-gray-100">-</button>
-                                        <input type="number" value="{{ $item->quantity }}" 
-                                               class="w-16 text-center px-2 py-1 focus:outline-none" 
-                                               readonly>
-                                        <button onclick="updateQuantity({{ $item->id }}, 1)" 
-                                                class="px-3 py-1 border-l hover:bg-gray-100">+</button>
-                                    </div>
-                                    
-                                    <form action="{{ route('cart.remove', $item) }}" method="POST" class="ml-4">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-600">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
+                            <h3 class="font-semibold text-sm">{{ $item->product->nama_barang }}</h3>
+                            <p class="text-gray-600 text-xs">Ukuran: {{ $item->size->size }}</p>
+                            <p class="text-gray-600 text-xs">Jumlah: {{ $item->quantity }}</p>
+                            
+                            <p class="text-gray-800 text-sm">
+                                Rp {{ number_format($item->size->harga, 0, ',', '.') }}
+                            </p>
+                            
+                            <button type="submit" class="mt-2 px-4 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition">
+                                Checkout
+                            </button>
                         </div>
                     </div>
                 @endforeach
             </div>
-
-            <!-- Order Summary -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                    <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
-                    
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
-                            <span>Subtotal</span>
-                            <span>Rp {{ number_format($cartItems->sum(function($item) {
-                                return $item->quantity * $item->size->harga;
-                            }), 0, ',', '.') }}</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-6">
-                        <a href="{{ route('purchases.index') }}" 
-                           class="w-full bg-yellow-500 text-white px-6 py-3 rounded-lg inline-block text-center hover:bg-yellow-600 transition">
-                            Proceed to Checkout
-                        </a>
-                    </div>
-                </div>
+            
+            <div class="mt-8 text-center">
+                <button type="submit" class="px-8 py-3 bg-yellow-500 text-white text-lg font-semibold rounded hover:bg-yellow-600 transition">
+                    Checkout
+                </button>
             </div>
-        </div>
+            
+            <div class="mt-6 flex justify-center">
+                <nav class="inline-flex">
+                    <a href="#" class="px-3 py-1 bg-gray-200 text-gray-700 border border-r-0 rounded-l">
+                        Prev
+                    </a>
+                    <a href="#" class="px-3 py-1 bg-white text-gray-700 border">
+                        1
+                    </a>
+                    <a href="#" class="px-3 py-1 bg-gray-200 text-gray-700 border border-l-0 rounded-r">
+                        Next
+                    </a>
+                </nav>
+            </div>
+        </form>
     @endif
 </div>
-
-<script>
-function updateQuantity(cartId, delta) {
-    const quantityInput = event.target.parentNode.querySelector('input');
-    const currentQty = parseInt(quantityInput.value);
-    const newQty = currentQty + delta;
-    
-    if (newQty >= 1) {
-        fetch(`/cart/${cartId}/update`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                quantity: newQty
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message || 'Error updating quantity');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error updating quantity');
-        });
-    }
-}
-</script>
+</body>
+</html>
 @endsection

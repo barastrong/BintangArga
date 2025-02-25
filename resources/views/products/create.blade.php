@@ -45,8 +45,6 @@
 
             <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
                 @csrf
-                <input type="hidden" name="user_id" value="{{$products->user_id}}">
-                
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group mb-3">

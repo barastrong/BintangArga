@@ -20,6 +20,8 @@ class Purchase extends Model
         'shipping_address',
         'phone_number',
         'description',
+        'status_pembelian',
+        'payment_method'
     ];
 
     public function user()

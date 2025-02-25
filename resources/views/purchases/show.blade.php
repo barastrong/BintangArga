@@ -63,8 +63,7 @@
         </div>
     </div>
 
-    {{-- Rating Section (Only for completed purchases) --}}
-    @if($purchase->status === 'pending')
+    @if($purchase->status === 'completed')
         <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
@@ -152,13 +151,12 @@
         </a>
         
         @if($purchase->status === 'pending')
-        <form action="{{ route('purchases.cancel', $purchase) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                Batalkan Pesanan
-            </button>
-        </form>
+            <form action="{{ route('purchases.cancel', $purchase) }}" method="POST">
+                @csrf
+                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Batalkan Pesanan
+                </button>
+            </form>
         @endif
     </div>
 </div>
