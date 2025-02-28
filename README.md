@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Must Download
+## Downloaded
 - Seeder
   ```
   php artisan db:seed --class=CategorySeeder
