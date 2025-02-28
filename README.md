@@ -17,7 +17,7 @@
   npm install && npm run dev
   ```
 
-  - Composer install
+- Composer install
   ```
   composer install
   ```
