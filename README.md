@@ -21,6 +21,11 @@
   ```
   composer install
   ```
+## Jika di perlukan
+- Key
+  ```
+  php artisan key:generate
+  ```
 
 ## About Laravel
 
