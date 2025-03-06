@@ -22,7 +22,6 @@
     @else
         <form action="{{ route('cart.checkout') }}" method="POST">
             @csrf
-            
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 @foreach($cartItems as $item)
                     <div class="bg-white rounded border p-4 relative">
@@ -43,7 +42,7 @@
                                 Rp {{ number_format($item->size->harga, 0, ',', '.') }}
                             </p>
                             
-                            <button type="submit" class="mt-2 px-4 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition">
+                            <button type="button" class="mt-2 px-4 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition">
                                 Checkout
                             </button>
                         </div>

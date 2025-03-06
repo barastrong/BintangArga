@@ -94,13 +94,13 @@
                         </div>
                     </div>
                     
-                    <!-- Add to Cart Button -->
+                    <!-- Add to Cart Button - FIXED -->
                     @if($size->stock > 0)
                     <button onclick="openPurchaseModal('{{ $size->id }}', '{{ $size->size }}', {{ $size->harga }}, {{ $size->stock }}, '{{ $product->id }}')" 
                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg inline-block transition shadow">
                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
+                            </svg>
                             Beli
                     </button>
                     @else
@@ -114,7 +114,7 @@
         </div>
     </div>
 
-        <div class="mt-12">
+    <div class="mt-12">
         <h2 class="text-2xl font-bold mb-6">Customer Reviews</h2>
         
         @if($product->ratings->count() > 0)
@@ -152,7 +152,7 @@
         @endif
     </div>
 
-    <!-- Add this Purchase Modal at the end of the container div -->
+    <!-- Purchase Modal - FIXED -->
     <div id="purchaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
         <div class="flex items-center justify-center min-h-screen px-4 py-6">
             <div class="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
@@ -230,29 +230,23 @@
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
+                    <!-- Submit Button - FIXED -->
                     <div class="flex space-x-4">
-                    @if($size->stock > 0)
-                    <button type="button" onclick="addToCart()" 
-                        class="flex-1 bg-white border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-50 px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        Keranjang
-                    </button>
-                    
-                    <button type="submit" 
-                        class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Beli Sekarang
-                    </button>
-                        @else
-                        <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg cursor-not-allowed">
-                            Out of Stock
+                        <button type="button" onclick="addToCart()" 
+                            class="flex-1 bg-white border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-50 px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Keranjang
                         </button>
-                        @endif
+                        
+                        <button type="submit" 
+                            class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Beli Sekarang
+                        </button>
                     </div>
                 </form>
             </div>
@@ -347,83 +341,87 @@
     });
 
     function addToCart() {
-    // Get form values
-    const productId = document.getElementById('productId').value;
-    const sizeId = document.getElementById('sizeId').value;
-    const quantity = document.getElementById('quantity').value;
-    
-    // Validate required fields are present
-    if (!productId || !sizeId || !quantity) {
-        alert('Missing required product information');
-        return;
-    }
-    
-    // Get CSRF token from meta tag
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
-    // Use FormData for a traditional form submit
-    const formData = new FormData();
-    formData.append('product_id', productId);
-    formData.append('size_id', sizeId);
-    formData.append('quantity', quantity);
-    formData.append('payment', 'Temporary');
-    formData.append('status_pembelian', 'keranjang');
-    formData.append('payment_method', 'pending');
-    formData.append('shipping_address', 'Temporary'); 
-    formData.append('phone_number', 'Temporary');     
-    formData.append('description', 'Added to cart');
-    formData.append('_token', csrfToken);
-    
-    // Send AJAX request
-    fetch('{{ route("purchases.store") }}', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',  // Important to identify AJAX request
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: formData
-    })
-    .then(response => {
-        // Check if the response is JSON
-        const contentType = response.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-            return response.json().then(data => {
-                if (!response.ok) {
-                    return Promise.reject(data);
-                }
-                return data;
-            });
-        } else {
-            // If not JSON, there's an error - the server returned HTML
-            return Promise.reject({
-                message: 'Server returned an unexpected response format. Please try again later.'
-            });
+        // Get form values
+        const productId = document.getElementById('productId').value;
+        const sizeId = document.getElementById('sizeId').value;
+        const quantity = document.getElementById('quantity').value;
+        
+        // Validate required fields are present
+        if (!productId || !sizeId || !quantity) {
+            alert('Missing required product information');
+            return;
         }
-    })
-    .then(data => {
-        // Success message
-        const notification = document.createElement('div');
-        notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-        notification.textContent = 'Item ditambahkan ke keranjang!';
-        document.body.appendChild(notification);
         
-        // Remove notification after 3 seconds
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
+        // Get CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
-        // Update cart count
-        updateCartCount();
+        // Use FormData for a traditional form submit
+        const formData = new FormData();
+        formData.append('product_id', productId);
+        formData.append('size_id', sizeId);
+        formData.append('quantity', quantity);
+        formData.append('payment', 'Temporary');
+        formData.append('status_pembelian', 'keranjang');
+        formData.append('payment_method', 'pending');
+        formData.append('shipping_address', 'Temporary'); 
+        formData.append('phone_number', 'Temporary');     
+        formData.append('description', 'Added to cart');
+        formData.append('_token', csrfToken);
         
-        // Close the modal
-        closePurchaseModal();
-    })
-    .catch(error => {
-        window.location.href = "{{ route('login') }}"
-        console.error('Error:', error);
-        alert('Error menambahkan item ke keranjang: ' + (error.message || 'Unknown error'));
-    });
-}
+        // Send AJAX request
+        fetch('{{ route("purchases.store") }}', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',  // Important to identify AJAX request
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: formData
+        })
+        .then(response => {
+            // Check if the response is JSON
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        return Promise.reject(data);
+                    }
+                    return data;
+                });
+            } else {
+                // If not JSON, there's an error - the server returned HTML
+                return Promise.reject({
+                    message: 'Server returned an unexpected response format. Please try again later.'
+                });
+            }
+        })
+        .then(data => {
+            // Success message
+            const notification = document.createElement('div');
+            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            notification.textContent = 'Item ditambahkan ke keranjang!';
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+            
+            // Update cart count
+            updateCartCount();
+            
+            // Close the modal
+            closePurchaseModal();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Check if it's an authentication error
+            if (error.message && error.message.includes('Unauthenticated')) {
+                window.location.href = "{{ route('login') }}";
+            } else {
+                alert('Error menambahkan item ke keranjang: ' + (error.message || 'Unknown error'));
+            }
+        });
+    }
 
     function updateCartCount() {
         fetch('{{ route("cart.count") }}')

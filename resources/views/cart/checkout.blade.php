@@ -126,6 +126,8 @@
                                     Rp {{ number_format($item->size->harga * $item->quantity, 0, ',', '.') }}
                                 </p>
                             </div>
+
+                            <input type="hidden" id="stock-{{ $item->id }}" value="{{ $item->size->stock }}">
                         </div>
                     </div>
                 @endforeach
@@ -204,51 +206,112 @@
 </div>
 
 <script>
-    // Function to update item quantity
-    function updateQuantity(itemId, action) {
-        const quantityElement = document.getElementById(`quantity-${itemId}`);
-        const priceElement = document.getElementById(`price-${itemId}`);
-        const quantityInput = document.getElementById(`input-quantity-${itemId}`);
-        
-        let currentQuantity = parseInt(quantityElement.innerText);
-        const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
-        
-        // Increase or decrease quantity
-        if (action === 'increase') {
-            currentQuantity++;
-        } else if (action === 'decrease' && currentQuantity > 1) {
-            currentQuantity--;
-        }
-        
-        // Update displayed quantity
-        quantityElement.innerText = currentQuantity;
-        
-        // Update hidden input for form submission
-        quantityInput.value = currentQuantity;
-        
-        // Update price display
-        const newPrice = unitPrice * currentQuantity;
-        priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
-        
-        // Update subtotal
-        updateSubtotal();
-        
-        // Send AJAX request to update quantity in database
-        fetch(`/cart/update/${itemId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({
-                quantity: currentQuantity
-            })
-        }).catch(error => {
-            console.error('Error updating quantity:', error);
-        });
+    function showErrorPopup(message) {
+    // Create popup element if it doesn't exist
+    if (!document.getElementById('error-popup')) {
+        const popup = document.createElement('div');
+        popup.id = 'error-popup';
+        popup.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+        popup.style.maxWidth = '350px';
+        document.body.appendChild(popup);
     }
     
-    // Function to remove item from the checkout page (without changing status in database)
+    // Get popup element and set message
+    const popup = document.getElementById('error-popup');
+    popup.innerHTML = message;
+    
+    // Show popup with animation
+    setTimeout(() => {
+        popup.classList.remove('translate-x-full');
+    }, 10);
+    
+    // Hide popup after 3 seconds
+    setTimeout(() => {
+        popup.classList.add('translate-x-full');
+    }, 3000);
+}
+function updateQuantity(itemId, action) {
+    const quantityElement = document.getElementById(`quantity-${itemId}`);
+    const priceElement = document.getElementById(`price-${itemId}`);
+    const quantityInput = document.getElementById(`input-quantity-${itemId}`);
+    const stockElement = document.getElementById(`stock-${itemId}`);
+    
+    let currentQuantity = parseInt(quantityElement.innerText);
+    const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
+    const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
+    
+    // Increase or decrease quantity
+    if (action === 'increase') {
+        if (currentQuantity + 1 > stockAvailable) {
+            showErrorPopup(`Stock tidak mencukupi. Tersedia: ${stockAvailable}`);
+            return;
+        }
+        currentQuantity++;
+    } else if (action === 'decrease' && currentQuantity > 1) {
+        currentQuantity--;
+    }
+    
+    // Update displayed quantity
+    quantityElement.innerText = currentQuantity;
+    
+    // Update hidden input for form submission
+    quantityInput.value = currentQuantity;
+    
+    // Update price display
+    const newPrice = unitPrice * currentQuantity;
+    priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
+    
+    // Update subtotal
+    updateSubtotal();
+    
+    // Send AJAX request to update quantity in database
+    fetch(`/cart/update/${itemId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            quantity: currentQuantity
+        })
+    }).catch(error => {
+        console.error('Error updating quantity:', error);
+    });
+}
+
+// Modify form submission validation to handle stock validation
+document.getElementById('checkout-form').addEventListener('submit', function(event) {
+    // Check if payment method is selected
+    const paymentSelected = document.querySelector('input[name="payment_method"]:checked');
+    if (!paymentSelected) {
+        event.preventDefault();
+        document.getElementById('payment-method-error').classList.remove('hidden');
+    }
+    
+    // Check stock availability for all items before submission
+    let stockError = false;
+    const cartItems = document.querySelectorAll('[id^="item-"]');
+    
+    cartItems.forEach(item => {
+        const itemId = item.id.split('-')[1];
+        const quantityElement = document.getElementById(`quantity-${itemId}`);
+        const stockElement = document.getElementById(`stock-${itemId}`);
+        
+        if (stockElement) {
+            const quantity = parseInt(quantityElement.innerText);
+            const stock = parseInt(stockElement.value);
+            
+            if (quantity > stock) {
+                event.preventDefault();
+                stockError = true;
+                const productName = document.querySelector(`#item-${itemId} h3`).innerText;
+                const sizeName = document.querySelector(`#item-${itemId} div:nth-child(4)`).innerText;
+                showErrorPopup(`Stock untuk ${productName} - ${sizeName} tidak mencukupi. Tersedia: ${stock}`);
+            }
+        }
+    });
+});
+    
     function removeItem(itemId, itemName) {
         // Remove item from DOM
         const itemElement = document.getElementById(`item-${itemId}`);
@@ -326,6 +389,12 @@
             document.getElementById('payment-method-error').classList.remove('hidden');
         }
     });
+
+    @if(session('error'))
+        document.addEventListener('DOMContentLoaded', function() {
+            showErrorPopup("{{ session('error') }}");
+        });
+    @endif
 </script>
 </body>
 </html>

@@ -321,7 +321,7 @@ class PurchaseController extends Controller
         ]);
     }
 
-    public function processCheckout(Request $request)
+    public function processCheckout(Request $request) 
     {
         $request->validate([
             'cart_items' => 'required|array',
@@ -330,36 +330,39 @@ class PurchaseController extends Controller
             'quantities.*' => 'integer|min:1',
             'shipping_address' => 'required|string',
             'phone_number' => 'required|string',
-            'payment_method' => 'required|in:gopay,qris,nyicil' // Validate payment method
+            'payment_method' => 'required|in:gopay,qris,nyicil'
         ]);
-
+        
         try {
             DB::beginTransaction();
-
+            
             $cartItems = Purchase::whereIn('id', $request->cart_items)
                 ->where('user_id', Auth::id())
                 ->where('status_pembelian', 'keranjang')
                 ->where('status', 'keranjang')
                 ->with(['size', 'product'])
                 ->get();
-
+            
+            // Keep track of the first processed item for redirection
+            $firstProcessedItem = null;
+            
             foreach ($cartItems as $item) {
                 // Get the updated quantity from the request
                 $newQuantity = $request->quantities[$item->id] ?? $item->quantity;
                 
                 // Check stock availability
                 if ($item->size->stock < $newQuantity) {
-                    throw new \Exception("Stock untuk {$item->product->nama_barang} - {$item->size->size} tidak mencukupi");
+                    throw new \Exception("Stock untuk {$item->product->nama_barang} - {$item->size->size} tidak mencukupi. Tersedia: {$item->size->stock}");
                 }
-
+                
                 // Get seller ID from the product
                 $seller_id = $item->product->seller_id;
-
+                
                 // Update stock
                 $item->size->update([
                     'stock' => $item->size->stock - $newQuantity
                 ]);
-
+                
                 // Update purchase with the new quantity and payment method
                 $item->update([
                     'status_pembelian' => 'beli',
@@ -371,17 +374,28 @@ class PurchaseController extends Controller
                     'payment_method' => $request->payment_method,
                     'seller_id' => $seller_id
                 ]);
+                
+                // Store the first item for redirection
+                if ($firstProcessedItem === null) {
+                    $firstProcessedItem = $item;
+                }
             }
-
+            
             DB::commit();
-
-            return redirect()->route('purchases.show')
-                ->with('success', 'Pesanan berhasil diproses');
-
+            
+            // Redirect to the specific purchase's show page or to the purchases index if no item was processed
+            if ($firstProcessedItem) {
+                return redirect()->route('purchases.show', $firstProcessedItem)
+                    ->with('success', 'Pesanan berhasil diproses');
+            } else {
+                return redirect()->route('purchases.index')
+                    ->with('success', 'Pesanan berhasil diproses');
+            }
+            
         } catch (\Exception $e) {
             DB::rollback();
             return back()
-                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->with('error', $e->getMessage())
                 ->withInput();
         }
     }
