@@ -7,22 +7,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <title>Document</title>
 </head>
 <body>
 <div class="container mx-auto px-4 py-8">
-    <!-- Back Button -->
     <div class="mb-4">
-        <a href="{{ route('products.index') }}" class="text-gray-600 hover:text-gray-800 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-            </svg>
+        <a href="{{ route('products.index') }}" class="text-secondary text-decoration-none d-flex align-items-center">
+            <i class="fas fa-chevron-left me-2"></i>
             Kembali ke explore
         </a>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Main Product Image -->
         <div class="relative">
             @if($product->sizes->isNotEmpty())
                 <img id="mainImage" src="{{ Storage::url($product->sizes->first()->gambar_size) }}" 
@@ -47,30 +44,25 @@
 
         <!-- Product Details -->
         <div>
-    <div class="mb-6">
-        <h1 class="text-3xl font-bold mb-2">{{ $product->nama_barang }}</h1>
-        <div class="flex items-center">
-            <span class="bg-blue-500 rounded-full p-2 mr-3">
-                <i class="fas fa-user-circle"></i>
-            </span>
-            <div>
-                <span class="text-gray-500 text-sm">Penjual</span>
-                <p class="font-semibold">{{ $product->user->name }}</p>
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold mb-2">{{ $product->nama_barang }}</h1>
+                    <div class="flex items-center gap-2">
+                        <img src="{{ asset('storage/' . $product->seller->foto_profil) }}" alt="Profil Penjual" class="w-20 h-20 rounded-full object-cover">
+                    <div>
+                        <span class="text-gray-500 fs-6">Penjual</span>
+                        <p class="font-semibold fs-5">{{ $product->seller->nama_penjual }}</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+
             <!-- Rating -->
             <div class="flex items-center mb-4">
                 <div class="flex text-yellow-400">
                     @for($i = 1; $i <= 5; $i++)
                         @if($i <= round($averageRating))
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
+                        <i class="fas fa-star text-warning"></i> <!-- Bintang penuh -->
                         @else
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                            </svg>
+                            <i class="far fa-star text-warning"></i> <!-- Bintang outline -->
                         @endif
                     @endfor
                 </div>
@@ -106,9 +98,9 @@
                     @if($size->stock > 0)
                     <button onclick="openPurchaseModal('{{ $size->id }}', '{{ $size->size }}', {{ $size->harga }}, {{ $size->stock }}, '{{ $product->id }}')" 
                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg inline-block transition shadow">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
+                            </svg>
                             Beli
                     </button>
                     @else
@@ -122,36 +114,31 @@
         </div>
     </div>
 
-    <!-- Reviews Section -->
-    <div class="mt-12">
+        <div class="mt-12">
         <h2 class="text-2xl font-bold mb-6">Customer Reviews</h2>
         
-        @if($product->purchases->where('rating', '!=', null)->count() > 0)
+        @if($product->ratings->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach($product->purchases->where('rating', '!=', null)->take(4) as $purchase)
+                @foreach($product->ratings->take(4) as $rating)
                     <div class="bg-white p-4 rounded-lg shadow">
                         <div class="flex justify-between items-start mb-2">
                             <div>
-                                <p class="font-semibold">{{ $purchase->user->name ?? 'Anonymous' }}</p>
+                                <p class="font-semibold">{{ $rating->user->name ?? 'Anonymous' }}</p>
                                 <div class="flex text-yellow-400 mt-1">
                                     @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $purchase->rating)
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
+                                        @if($i <= $rating->rating)
+                                        <i class="fas fa-star text-warning"></i> <!-- Bintang penuh -->
                                         @else
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                            </svg>
+                                            <i class="far fa-star text-warning"></i> <!-- Bintang outline -->
                                         @endif
                                     @endfor
                                 </div>
                             </div>
-                            <span class="text-sm text-gray-500">{{ $purchase->updated_at->diffForHumans() }}</span>
+                            <span class="text-sm text-gray-500">{{ $rating->created_at->diffForHumans() }}</span>
                         </div>
                         
-                        @if($purchase->review)
-                            <p class="text-gray-700 mt-2">{{ $purchase->review }}</p>
+                        @if($rating->review)
+                            <p class="text-gray-700 mt-2">{{ $rating->review }}</p>
                         @else
                             <p class="text-gray-500 italic mt-2">No written review</p>
                         @endif

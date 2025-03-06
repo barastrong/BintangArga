@@ -27,9 +27,18 @@
 
                         <!-- Navigation Links -->
                         <div class="md:flex items-center space-x-8">
-                            <a href="{{ route('products.index') }}" class="text-gray-600 hover:text-gray-900 font-medium">Home</a>
-                            <a href="{{ route('shop') }}" class="text-gray-600 hover:text-gray-900 font-medium">Shop</a>
-                            <a href="{{ route('purchases.index') }}" class="text-gray-600 hover:text-gray-900 font-medium">Status Pemsenan</a>
+                            <a href="{{ route('products.index') }}" 
+                            class="text-gray-600 hover:text-gray-900 font-medium border-b-2  hover:border-orange-600 {{ request()->routeIs('products.index') ? 'border-orange-600' : 'border-transparent' }}">
+                                Home
+                            </a>
+                            <a href="{{ route('shop') }}" 
+                            class="text-gray-600 hover:text-gray-900 font-medium border-b-2 hover:border-orange-600 {{ request()->routeIs('shop') ? 'border-orange-600' : 'border-transparent' }}">
+                                Shop
+                            </a>
+                            <a href="{{ route('purchases.index') }}" 
+                            class="text-gray-600 hover:text-gray-900 font-medium border-b-2 border-transparent hover:border-orange-600 focus:border-orange-600 active:border-orange-600">
+                                Status Pemesanan
+                            </a>
                         </div>
 
                         <!-- Auth Links -->
@@ -43,8 +52,7 @@
                             </a>
                         </div>
                     @else
-                            <!-- Add authenticated user menu here -->
-                            <div class="hidden sm:flex sm:items-center sm:ms-6">
+                <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -62,12 +70,12 @@
                         <x-dropdown-link :href="route('cart.index')">
                             Keranjang
                         </x-dropdown-link>
-                        <x-dropdown-link :href="route('products.create')">
-                            Membuat Product
+                        <x-dropdown-link :href="route('seller.dashboard')">
+                            Toko
                         </x-dropdown-link>
-                        <x-dropdown-link :href="route('profile.edit')">
+                        <!-- <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
-                        </x-dropdown-link>
+                        </x-dropdown-link> -->
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">

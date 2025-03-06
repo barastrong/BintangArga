@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Purchase;
 use App\Models\Product;
 use App\Models\Size;
+use App\Models\Rating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -58,12 +59,17 @@ class PurchaseController extends Controller
                 throw new \Exception('Stock tidak mencukupi');
             }
     
+            // Get product to retrieve seller_id
+            $product = Product::findOrFail($request->product_id);
+            $seller_id = $product->seller_id;
+            
             // Calculate total price
             $total_price = $size->harga * $request->quantity;
     
             // Create purchase
             $purchase = Purchase::create([
                 'user_id' => Auth::id(),
+                'seller_id' => $seller_id,
                 'product_id' => $request->product_id,
                 'size_id' => $request->size_id,
                 'quantity' => $request->quantity,
@@ -177,20 +183,45 @@ class PurchaseController extends Controller
                 ->with('error', 'Hanya pembelian yang telah selesai yang dapat diberi rating.');
         }
         
+        // Check if the purchase has already been rated
+        if (isset($purchase->rating)) {
+            return redirect()->back()
+                ->with('error', 'Anda sudah memberikan rating untuk pesanan ini.');
+        }
+        
         // Validate input
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'review' => 'nullable|string|max:500'
         ]);
         
-        // Save the rating and review
-        $purchase->update([
-            'rating' => $validated['rating'],
-            'review' => $validated['review']
-        ]);
-        
-        return redirect()->back()
-            ->with('success', 'Terima kasih! Rating dan ulasan Anda telah disimpan.');
+        try {
+            // Update the purchase with rating information
+            $purchase->update([
+                'rating' => $validated['rating'],
+                'review' => $validated['review'],
+                'has_been_rated' => true
+            ]);
+            
+            // Create or update rating record for product statistics
+            Rating::updateOrCreate(
+                [
+                    'product_id' => $purchase->product_id,
+                    'user_id' => auth()->id(),
+                ],
+                [
+                    'rating' => $validated['rating'],
+                    'review' => $validated['review']
+                ]
+            );
+            
+            return redirect()->back()
+                ->with('success', 'Terima kasih! Rating dan ulasan Anda telah disimpan.');
+                
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function viewCart() 
@@ -253,106 +284,105 @@ class PurchaseController extends Controller
         return response()->json(['count' => $count]);
     }
 
-// Add these methods to your PurchaseController
-
-public function updateCartItem(Request $request, Purchase $purchase)
-{
-    // Check authorization
-    if (Auth::id() !== $purchase->user_id) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
-
-    // Validate request
-    $validated = $request->validate([
-        'quantity' => 'required|integer|min:1'
-    ]);
-
-    // Make sure this is a cart item
-    if ($purchase->status_pembelian !== 'keranjang' || $purchase->status !== 'pending') {
-        return response()->json(['error' => 'This is not a cart item'], 400);
-    }
-
-    // Check stock availability
-    if ($purchase->size->stock < $validated['quantity']) {
-        return response()->json([
-            'error' => 'Stock tidak mencukupi',
-            'available_stock' => $purchase->size->stock
-        ], 400);
-    }
-
-    // Update quantity and total price
-    $purchase->update([
-        'quantity' => $validated['quantity'],
-        'total_price' => $purchase->size->harga * $validated['quantity']
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Quantity updated successfully'
-    ]);
-}
-
-// Add this to your PurchaseController
-
-public function processCheckout(Request $request)
-{
-    $request->validate([
-        'cart_items' => 'required|array',
-        'status' => 'pending',
-        'cart_items.*' => 'exists:purchases,id',
-        'quantities' => 'required|array',
-        'quantities.*' => 'integer|min:1',
-        'shipping_address' => 'required|string',
-        'phone_number' => 'required|string',
-        'payment_method' => 'required|in:gopay,qris,nyicil' // Validate payment method
-    ]);
-
-    try {
-        DB::beginTransaction();
-
-        $cartItems = Purchase::whereIn('id', $request->cart_items)
-            ->where('user_id', Auth::id())
-            ->where('status_pembelian', 'keranjang')
-            ->where('status', 'pending')
-            ->with('size')
-            ->get();
-
-        foreach ($cartItems as $item) {
-            // Get the updated quantity from the request
-            $newQuantity = $request->quantities[$item->id] ?? $item->quantity;
-            
-            // Check stock availability
-            if ($item->size->stock < $newQuantity) {
-                throw new \Exception("Stock untuk {$item->product->nama_barang} - {$item->size->size} tidak mencukupi");
-            }
-
-            // Update stock
-            $item->size->update([
-                'stock' => $item->size->stock - $newQuantity
-            ]);
-
-            // Update purchase with the new quantity and payment method
-            $item->update([
-                'status_pembelian' => 'beli',
-                'shipping_address' => $request->shipping_address,
-                'phone_number' => $request->phone_number,
-                'status'=>$request->status,
-                'quantity' => $newQuantity,
-                'total_price' => $item->size->harga * $newQuantity,
-                'payment_method' => $request->payment_method // Store the selected payment method
-            ]);
+    public function updateCartItem(Request $request, Purchase $purchase)
+    {
+        // Check authorization
+        if (Auth::id() !== $purchase->user_id) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        DB::commit();
+        // Validate request
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
 
-        return redirect()->route('purchases.index')
-            ->with('success', 'Pesanan berhasil diproses');
+        // Make sure this is a cart item
+        if ($purchase->status_pembelian !== 'keranjang' || $purchase->status !== 'keranjang') {
+            return response()->json(['error' => 'This is not a cart item'], 400);
+        }
 
-    } catch (\Exception $e) {
-        DB::rollback();
-        return back()
-            ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
-            ->withInput();
+        // Check stock availability
+        if ($purchase->size->stock < $validated['quantity']) {
+            return response()->json([
+                'error' => 'Stock tidak mencukupi',
+                'available_stock' => $purchase->size->stock
+            ], 400);
+        }
+
+        // Update quantity and total price
+        $purchase->update([
+            'quantity' => $validated['quantity'],
+            'total_price' => $purchase->size->harga * $validated['quantity']
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Quantity updated successfully'
+        ]);
     }
-}
+
+    public function processCheckout(Request $request)
+    {
+        $request->validate([
+            'cart_items' => 'required|array',
+            'cart_items.*' => 'exists:purchases,id',
+            'quantities' => 'required|array',
+            'quantities.*' => 'integer|min:1',
+            'shipping_address' => 'required|string',
+            'phone_number' => 'required|string',
+            'payment_method' => 'required|in:gopay,qris,nyicil' // Validate payment method
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $cartItems = Purchase::whereIn('id', $request->cart_items)
+                ->where('user_id', Auth::id())
+                ->where('status_pembelian', 'keranjang')
+                ->where('status', 'keranjang')
+                ->with(['size', 'product'])
+                ->get();
+
+            foreach ($cartItems as $item) {
+                // Get the updated quantity from the request
+                $newQuantity = $request->quantities[$item->id] ?? $item->quantity;
+                
+                // Check stock availability
+                if ($item->size->stock < $newQuantity) {
+                    throw new \Exception("Stock untuk {$item->product->nama_barang} - {$item->size->size} tidak mencukupi");
+                }
+
+                // Get seller ID from the product
+                $seller_id = $item->product->seller_id;
+
+                // Update stock
+                $item->size->update([
+                    'stock' => $item->size->stock - $newQuantity
+                ]);
+
+                // Update purchase with the new quantity and payment method
+                $item->update([
+                    'status_pembelian' => 'beli',
+                    'shipping_address' => $request->shipping_address,
+                    'phone_number' => $request->phone_number,
+                    'status' => 'pending',
+                    'quantity' => $newQuantity,
+                    'total_price' => $item->size->harga * $newQuantity,
+                    'payment_method' => $request->payment_method,
+                    'seller_id' => $seller_id
+                ]);
+            }
+
+            DB::commit();
+
+            return redirect()->route('purchases.show')
+                ->with('success', 'Pesanan berhasil diproses');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
 }

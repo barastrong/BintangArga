@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Explorasi UMKM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -194,6 +195,18 @@
         .pagination span {
             background-color: white;
         }
+        .seller-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 14px;
+            margin: 8px 0;
+        }
+
+        .seller-info i {
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -226,15 +239,17 @@
             @foreach($products as $product)
             <div class="product-card">
                 <div class="product-image">
-                    <svg class="hanger-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2L12 6M12 6C10.8954 6 10 6.89543 10 8C10 9.10457 10.8954 10 12 10M12 6C13.1046 6 14 6.89543 14 8C14 9.10457 13.1046 10 12 10M12 10L5 18H19L12 10Z"/>
-                    </svg>
+                <i class="fas fa-hanger hanger-icon"></i>
                     <img src="{{ Storage::url($product->sizes->first()->gambar_size) }}" alt="{{ $product->nama_barang }}">
                 </div>
                 <a href="{{ route('products.show', $product->id) }}" class="product-card">
                 <div class="product-info">
                     <h3 class="product-title">{{ $product->nama_barang }}</h3>
                     <p class="product-description">{{ $product->description }}</p>
+                    <div class="seller-info">
+                    <i class="fas fa-user"></i>
+                    <span>{{ $product->seller->nama_penjual }}</span>
+                </div>
                     <div class="rating">
                         <span class="star">★</span>
                         <span class="rating-value">{{ number_format($product->ratings->avg('rating') ?? 0, 1) }}</span>

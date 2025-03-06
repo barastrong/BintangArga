@@ -21,12 +21,23 @@ class Purchase extends Model
         'phone_number',
         'description',
         'status_pembelian',
-        'payment_method'
+        'payment_method',
+        'seller_id'
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    
+    public function seller()
+    {
+        return $this->belongsTo(Seller::class);
+    }
+
+    public function rating()
+    {
+        return $this->belongsTo(Rating::class);
     }
 
     public function product()

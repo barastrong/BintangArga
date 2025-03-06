@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SellerController;
 use App\Http\Controllers\CartController;
 
 
@@ -12,6 +13,26 @@ Route::get('/products/{id}', [ProductController::class, 'show'])->name('products
 Route::get('/shop', [ProductController::class, 'shop'])->name('shop');
 Route::get('/product/create', [ProductController::class, 'create'])->name('products.create');
 Route::post('/product/store', [ProductController::class, 'store'])->name('products.store');
+Route::get('/category/{categoryId}', [ProductController::class, 'category'])->name('products.category');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
+    Route::post('/seller/register', [SellerController::class, 'store'])->name('seller.store');
+    Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
+    Route::get('/seller/edit', [SellerController::class, 'edit'])->name('seller.edit');
+    Route::put('/seller/update', [SellerController::class, 'update'])->name('seller.update');
+    Route::get('/seller/products', [SellerController::class, 'products'])->name('seller.products');
+    
+    // New orders routes
+    Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
+    Route::put('/seller/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.update-status');
+    
+    // Product 
+    Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+    
+});
 
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');

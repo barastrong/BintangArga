@@ -84,19 +84,16 @@
                 @foreach($selectedItems as $item)
                     <!-- Product Item with New Design -->
                     <div class="product-card mb-4" id="item-{{ $item->id }}">
-                        <!-- Add remove button -->
-                        <button type="button" 
-                                class="remove-btn" 
-                                onclick="showRemoveModal({{ $item->id }}, '{{ $item->product->nama_barang }}')">
-                            ×
-                        </button>
-                        
                         <div class="product-image">
                             <img src="{{ Storage::url($item->product->sizes->first()->gambar_size) }}" 
                                  alt="{{ $item->product->nama_barang }}" 
                                  class="object-contain">
                         </div>
-                        
+                        <button type="button" 
+                                class="remove-btn" 
+                                onclick="removeItem({{ $item->id }}, '{{ $item->product->nama_barang }}')">
+                            ×
+                        </button>
                         <div class="product-details">
                             <h3 class="text-lg font-medium">{{ $item->product->nama_barang }}</h3>
                             
@@ -206,27 +203,7 @@
     </div>
 </div>
 
-<!-- Remove Item Modal -->
-<div id="removeModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
-    <div class="bg-white rounded-lg max-w-md w-full p-6">
-        <h3 class="text-lg font-semibold mb-4">Remove Item</h3>
-        <p id="removeModalText" class="mb-6">Are you sure you want to remove this item from your cart?</p>
-        
-        <div class="flex justify-end space-x-3">
-            <button type="button" class="px-4 py-2 border rounded hover:bg-gray-100" onclick="hideRemoveModal()">
-                Cancel
-            </button>
-            <button id="confirmRemoveBtn" type="button" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
-                Remove
-            </button>
-        </div>
-    </div>
-</div>
-
 <script>
-    // Variables to track current item being removed
-    let currentItemId = null;
-    
     // Function to update item quantity
     function updateQuantity(itemId, action) {
         const quantityElement = document.getElementById(`quantity-${itemId}`);
@@ -271,34 +248,8 @@
         });
     }
     
-    // Function to show remove modal
-    function showRemoveModal(itemId, itemName) {
-        currentItemId = itemId;
-        
-        // Set modal text
-        document.getElementById('removeModalText').innerText = 
-            `Are you sure you want to remove "${itemName}" from your cart?`;
-        
-        // Show modal
-        document.getElementById('removeModal').classList.remove('hidden');
-        
-        // Set up confirm button
-        document.getElementById('confirmRemoveBtn').onclick = function() {
-            removeItem(currentItemId);
-        };
-    }
-    
-    // Function to hide remove modal
-    function hideRemoveModal() {
-        document.getElementById('removeModal').classList.add('hidden');
-        currentItemId = null;
-    }
-    
-    // Function to remove item
-    function removeItem(itemId) {
-        // Hide modal
-        hideRemoveModal();
-        
+    // Function to remove item from the checkout page (without changing status in database)
+    function removeItem(itemId, itemName) {
         // Remove item from DOM
         const itemElement = document.getElementById(`item-${itemId}`);
         const inputElement = document.getElementById(`input-item-${itemId}`);
@@ -311,20 +262,10 @@
         // Update subtotal
         updateSubtotal();
         
-        // Send AJAX request to remove from cart
-        fetch(`/cart/remove/${itemId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        }).catch(error => {
-            console.error('Error removing item:', error);
-        });
-        
-        // Check if cart is empty
+        // Check if checkout is empty
         const cartItems = document.querySelectorAll('[id^="item-"]');
         if (cartItems.length === 0) {
-            // Redirect to cart page if no items left
+            // Redirect to cart page if no items left in checkout
             window.location.href = "{{ route('cart.index') }}";
         }
     }
@@ -350,13 +291,6 @@
     function formatNumber(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
-    
-    // Close modal when clicking outside
-    document.getElementById('removeModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            hideRemoveModal();
-        }
-    });
     
     // Add event listeners for payment method selection
     document.querySelectorAll('.payment-option').forEach(option => {

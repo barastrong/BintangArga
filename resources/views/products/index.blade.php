@@ -39,7 +39,7 @@
         .hero-section {
             position: relative;
             height: 300px;
-            background-image: url('/storage/banner.png');
+            background-image: url('/banner.png');
             background-size: cover;
             background-position: center;
             color: white;
@@ -133,15 +133,39 @@
             }
         }
 
-        /* Products Grid */
+        /* Products Grid - Updated for horizontal scrolling */
+        .products-container {
+            position: relative;
+            padding: 0 20px;
+        }
+
         .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px 0;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: #FF9800 #f1f1f1;
+        }
+
+        .products-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .products-grid::-webkit-scrollbar-thumb {
+            background-color: #FF9800;
+            border-radius: 20px;
+        }
+
+        .products-grid::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            border-radius: 20px;
         }
 
         .product-card {
+            flex: 0 0 200px;
             border: 1px solid #eee;
             padding: 15px;
             border-radius: 8px;
@@ -179,15 +203,39 @@
             margin-top: 5px;
         }
 
-        /* Discount Categories Section */
+        /* Discount Categories Section - Updated for horizontal scrolling */
+        .discount-container {
+            position: relative;
+            padding: 0 20px;
+        }
+        
         .discount-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px 0;
+            gap: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: #FF9800 #f1f1f1;
+        }
+        
+        .discount-grid::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .discount-grid::-webkit-scrollbar-thumb {
+            background-color: #FF9800;
+            border-radius: 20px;
+        }
+        
+        .discount-grid::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            border-radius: 20px;
         }
 
         .discount-card {
+            flex: 0 0 250px;
             position: relative;
             height: 200px;
             overflow: hidden;
@@ -225,6 +273,39 @@
             font-size: 18px;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+        
+        /* Scroll buttons */
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 152, 0, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+        
+        .scroll-btn:hover {
+            opacity: 1;
+        }
+        
+        .scroll-left {
+            left: 5px;
+        }
+        
+        .scroll-right {
+            right: 5px;
         }
 
         /* Location Section */
@@ -324,26 +405,38 @@
     </div>
 </div>
 
-<!-- Discount Categories Section -->
+<!-- Discount Categories Section - Updated with container and scroll buttons -->
 <section>
     <h1>Category</h1>
-    <div class="discount-grid">
-        <!-- Use categories as discount sections -->
-        @foreach($categories as $category)
-        <a href="" class="discount-card">
-            <img src="{{ $category->gambar }}" alt="{{ $category->nama }}">
-            <div class="overlay">
-                <h3>{{ $category->nama }}</h3>
-            </div>
-        </a>
-        @endforeach
+    <div class="discount-container">
+        <button class="scroll-btn scroll-left" onclick="scrollContainer('discount-grid', 'left')">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="discount-grid" id="discount-grid">
+            <!-- Use categories as discount sections -->
+            @foreach($categories as $category)
+            <a href="{{ route('products.category', $category->id) }}" class="discount-card">
+                <img src="{{ $category->gambar }}" alt="{{ $category->nama }}">
+                <div class="overlay">
+                    <h3>{{ $category->nama }}</h3>
+                </div>
+            </a>
+            @endforeach
+        </div>
+        <button class="scroll-btn scroll-right" onclick="scrollContainer('discount-grid', 'right')">
+            <i class="fas fa-chevron-right"></i>
+        </button>
     </div>
 </section>
 
-<!-- Favorite Products Section -->
-    <section>
-        <h1>Barang Favorit Kami</h1>
-        <div class="products-grid">
+<!-- Favorite Products Section - Updated with container and scroll buttons -->
+<section>
+    <h1>Barang Favorit Kami</h1>
+    <div class="products-container">
+        <button class="scroll-btn scroll-left" onclick="scrollContainer('products-grid', 'left')">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="products-grid" id="products-grid">
             @foreach($products as $product)
             <a href="{{ route('products.show', $product->id) }}" class="product-card">
                 <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
@@ -351,7 +444,7 @@
                 <p>{{ Str::limit($product->description, 50) }}</p>
                 <div class="seller-info">
                     <i class="fas fa-user"></i>
-                    <span>{{ $product->user->name }}</span>
+                    <span>{{ $product->seller->nama_penjual }}</span>
                 </div>
                 <div class="rating">
                     @php
@@ -369,28 +462,51 @@
             </a>
             @endforeach
         </div>
-    </section>
+        <button class="scroll-btn scroll-right" onclick="scrollContainer('products-grid', 'right')">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+</section>
 
+<!-- Location Section -->
+<section class="location-section" id="Locate">
+    <div class="map">
+        <h2>Lokasi Kantor Kami</h2>
+        <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.9871065035472!2d112.72276627605149!3d-7.466674473607052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e6d71181af21%3A0x4232ab0204ccbfe5!2sSMK%20TELKOM%20Sidoarjo!5e0!3m2!1sid!2sid!4v1740023359217!5m2!1sid!2sid"
+            width="100%"
+            height="350"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy">
+        </iframe>
+    </div>
+    <div class="address">
+        <h3>SMK Telkom Sidoarjo</h3>
+        <p>Sekardangan</p>
+        <p>RT 00 RW 99</p>
+    </div>
+</section>
 
-    <!-- Location Section -->
-    <section class="location-section" id="Locate">
-        <div class="map">
-            <h2>Lokasi Kantor Kami</h2>
-            <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.9871065035472!2d112.72276627605149!3d-7.466674473607052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e6d71181af21%3A0x4232ab0204ccbfe5!2sSMK%20TELKOM%20Sidoarjo!5e0!3m2!1sid!2sid!4v1740023359217!5m2!1sid!2sid"
-                width="100%"
-                height="350"
-                style="border:0;"
-                allowfullscreen=""
-                loading="lazy">
-            </iframe>
-        </div>
-        <div class="address">
-            <h3>SMK Telkom Sidoarjo</h3>
-            <p>Sekardangan</p>
-            <p>RT 00 RW 99</p>
-        </div>
-    </section>
+<!-- Script for horizontal scrolling -->
+<script>
+    function scrollContainer(containerId, direction) {
+        const container = document.getElementById(containerId);
+        const scrollAmount = 300; // Adjust scroll amount as needed
+        
+        if (direction === 'left') {
+            container.scrollBy({
+                left: -scrollAmount,
+                behavior: 'smooth'
+            });
+        } else {
+            container.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    }
+</script>
 </body>
 </html>
 @endsection
