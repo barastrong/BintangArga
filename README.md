@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Must Download
+## Downloaded
 - Seeder
   ```
   php artisan db:seed --class=CategorySeeder
@@ -15,6 +15,16 @@
 - Npm Install && Npm Run Dev
   ```
   npm install && npm run dev
+  ```
+
+- Composer install
+  ```
+  composer install
+  ```
+## Jika di perlukan
+- Key
+  ```
+  php artisan key:generate
   ```
 
 ## About Laravel
