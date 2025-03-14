@@ -191,7 +191,7 @@
                         <label class="block text-gray-700 font-medium mb-2">Jumlah</label>
                         <div class="flex items-center space-x-4">
                             <div class="flex items-center border rounded">
-                                <button type="button" onclick="updateQuantity(-1)" class="px-3 py-1 border-r hover:bg-gray-100">-</button>
+                                <button type="button" onclick="updateQuantity(-1)" class="px-3 py-1 border-r hover:bg-gray-100 ">-</button>
                                 <input type="number" id="quantity" name="quantity" value="1" min="1" 
                                        class="w-16 text-center px-2 py-1 focus:outline-none" readonly>
                                 <button type="button" onclick="updateQuantity(1)" class="px-3 py-1 border-l hover:bg-gray-100">+</button>
