@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CartController;
 
 
@@ -22,7 +23,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/seller/edit', [SellerController::class, 'edit'])->name('seller.edit');
     Route::put('/seller/update', [SellerController::class, 'update'])->name('seller.update');
     Route::get('/seller/products', [SellerController::class, 'products'])->name('seller.products');
-    
+
     // New orders routes
     Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
     Route::put('/seller/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.update-status');
@@ -39,6 +40,14 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store');
     Route::get('/purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::post('/purchase/{purchase}/rate', [PurchaseController::class, 'rate'])->name('purchases.rate');
+
+    // Admin Route
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
+    Route::get('/admin/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.view');
+    Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
+    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
 
     // Carts Route
     Route::get('/cart', [PurchaseController::class, 'viewCart'])->name('cart.index');

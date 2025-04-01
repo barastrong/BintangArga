@@ -67,26 +67,35 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('cart.index')">
-                            Keranjang
-                        </x-dropdown-link>
-                        <x-dropdown-link :href="route('seller.dashboard')">
-                            Toko
-                        </x-dropdown-link>
-                        <!-- <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link> -->
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                            @if (Auth::user()->role === 'admin')
+                            <x-dropdown-link :href="route('cart.index')">
+                                Keranjang
                             </x-dropdown-link>
-                        </form>
+                            <x-dropdown-link :href="route('seller.dashboard')">
+                                Toko
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('admin.index')">
+                                Admin
+                            </x-dropdown-link>
+                            @else
+                            <x-dropdown-link :href="route('cart.index')">
+                                Keranjang
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('seller.dashboard')">
+                                Toko
+                            </x-dropdown-link>
+                            @endif
+                            <x-dropdown-link :href="route('profile.edit')">
+                                Profile
+                            </x-dropdown-link>
+                            <!-- Logout Form -->
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')"
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
                     </x-slot>
                 </x-dropdown>
             </div>
