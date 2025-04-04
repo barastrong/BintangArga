@@ -240,7 +240,7 @@
             <div class="product-card">
                 <div class="product-image">
                 <i class="fas fa-hanger hanger-icon"></i>
-                    <img src="{{ Storage::url($product->sizes->first()->gambar_size) }}" alt="{{ $product->nama_barang }}">
+                <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
                 </div>
                 <a href="{{ route('products.show', $product->id) }}" class="product-card">
                 <div class="product-info">

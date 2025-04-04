@@ -5,8 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         [x-cloak] { display: none !important; }
+        /* Fix alignment issues between icon and text */
+        .nav-link {
+            display: flex;
+            align-items: center;
+        }
+        .nav-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+        }
     </style>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -37,9 +50,7 @@
                 <div class="absolute top-0 right-0 -mr-12 pt-2">
                     <button @click="sidebarOpen = false" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
                         <span class="sr-only">Close sidebar</span>
-                        <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <i class="fas fa-times text-white"></i>
                     </button>
                 </div>
                 
@@ -48,16 +59,22 @@
                         <span class="text-2xl font-bold text-orange-600">Admin Panel</span>
                     </div>
                     <nav class="mt-5 px-2 space-y-1">
-                        <a href="{{ route('admin.index') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('admin.index') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                            <svg class="mr-4 h-6 w-6 {{ request()->routeIs('admin.index') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
+                        <a href="{{ route('products.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('products.index') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-4 {{ request()->routeIs('products.index') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-home"></i>
+                            </span>
+                            Home
+                        </a>
+                        <a href="{{ route('admin.index') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('admin.index') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-4 {{ request()->routeIs('admin.index') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-users"></i>
+                            </span>
                             Users
                         </a>
-                        <a href="{{ route('admin.products') }}" class="group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('admin.products') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                            <svg class="mr-4 h-6 w-6 {{ request()->routeIs('admin.products') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
+                        <a href="{{ route('admin.products') }}" class="nav-link group flex items-center px-2 py-2 text-base font-medium rounded-md {{ request()->routeIs('admin.products') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-4 {{ request()->routeIs('admin.products') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-box"></i>
+                            </span>
                             Products
                         </a>
                     </nav>
@@ -92,16 +109,22 @@
                         <span class="text-2xl font-bold text-orange-600">Admin Panel</span>
                     </div>
                     <nav class="mt-5 flex-1 px-2 bg-white space-y-1">
-                        <a href="{{ route('admin.index') }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.index') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                            <svg class="mr-3 flex-shrink-0 h-6 w-6 {{ request()->routeIs('admin.index') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                            </svg>
+                        <a href="{{ route('products.index') }}" class="nav-link group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('products.index') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-3 flex-shrink-0 {{ request()->routeIs('products.index') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-home"></i>
+                            </span>
+                            Home
+                        </a>
+                        <a href="{{ route('admin.index') }}" class="nav-link group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.index') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-3 flex-shrink-0 {{ request()->routeIs('admin.index') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-users"></i>
+                            </span>
                             Users
                         </a>
-                        <a href="{{ route('admin.products') }}" class="group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.products') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
-                            <svg class="mr-3 flex-shrink-0 h-6 w-6 {{ request()->routeIs('admin.products') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                            </svg>
+                        <a href="{{ route('admin.products') }}" class="nav-link group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.products') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-3 flex-shrink-0 {{ request()->routeIs('admin.products') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-box"></i>
+                            </span>
                             Products
                         </a>
                     </nav>
@@ -129,9 +152,7 @@
             <div class="sticky top-0 z-10 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-white">
                 <button @click="sidebarOpen = true" class="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500">
                     <span class="sr-only">Open sidebar</span>
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
             

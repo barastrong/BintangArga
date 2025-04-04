@@ -41,13 +41,15 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::post('/purchase/{purchase}/rate', [PurchaseController::class, 'rate'])->name('purchases.rate');
 
-    // Admin Route
+    // Admin Routes
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
+    Route::get('/admin/products/search', [ProductController::class, 'searchProduct'])->name('admin.products.search');
+    Route::get('/admin/users/search', [AdminController::class, 'searchUsers'])->name('admin.users.search');
     Route::get('/admin/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.view');
     Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
     Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
-    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete'); 
 
     // Carts Route
     Route::get('/cart', [PurchaseController::class, 'viewCart'])->name('cart.index');
