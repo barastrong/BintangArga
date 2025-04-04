@@ -22,6 +22,7 @@
     body {
         background-color: #f5f5f5;
         font-family: 'Inter', sans-serif;
+        text-decoration: none;
         margin: 0;
         padding: 0;
     }
@@ -54,84 +55,6 @@
     .btn-orange:hover {
         background-color: var(--orange-secondary);
         transform: translateY(-2px);
-    }
-    
-    .progress-container {
-        margin-bottom: 40px;
-    }
-    
-    .progress-steps {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-        margin-top: 30px;
-    }
-    
-    .progress-line {
-        position: absolute;
-        top: 25px;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-color: #e9ecef;
-        z-index: 1;
-    }
-    
-    .progress-line-active {
-        position: absolute;
-        top: 25px;
-        left: 0;
-        height: 2px;
-        background-color: var(--orange-primary);
-        z-index: 2;
-        width: 33%;
-    }
-    
-    .step {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: white;
-        border: 2px solid #e9ecef;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        position: relative;
-        z-index: 3;
-    }
-    
-    .step.active {
-        background-color: var(--orange-primary);
-        border-color: var(--orange-primary);
-        color: white;
-    }
-    
-    .step.completed {
-        background-color: var(--orange-primary);
-        border-color: var(--orange-primary);
-        color: white;
-    }
-    
-    .step-label {
-        position: absolute;
-        top: 60px;
-        font-size: 14px;
-        font-weight: 500;
-        color: #6c757d;
-        width: 100px;
-        text-align: center;
-        margin-left: -25px;
-    }
-    
-    .step.active .step-label {
-        color: var(--orange-primary);
-        font-weight: 600;
-    }
-    
-    .step.completed .step-label {
-        color: var(--orange-primary);
-        font-weight: 600;
     }
     
     .form-container {
@@ -233,30 +156,6 @@
             <div class=" align-items-center">
                 <h2 class="text-orange fw-bold mb-0">Edit Produk</h2>
                 <p class="mb-5">Lengkapi informasi produk Anda di bawah ini</p>
-            </div>
-            
-            <!-- Progress Steps -->
-            <div class="progress-container">
-                <div class="progress-steps">
-                    <div class="step completed">
-                        <span>1</span>
-                        <div class="step-label">Info Toko</div>
-                    </div>
-                    <div class="progress-line"></div>
-                    <div class="progress-line-active" style="width: 33%;"></div>
-                    <div class="step active">
-                        <span>2</span>
-                        <div class="step-label">Produk</div>
-                    </div>
-                    <div class="step">
-                        <span>3</span>
-                        <div class="step-label">Harga</div>
-                    </div>
-                    <div class="step">
-                        <span>4</span>
-                        <div class="step-label">Selesai</div>
-                    </div>
-                </div>
             </div>
             
             @if ($errors->any())

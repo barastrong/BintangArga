@@ -11,363 +11,341 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <style>
+    /* Main Layout & Typography */
 :root {
-    --orange-primary: #FF6B35;
-    --orange-light: #FFE0D3;
-    --orange-hover: #FF5722;
-    --orange-ultra-light: #FFF5F0;
-    --dark-text: #2D3748;
-    --gray-light: #F8FAFC;
-    --border-radius: 12px;
-    --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  --primary-color: #ff7a30;
+  --primary-dark: #e65a00;
+  --secondary-color: #3b5998;
+  --light-gray: #f5f7fa;
+  --border-color: #e4e9f0;
+  --success: #38b653;
+  --danger: #e53e3e;
+  --text-dark: #333333;
+  --text-muted: #6c757d;
+  --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
+  --border-radius: 8px;
 }
 
 body {
-    background-color: #FAFAFA;
-    font-family: 'Poppins', sans-serif;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-dark);
+  background-color: #f8f9fc;
+  line-height: 1.6;
 }
 
 .main-container {
-    max-width: 1080px;
-    margin: 40px auto;
-    padding: 0 20px;
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 15px;
 }
 
+/* Form Card Styling */
 .form-card {
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    border: none;
-    overflow: hidden;
-    transition: all 0.4s ease;
-    background-color: #ffffff;
+  background-color: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 30px;
+  overflow: hidden;
 }
 
 .form-card-header {
-    padding: 35px 40px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(to right, rgba(255, 107, 53, 0.03), rgba(255, 107, 53, 0.01));
-}
-
-.form-card-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 6px;
-    height: 100%;
-    background: linear-gradient(to bottom, var(--orange-primary), var(--orange-hover));
-}
-
-.form-control, .form-select {
-    border-radius: 10px;
-    padding: 14px 18px;
-    font-size: 14px;
-    border: 1px solid #E2E8F0;
-    background-color: var(--gray-light);
-    transition: all 0.3s ease;
-    font-weight: 400;
-}
-
-.form-control:focus, .form-select:focus {
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.15);
-    border-color: var(--orange-primary);
-    background-color: #fff;
-}
-
-.section-divider {
-    display: flex;
-    align-items: center;
-    margin: 35px 0;
-}
-
-.section-divider::before,
-.section-divider::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, rgba(226, 232, 240, 0.5), rgba(226, 232, 240, 1), rgba(226, 232, 240, 0.5));
-}
-
-.section-divider .section-icon {
-    padding: 0 20px;
-}
-
-.section-icon {
-    background: linear-gradient(135deg, var(--orange-ultra-light), white);
-    color: var(--orange-primary);
-    width: 54px;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.12);
-    border: 2px solid rgba(255, 107, 53, 0.1);
-}
-
-.dropzone-container {
-    border: 2px dashed #E2E8F0;
-    transition: all 0.3s ease;
-    border-radius: var(--border-radius);
-    background-color: var(--gray-light);
-}
-
-.dropzone-container:hover {
-    border-color: var(--orange-primary);
-    background-color: var(--orange-ultra-light);
-}
-
-.size-details {
-    display: none;
-    transition: all 0.3s ease;
-}
-
-.size-details.active {
-    display: block;
-    animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.size-card {
-    transition: all 0.3s ease;
-    border-radius: var(--border-radius);
-    border: 1px solid #E2E8F0;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
-}
-
-.size-card.active {
-    border-color: var(--orange-primary);
-    box-shadow: 0 5px 20px rgba(255, 107, 53, 0.15);
-    transform: translateY(-3px);
-}
-
-.size-card .card-header {
-    background-color: #fff;
-    transition: all 0.3s ease;
-    border-bottom: 1px solid #E2E8F0;
-    padding: 16px 20px;
-}
-
-.size-card.active .card-header {
-    background: linear-gradient(to right, var(--orange-ultra-light), white);
-    border-bottom: 1px solid var(--orange-light);
-}
-
-/* Custom form switch for orange color */
-.form-check-input:checked {
-    background-color: var(--orange-primary);
-    border-color: var(--orange-primary);
-}
-
-.form-switch .form-check-input {
-    height: 1.5em;
-    width: 3em;
-}
-
-.btn-orange {
-    background: linear-gradient(45deg, var(--orange-primary), var(--orange-hover));
-    border: none;
-    color: white;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    padding: 14px 32px;
-    border-radius: 10px;
-}
-
-.btn-orange:hover {
-    background: linear-gradient(45deg, var(--orange-hover), var(--orange-primary));
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(255, 107, 53, 0.25);
-}
-
-.btn-light {
-    background-color: #EDF2F7;
-    border: none;
-    color: #4A5568;
-    font-weight: 500;
-    padding: 14px 32px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.btn-light:hover {
-    background-color: #E2E8F0;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.form-label {
-    font-weight: 500;
-    margin-bottom: 10px;
-    color: #4A5568;
-    font-size: 14px;
-    letter-spacing: 0.3px;
+  background-color: #fff;
+  padding: 25px 30px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .page-title {
-    background: linear-gradient(45deg, var(--orange-primary), #FF9671);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    font-size: 28px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
 }
 
-.upload-icon {
-    color: var(--orange-primary);
-}
-
-.alert {
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.input-group-text {
-    background: linear-gradient(to right, var(--orange-ultra-light), white);
-    color: var(--orange-primary);
-    border: 1px solid #E2E8F0;
-    border-right: 0;
-    font-weight: 500;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    padding: 0 16px;
-}
-
-.input-group .form-control {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.progress-container {
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
-
-.progress-steps {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.progress-steps::before {
-    content: '';
-    position: absolute;
-    top: 15px;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(to right, 
-        var(--orange-primary) 25%, 
-        #E2E8F0 25%, #E2E8F0 100%);
-    z-index: 1;
-    border-radius: 10px;
-}
-
-.step {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.step-circle {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background-color: #E2E8F0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 8px;
-    color: #4A5568;
-    transition: all 0.3s ease;
-    font-weight: 600;
-    font-size: 14px;
-}
-
-.step.active .step-circle {
-    background: linear-gradient(135deg, var(--orange-primary), var(--orange-hover));
-    color: white;
-    box-shadow: 0 0 0 5px var(--orange-ultra-light);
-}
-
-.step.completed .step-circle {
-    background: linear-gradient(135deg, var(--orange-primary), var(--orange-hover));
-    color: white;
-    box-shadow: 0 0 0 5px var(--orange-ultra-light);
-}
-
-.step-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #718096;
-}
-
-.step.active .step-label {
-    color: var(--orange-primary);
-    font-weight: 600;
-}
-
-.cursor-pointer {
-    cursor: pointer;
-}
-
-.is-invalid {
-    border-color: #FC8181 !important;
-    background-image: none !important;
-}
-
-.invalid-feedback {
-    display: none;
-    color: #E53E3E;
-    font-size: 12px;
-    margin-top: 4px;
-}
-
-.tag-label {
-    display: inline-block;
-    background: linear-gradient(to right, var(--orange-ultra-light), white);
-    color: var(--orange-primary);
-    padding: 4px 12px;
-    border-radius: 50px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-left: 10px;
-    border: 1px solid rgba(255, 107, 53, 0.2);
-}
-
-.preview-image-container {
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.preview-image-container img {
-    transition: all 0.3s ease;
-}
-
-.preview-image-container:hover img {
-    transform: scale(1.05);
+.text-muted {
+  color: var(--text-muted);
 }
 
 .card-body {
-    background: linear-gradient(to bottom right, white, rgba(255, 255, 255, 0.8));
+  padding: 30px;
+}
+
+/* Section Dividers */
+.section-divider {
+  display: flex;
+  align-items: center;
+  margin: 35px 0 20px;
+  position: relative;
+}
+
+.section-divider::before {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--border-color);
+  margin-right: 15px;
+}
+
+.section-divider::after {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background-color: var(--border-color);
+  margin-left: 15px;
+}
+
+.section-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--light-gray);
+  border-radius: 50%;
+  color: var(--primary-color);
+}
+
+/* Form Elements */
+.form-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-dark);
+  display: block;
+}
+
+.tag-label {
+  font-size: 0.7rem;
+  background-color: rgba(255, 122, 48, 0.1);
+  color: var(--primary-color);
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-left: 5px;
+  font-weight: 500;
+}
+
+.form-control, .form-select {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 12px;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 122, 48, 0.15);
+  outline: none;
+}
+
+.input-group {
+  display: flex;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.input-group-text {
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  background-color: var(--light-gray);
+  border: 1px solid var(--border-color);
+  border-right: none;
+  color: var(--text-muted);
+}
+
+.input-group .form-control {
+  box-shadow: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Image Upload */
+.dropzone-container {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 25px 20px;
+  background-color: var(--light-gray);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.dropzone-container:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(255, 122, 48, 0.05);
+}
+
+.upload-icon {
+  color: var(--primary-color);
+}
+
+.preview-image-container {
+  display: flex;
+  justify-content: center;
 }
 
 .img-thumbnail {
-    border-radius: 10px;
-    border: 2px solid rgba(255, 107, 53, 0.1);
+  max-height: 150px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+/* Size Cards */
+.size-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.size-card.active {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(255, 122, 48, 0.1);
+}
+
+.card-header {
+  background-color: var(--light-gray);
+  border-bottom: 1px solid var(--border-color);
+  padding: 15px 20px;
+}
+
+.size-details {
+  display: none;
+  padding: 20px;
+}
+
+.size-details.active {
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Switch */
+.form-check-input {
+  cursor: pointer;
+  width: 45px;
+  height: 22px;
+  appearance: none;
+  position: relative;
+  border-radius: 20px;
+  background-color: #ddd;
+  transition: all 0.3s;
+}
+
+.form-check-input:checked {
+  background-color: var(--success);
+}
+
+.form-check-input::before {
+  content: "";
+  position: absolute;
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  border-radius: 50%;
+  background-color: white;
+  transition: all 0.3s;
+}
+
+.form-check-input:checked::before {
+  transform: translateX(23px);
+}
+
+.form-check-label {
+  cursor: pointer;
+}
+
+/* Buttons */
+.btn {
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: all 0.3s;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  border: none;
+}
+
+.btn-orange {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-orange:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 122, 48, 0.25);
+}
+
+.btn-light {
+  background-color: var(--light-gray);
+  color: var(--text-dark);
+}
+
+.btn-light:hover {
+  background-color: #e9ecef;
+}
+
+/* Alert Styling */
+.alert {
+  padding: 15px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+}
+
+.alert-danger {
+  background-color: #fff5f5;
+  border-left: 5px solid var(--danger);
+}
+
+/* Validation Feedback */
+.invalid-feedback {
+  display: none;
+  color: var(--danger);
+  font-size: 0.8rem;
+  margin-top: 5px;
+}
+
+.is-invalid {
+  border-color: var(--danger) !important;
+}
+
+.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.15) !important;
+}
+
+/* Badges */
+.badge {
+  padding: 5px 10px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  border-radius: 15px;
+}
+
+.bg-success {
+  background-color: var(--success) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-body {
+    padding: 20px 15px;
+  }
+  
+  .section-divider h5 {
+    font-size: 1rem;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
 }
 </style>
 <body>
@@ -376,28 +354,6 @@ body {
         <div class="form-card-header">
             <h2 class="page-title mb-1">Tambah Produk Baru</h2>
             <p class="text-muted mb-0">Lengkapi informasi produk Anda di bawah ini</p>
-            
-            <!-- Progress Steps -->
-            <div class="progress-container">
-                <div class="progress-steps">
-                    <div class="step completed">
-                        <div class="step-circle"><i class="fas fa-check"></i></div>
-                        <span class="step-label">Info Toko</span>
-                    </div>
-                    <div class="step active">
-                        <div class="step-circle">2</div>
-                        <span class="step-label">Produk</span>
-                    </div>
-                    <div class="step">
-                        <div class="step-circle">3</div>
-                        <span class="step-label">Harga</span>
-                    </div>
-                    <div class="step">
-                        <div class="step-circle">4</div>
-                        <span class="step-label">Selesai</span>
-                    </div>
-                </div>
-            </div>
         </div>
         <div class="card-body p-md-5 p-4">
             @if ($errors->any())
@@ -427,9 +383,9 @@ body {
                 
                 <div class="row g-4 mt-2">
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="form-group">
                             <label for="category_id" class="form-label">Kategori <span class="tag-label">Wajib</span></label>
-                            <select name="category_id" id="category_id" class="form-select shadow-none" required>
+                            <select name="category_id" id="category_id" class="form-select" required>
                                 <option value="">Pilih Kategori</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->nama }}</option>
@@ -437,36 +393,36 @@ body {
                             </select>
                         </div>
 
-                        <div class="form-group mb-3">
+                        <div class="form-group">
                             <label for="nama_barang" class="form-label">Nama Barang <span class="tag-label">Wajib</span></label>
-                            <input type="text" name="nama_barang" id="nama_barang" class="form-control shadow-none" placeholder="Masukkan nama produk" required>
+                            <input type="text" name="nama_barang" id="nama_barang" class="form-control" placeholder="Masukkan nama produk" required>
                         </div>
 
-                        <div class="form-group mb-3">
+                        <div class="form-group">
                             <label for="description" class="form-label">Deskripsi <span class="tag-label">Wajib</span></label>
-                            <textarea name="description" id="description" class="form-control shadow-none" rows="4" placeholder="Jelaskan detail produk Anda" required></textarea>
+                            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Jelaskan detail produk Anda" required></textarea>
                         </div>
                     </div>
 
                     <div class="col-md-6">
-                        <div class="form-group mb-3">
+                        <div class="form-group">
                             <label for="lokasi" class="form-label">Lokasi Toko <span class="tag-label">Wajib</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </span>
-                                <input type="text" name="lokasi" id="lokasi" class="form-control shadow-none" placeholder="Kota atau provinsi" required>
+                                <input type="text" name="lokasi" id="lokasi" class="form-control" placeholder="Kota atau provinsi" required>
                             </div>
                         </div>
 
-                        <div class="form-group mb-3">
+                        <div class="form-group">
                             <label for="alamat_lengkap" class="form-label">Alamat Lengkap <span class="tag-label">Wajib</span></label>
-                            <textarea name="alamat_lengkap" id="alamat_lengkap" class="form-control shadow-none" rows="2" placeholder="Alamat lengkap toko Anda" required></textarea>
+                            <textarea name="alamat_lengkap" id="alamat_lengkap" class="form-control" rows="3" placeholder="Alamat lengkap toko Anda" required></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="gambar" class="form-label">Gambar Produk <span class="tag-label">Wajib</span></label>
-                            <div class="dropzone-container p-4 text-center">
+                            <div class="dropzone-container text-center">
                                 <input type="file" name="gambar" id="gambar" class="form-control d-none" accept="image/*" hidden required>
                                 <label for="gambar" class="d-block cursor-pointer mb-2">
                                     <div class="upload-icon mb-3">
@@ -515,7 +471,7 @@ body {
                                             <div class="input-group">
                                                 <span class="input-group-text">Rp</span>
                                                 <input type="number" name="sizes[{{ $size }}][harga]" 
-                                                       id="harga_{{ $size }}" class="form-control shadow-none" 
+                                                       id="harga_{{ $size }}" class="form-control" 
                                                        data-size="{{ $size }}" min="0" placeholder="0">
                                             </div>
                                             <div class="invalid-feedback" id="harga_feedback_{{ $size }}">
@@ -531,7 +487,7 @@ body {
                                                     <i class="fas fa-boxes"></i>
                                                 </span>
                                                 <input type="number" name="sizes[{{ $size }}][stock]" 
-                                                       id="stock_{{ $size }}" class="form-control shadow-none" 
+                                                       id="stock_{{ $size }}" class="form-control" 
                                                        data-size="{{ $size }}" min="0" placeholder="0">
                                             </div>
                                             <div class="invalid-feedback" id="stock_feedback_{{ $size }}">
