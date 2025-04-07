@@ -56,9 +56,9 @@ body {
 }
 
 .page-title {
-  font-size: 1.5rem;
+  font-size: 43px;
   font-weight: 600;
-  color: var(--text-dark);
+  color: var(--primary-color);
   margin-bottom: 8px;
 }
 
@@ -248,7 +248,7 @@ body {
   height: 18px;
   width: 18px;
   left: 2px;
-  bottom: 2px;
+  bottom: 1px;
   border-radius: 50%;
   background-color: white;
   transition: all 0.3s;
