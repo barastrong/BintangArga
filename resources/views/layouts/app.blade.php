@@ -85,7 +85,7 @@
                                 Toko
                             </x-dropdown-link>
                             @endif
-                            <x-dropdown-link :href="route('profile.edit')">
+                            <x-dropdown-link :href="route('profile.index')">
                                 Profile
                             </x-dropdown-link>
                             <!-- Logout Form -->
