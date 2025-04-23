@@ -22,30 +22,24 @@ class ProductApiController extends Controller
      */
     public function index(Request $request)
     {
-        // Query builder untuk products
         $query = Product::with(['category', 'sizes', 'ratings', 'user']);
 
-        // Filter berdasarkan lokasi jika ada
         if ($request->has('lokasi')) {
             $query->where('lokasi', $request->lokasi);
         }
 
-        // Filter berdasarkan kategori jika ada
         if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        // Search berdasarkan nama barang
         if ($request->has('search')) {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
 
-        // Sorting
         $sortField = $request->get('sort_by', 'created_at');
         $sortDirection = $request->get('sort_direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        // Pagination
         $perPage = $request->get('per_page', 10);
         $products = $query->paginate($perPage);
 
@@ -99,7 +93,6 @@ class ProductApiController extends Controller
             ]);
     
             foreach ($request->sizes as $index => $sizeData) {
-                // Access the file using the index from the request
                 $sizeImage = $request->file("sizes.{$index}.gambar");
                 $gambarSizePath = $sizeImage->store('sizes', 'public');
                 
@@ -123,7 +116,6 @@ class ProductApiController extends Controller
         } catch (\Exception $e) {
             DB::rollback();
             
-            // Delete uploaded image if there's an error
             if(isset($gambarPath)) {
                 Storage::disk('public')->delete($gambarPath);
             }
@@ -131,7 +123,7 @@ class ProductApiController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating product',
-                'error' => $e->getMessage()  // This will help debug the specific error
+                'error' => $e->getMessage() 
             ], 500);
         }
     }
@@ -183,7 +175,6 @@ class ProductApiController extends Controller
             
             $product = Product::findOrFail($id);
             
-            // Optional: Check if the current user is the owner of the product
             if (Auth::check()) {
                 $seller = Seller::where('user_id', Auth::id())->first();
                 
@@ -195,7 +186,6 @@ class ProductApiController extends Controller
                 }
             }
             
-            // Delete all sizes and their images
             foreach ($product->sizes as $size) {
                 if ($size->gambar_size) {
                     Storage::disk('public')->delete($size->gambar_size);
@@ -203,12 +193,10 @@ class ProductApiController extends Controller
                 $size->delete();
             }
             
-            // Delete product image
             if ($product->gambar) {
                 Storage::disk('public')->delete($product->gambar);
             }
             
-            // Delete product
             $product->delete();
             
             DB::commit();
