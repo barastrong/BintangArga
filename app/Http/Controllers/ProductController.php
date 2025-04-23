@@ -139,6 +139,7 @@ class ProductController extends Controller
 {
     $product = Product::with('sizes')->findOrFail($id);
     
+    // Check if the current user is the owner of the product
     $seller = Seller::where('user_id', Auth::id())->first();
     
     if (!$seller || $product->seller_id != $seller->id) {
