@@ -35,8 +35,6 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                <!-- <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th> -->
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -59,12 +57,9 @@
                                         <div class="text-sm font-medium text-gray-900">{{ $product->nama_barang }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ Str::limit($product->description, 40) }}</td>
-                                    <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ number_format($product->price, 0, ',', '.') }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $product->stock }}</td> -->
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="flex space-x-2">
-                                            <a href="{{ route('products.show', $product->id) }}" class="text-orange-600 hover:text-orange-900">View</a>
-                                            <a href="" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                            <a href="{{ route('products.show', $product->id) }}" class="text-blue-600 hover:text-orange-900">View</a>
                                             <form action="" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');" class="inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -211,7 +206,6 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <a href="/products/${product.id}" class="text-orange-600 hover:text-orange-900">View</a>
-                                    <a href="/products/${product.id}/edit" class="text-indigo-600 hover:text-indigo-900">Edit</a>
                                     <form action="/products/${product.id}" method="POST" onsubmit="return confirm('Are you sure you want to delete this product?');" class="inline">
                                         @csrf
                                         @method('DELETE')
