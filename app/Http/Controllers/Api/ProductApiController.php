@@ -203,6 +203,7 @@ class ProductApiController extends Controller
             
             return response()->json([
                 'success' => true,
+                'data' => $id,
                 'message' => 'Product deleted successfully'
             ]);
             

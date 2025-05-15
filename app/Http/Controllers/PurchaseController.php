@@ -66,26 +66,68 @@ class PurchaseController extends Controller
             // Calculate total price
             $total_price = $size->harga * $request->quantity;
     
-            // Create purchase
-            $purchase = Purchase::create([
-                'user_id' => Auth::id(),
-                'seller_id' => $seller_id,
-                'product_id' => $request->product_id,
-                'size_id' => $request->size_id,
-                'quantity' => $request->quantity,
-                'total_price' => $total_price,
-                'description' => $request->description ?? 'Added to cart',
-                'shipping_address' => $request->shipping_address ?? 'Temporary',
-                'phone_number' => $request->phone_number ?? 'Temporary',
-                'status_pembelian' => $request->status_pembelian,
-                'status' => $request->status_pembelian === 'keranjang' ? 'keranjang' : 'pending',
-                'payment_status' => 'unpaid',
-                'payment_method' => $request->payment_method ?? 'pending'
-            ]);
-    
-            // Only update stock if it's a direct purchase, not cart
-            if ($request->status_pembelian === 'beli') {
-                // Update stock
+            // Check if the same product with the same size already exists in cart
+            if ($request->status_pembelian === 'keranjang') {
+                $existingCartItem = Purchase::where([
+                    'user_id' => Auth::id(),
+                    'product_id' => $request->product_id,
+                    'size_id' => $request->size_id,
+                    'status_pembelian' => 'keranjang',
+                    'status' => 'keranjang'
+                ])->first();
+                
+                if ($existingCartItem) {
+                    // Update the existing cart item by adding the new quantity
+                    $newQuantity = $existingCartItem->quantity + $request->quantity;
+                    
+                    // Verify that the new total quantity doesn't exceed available stock
+                    if ($size->stock < $newQuantity) {
+                        throw new \Exception('Total kuantitas melebihi stok yang tersedia');
+                    }
+                    
+                    $existingCartItem->update([
+                        'quantity' => $newQuantity,
+                        'total_price' => $size->harga * $newQuantity
+                    ]);
+                    
+                    $purchase = $existingCartItem;
+                } else {
+                    // Create new cart item if it doesn't exist
+                    $purchase = Purchase::create([
+                        'user_id' => Auth::id(),
+                        'seller_id' => $seller_id,
+                        'product_id' => $request->product_id,
+                        'size_id' => $request->size_id,
+                        'quantity' => $request->quantity,
+                        'total_price' => $total_price,
+                        'description' => $request->description ?? 'Added to cart',
+                        'shipping_address' => $request->shipping_address ?? 'Temporary',
+                        'phone_number' => $request->phone_number ?? 'Temporary',
+                        'status_pembelian' => 'keranjang',
+                        'status' => 'keranjang',
+                        'payment_status' => 'unpaid',
+                        'payment_method' => $request->payment_method ?? 'pending'
+                    ]);
+                }
+            } else {
+                // For direct purchase, always create a new entry
+                $purchase = Purchase::create([
+                    'user_id' => Auth::id(),
+                    'seller_id' => $seller_id,
+                    'product_id' => $request->product_id,
+                    'size_id' => $request->size_id,
+                    'quantity' => $request->quantity,
+                    'total_price' => $total_price,
+                    'description' => $request->description,
+                    'shipping_address' => $request->shipping_address,
+                    'phone_number' => $request->phone_number,
+                    'status_pembelian' => 'beli',
+                    'status' => 'pending',
+                    'payment_status' => 'unpaid',
+                    'payment_method' => $request->payment_method ?? 'pending'
+                ]);
+                
+                // Update stock for direct purchase
                 $size->update([
                     'stock' => $size->stock - $request->quantity
                 ]);
@@ -156,7 +198,8 @@ class PurchaseController extends Controller
 
             // Update purchase status
             $purchase->update([
-                'status' => 'cancelled'
+                'status' => 'cancelled',
+                'payment_status' => 'cancelled',
             ]);
 
             DB::commit();
@@ -230,6 +273,9 @@ class PurchaseController extends Controller
             ->where('status_pembelian', 'keranjang')
             ->where('status', 'keranjang')
             ->with(['product', 'size'])
+            ->with([
+                'size'
+            ])
             ->get();
             
         return view('cart.index', compact('cartItems'));

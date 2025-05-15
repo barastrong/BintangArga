@@ -28,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/seller/edit', [SellerController::class, 'edit'])->name('seller.edit');
     Route::put('/seller/update', [SellerController::class, 'update'])->name('seller.update');
     Route::get('/seller/products', [SellerController::class, 'products'])->name('seller.products');
+    Route::delete('/seller/{id}', [SellerController::class, 'destroy'])->name('seller.destroy');
 
     // New orders routes
     Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
@@ -46,16 +47,6 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::post('/purchase/{purchase}/rate', [PurchaseController::class, 'rate'])->name('purchases.rate');
 
-    // Admin Routes
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-    Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
-    Route::get('/admin/products/search', [ProductController::class, 'searchProduct'])->name('admin.products.search');
-    Route::get('/admin/users/search', [AdminController::class, 'searchUsers'])->name('admin.users.search');
-    Route::get('/admin/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.view');
-    Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
-    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
-    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete'); 
-
     // Carts Route
     Route::get('/cart', [PurchaseController::class, 'viewCart'])->name('cart.index');
     Route::post('/cart/update/{purchase}', [PurchaseController::class, 'updateCartItem'])->name('cart.update');
@@ -68,6 +59,22 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::middleware(['auth', 'admin'])->group(function () {
+    // Admin Routes
+    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
+    Route::get('/admin/products/search', [ProductController::class, 'searchProduct'])->name('admin.products.search');
+    Route::get('/admin/users/search', [AdminController::class, 'searchUsers'])->name('admin.users.search');
+    Route::get('/admin/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.view');
+    Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
+    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete'); 
+    Route::get('/admin/purchases', [AdminController::class, 'purchases'])->name('admin.purchases');
+    Route::get('/admin/purchases/{id}', [AdminController::class, 'viewPurchase'])->name('admin.purchases.view');
+    Route::delete('/admin/purchases/{id}', [AdminController::class, 'deletePurchase'])->name('admin.purchases.delete');
+    Route::get('/admin/purchases/search', [AdminController::class, 'searchPurchases'])->name('admin.purchases.search');
 });
 
 require __DIR__.'/auth.php';

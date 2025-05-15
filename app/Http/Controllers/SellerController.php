@@ -179,4 +179,43 @@ class SellerController extends Controller
         return redirect()->route('seller.orders')
             ->with('success', 'Status pesanan berhasil diperbarui');
     }
+    public function destroy($id)
+    {
+        // Check if user is authorized to delete this seller
+        if (!Auth::user()->isAdmin() && Auth::user()->seller->id != $id) {
+            return redirect()->route('seller.dashboard')
+                ->with('error', 'Anda tidak memiliki izin untuk menghapus profil penjual ini');
+        }
+        
+        // Get the seller
+        $seller = Seller::findOrFail($id);
+        
+        // Delete profile picture if exists
+        if ($seller->foto_profil) {
+            Storage::disk('public')->delete($seller->foto_profil);
+        }
+        
+        // Delete related products
+        $products = Product::where('seller_id', $id)->get();
+        foreach ($products as $product) {
+            // Delete product images if exist
+            if ($product->gambar_produk) {
+                Storage::disk('public')->delete($product->gambar_produk);
+            }
+            $product->delete();
+        }
+        
+        // Delete the seller profile
+        $seller->delete();
+        
+        // If the user deleted their own profile, redirect to home
+        if (Auth::user()->seller && Auth::user()->seller->id == $id) {
+            return redirect()->route('products.index')
+                ->with('success', 'Profil penjual berhasil dihapus');
+        }
+        
+        // If admin deleted a profile, redirect to admin dashboard or sellers list
+        return redirect()->route('sellers.index')
+            ->with('success', 'Profil penjual berhasil dihapus');
+    }
 }

@@ -5,7 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+            /* Particle background styles */
+            .particle-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        #particleCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+</style>
 </head>
+<div class="particle-background">
+    <canvas id="particleCanvas"></canvas>
+</div>
 <body class="bg-gray-100">
     <div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -129,4 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+<script src="/js/particles.js"></script>
+
 </html>

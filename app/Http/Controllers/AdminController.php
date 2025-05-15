@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Purchase;
 
 class AdminController extends Controller
 {
@@ -121,5 +122,66 @@ class AdminController extends Controller
         $user->delete();
         
         return redirect()->route('admin.index')->with('success', 'User deleted successfully');
+    }
+
+    public function purchases(){
+    $purchases = Purchase::with(['user', 'product', 'size', 'seller'])->latest()->paginate(10);
+    return view('admin.purchases', ['purchases' => $purchases]);
+    }
+
+    /**
+     * Search for purchases
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function searchPurchases(Request $request)
+    {
+        $query = $request->input('query');
+        
+        $purchases = Purchase::with(['user', 'product', 'size', 'seller'])
+            ->where(function($q) use ($query) {
+                $q->where('id', 'LIKE', '%' . $query . '%')
+                  ->orWhere('status', 'LIKE', '%' . $query . '%')
+                  ->orWhere('payment_status', 'LIKE', '%' . $query . '%')
+                  ->orWhere('total_price', 'LIKE', '%' . $query . '%')
+                  ->orWhereHas('user', function($sq) use ($query) {
+                      $sq->where('name', 'LIKE', '%' . $query . '%')
+                        ->orWhere('email', 'LIKE', '%' . $query . '%');
+                  })
+                  ->orWhereHas('product', function($sq) use ($query) {
+                      $sq->where('nama_barang', 'LIKE', '%' . $query . '%');
+                  });
+            })
+            ->get()
+            ->map(function ($purchase) {
+                return [
+                    'id' => $purchase->id,
+                    'user_name' => $purchase->user->name ?? 'Unknown',
+                    'product_name' => $purchase->product->nama_barang ?? 'Unknown',
+                    'quantity' => $purchase->quantity,
+                    'total_price' => $purchase->total_price,
+                    'status' => $purchase->status,
+                    'payment_status' => $purchase->payment_status,
+                    'status_pembelian' => $purchase->status_pembelian ?? '',
+                    'created_at' => $purchase->created_at->format('M d, Y'),
+                ];
+            });
+        
+        return response()->json([
+            'purchases' => $purchases
+        ]);
+    }
+
+    public function viewPurchase($id){
+        $purchase = Purchase::with(['user', 'product', 'size', 'seller'])->findOrFail($id);
+        return view('admin.purchase-detail', ['purchase' => $purchase]);
+    }
+
+    public function deletePurchase($id){
+        $purchase = Purchase::findOrFail($id);
+        $purchase->delete();
+        
+        return redirect()->route('admin.purchases')->with('success', 'Purchase deleted successfully');
     }
 }

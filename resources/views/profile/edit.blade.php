@@ -7,10 +7,7 @@
             <h2 class="font-bold text-3xl text-orange-600 font-serif">
                 Profile Edit
             </h2>
-    
-            <a href="{{ route('profile.index') }}" class="inline-block px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md transition">
-                Back to profile
-            </a>
+
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
                     @include('profile.partials.update-profile-information-form')

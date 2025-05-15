@@ -30,9 +30,9 @@
                         </div>
                         
                         <div class="flex flex-col items-center text-center">
-                            <img src="{{ Storage::url($item->product->sizes->first()->gambar_size) }}" 
-                                 alt="{{ $item->product->nama_barang }}" 
-                                 class="w-32 h-40 object-cover mb-2">
+                            <img src="{{ Storage::url($item->size->gambar_size) }}" 
+                                alt="{{ $item->product->nama_barang }} - {{ $item->size->size }}" 
+                                class="w-32 h-40 object-cover mb-2">
                             
                             <h3 class="font-semibold text-sm">{{ $item->product->nama_barang }}</h3>
                             <p class="text-gray-600 text-xs">Ukuran: {{ $item->size->size }}</p>

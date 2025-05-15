@@ -196,27 +196,37 @@
 
     /* Empty State */
     .empty-state {
-        background-color: white;
-        border-radius: 10px;
-        padding: 40px;
-        text-align: center;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    background-color: white;
+    border-radius: 10px;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }
 
-    .empty-state img {
-        max-width: 200px;
-        margin-bottom: 24px;
+    .empty-state-img {
+        max-width: 120px;
+        height: auto;
+        display: block;
+        margin: 0 auto 30px;
     }
 
     .empty-state h4 {
         color: var(--secondary);
-        margin-bottom: 12px;
+        margin-bottom: 16px;
         font-weight: 600;
     }
 
     .empty-state p {
         color: #718096;
-        margin-bottom: 24px;
+        margin-bottom: 28px;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .empty-state .btn {
+        padding: 10px 20px;
+        font-weight: 500;
     }
 
     /* Alert Styling */
@@ -439,7 +449,7 @@
                         @endif
                     @else
                         <div class="empty-state">
-                            <img src="{{ asset('images/empty-box.svg') }}" alt="Empty Products">
+                            <img src="{{ asset('/empty-box.svg') }}" alt="No Products" class="empty-state-img">
                             <h4>Anda belum memiliki produk</h4>
                             <p>Mulai tambahkan produk untuk dijual di platform kami dan tingkatkan bisnis Anda</p>
                             <a href="{{ route('products.create') }}" class="btn btn-primary btn-lg text-white">

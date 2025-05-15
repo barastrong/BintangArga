@@ -77,6 +77,12 @@
                             </span>
                             Products
                         </a>
+                        <a href="{{ route('admin.purchases') }}" class="nav-link group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.purchases') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-3 flex-shrink-0 {{ request()->routeIs('admin.purchases') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-shopping-cart"></i>
+                            </span>
+                            Purchase
+                        </a>
                     </nav>
                 </div>
                 
@@ -126,6 +132,12 @@
                                 <i class="fas fa-box"></i>
                             </span>
                             Products
+                        </a>
+                        <a href="{{ route('admin.purchases') }}" class="nav-link group flex items-center px-2 py-2 text-sm font-medium rounded-md {{ request()->routeIs('admin.purchases') ? 'bg-orange-100 text-orange-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                            <span class="nav-icon mr-3 flex-shrink-0 {{ request()->routeIs('admin.purchases') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-500' }}">
+                                <i class="fas fa-shopping-cart"></i>
+                            </span>
+                            Purchase
                         </a>
                     </nav>
                 </div>

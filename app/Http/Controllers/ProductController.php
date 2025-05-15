@@ -222,10 +222,6 @@ class ProductController extends Controller
                     if ($size) {
                         $size->update($sizeData);
                     } else {
-                        if (!isset($sizeData['gambar_size']) && $request->hasFile("sizes.$sizeName.gambar")) {
-                            $sizeData['gambar_size'] = $request->file("sizes.$sizeName.gambar")->store('sizes', 'public');
-                        }
-                        
                         Size::create($sizeData);
                     }
                 } else {

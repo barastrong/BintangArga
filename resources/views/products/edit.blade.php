@@ -9,6 +9,7 @@
     <title>Edit Produk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
 </head>
 <style>
     :root {
@@ -62,7 +63,7 @@
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         padding: 30px;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
     
     .section-title {
@@ -84,6 +85,16 @@
         margin-bottom: 8px;
     }
     
+    .tag-label {
+        font-size: 0.7rem;
+        background-color: rgba(255, 103, 21, 0.1);
+        color: var(--orange-primary);
+        padding: 2px 8px;
+        border-radius: 20px;
+        margin-left: 5px;
+        font-weight: 500;
+        }
+
     .form-control, .form-select {
         padding: 12px 16px;
         border: 1px solid var(--border-color);
@@ -148,14 +159,71 @@
         font-size: 12px;
         color: #6c757d;
     }
+
+    /* Style for progress steps */
+    .progress-steps {
+        display: flex;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 20px;
+    }
+
+    .step-item {
+        display: flex;
+        align-items: center;
+        margin-right: 40px;
+    }
+
+    .step-number {
+        width: 24px;
+        height: 24px;
+        background-color: var(--orange-primary);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+
+    .step-text {
+        font-weight: 500;
+        color: var(--orange-primary);
+    }
+
+    /* Location icon style */
+    .location-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .location-input {
+        padding-left: 40px !important;
+    }
 </style>
 <body>
 <div class="container py-4">
     <div class="row">
         <div class="col-12">
-            <div class=" align-items-center">
+            <div class="mb-4">
                 <h2 class="text-orange fw-bold mb-0">Edit Produk</h2>
-                <p class="mb-5">Lengkapi informasi produk Anda di bawah ini</p>
+                <p class="mb-3">Lengkapi informasi produk Anda di bawah ini</p>
+            </div>
+            
+            <!-- Progress Steps -->
+            <div class="progress-steps">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Informasi Produk</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Ukuran dan Harga</div>
+                </div>
             </div>
             
             @if ($errors->any())
@@ -175,12 +243,10 @@
                 
                 <!-- Product Information Section -->
                 <div class="form-container">
-                    <div class="section-title">
-                        <i class="bi bi-info-circle"></i> Informasi Produk
-                    </div>
+                    <h5 class="mb-4 text-orange"><i class="bi bi-info-circle me-2"></i>Informasi Produk</h5>
                     
                     <div class="mb-3">
-                        <label for="category_id" class="form-label required-field">Kategori</label>
+                        <label for="category_id" class="form-label">Kategori <span class="tag-label">Wajib</span></label>
                         <select id="category_id" class="form-select @error('category_id') is-invalid @enderror" name="category_id" required>
                             <option value="">Pilih Kategori</option>
                             @foreach($categories as $category)
@@ -195,7 +261,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="nama_barang" class="form-label required-field">Nama Barang</label>
+                        <label for="nama_barang" class="form-label">Nama Barang <span class="tag-label">Wajib</span></label>
                         <input id="nama_barang" type="text" class="form-control @error('nama_barang') is-invalid @enderror" 
                             name="nama_barang" value="{{ old('nama_barang', $product->nama_barang) }}" 
                             placeholder="Masukkan nama produk" required>
@@ -205,28 +271,31 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="description" class="form-label required-field">Deskripsi</label>
+                        <label for="description" class="form-label">Deskripsi <span class="tag-label">Wajib</span></label>
                         <textarea id="description" class="form-control @error('description') is-invalid @enderror" 
-                            name="description" rows="4" placeholder="Jelaskan detail produk" required>{{ old('description', $product->description) }}</textarea>
+                            name="description" rows="4" placeholder="Jelaskan detail produk Anda" required>{{ old('description', $product->description) }}</textarea>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     
                     <div class="mb-3">
-                        <label for="lokasi" class="form-label required-field">Lokasi Toko</label>
-                        <input id="lokasi" type="text" class="form-control @error('lokasi') is-invalid @enderror" 
-                            name="lokasi" value="{{ old('lokasi', $product->lokasi) }}" 
-                            placeholder="Kota atau provinsi" required>
+                        <label for="lokasi" class="form-label">Lokasi Toko <span class="tag-label">Wajib</span></label>
+                        <div class="position-relative">
+                            <i class="bi bi-geo-alt location-icon"></i>
+                            <input id="lokasi" type="text" class="form-control location-input @error('lokasi') is-invalid @enderror" 
+                                name="lokasi" value="{{ old('lokasi', $product->lokasi) }}" 
+                                placeholder="Kota atau provinsi" required>
+                        </div>
                         @error('lokasi')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
                     
                     <div class="mb-3">
-                        <label for="alamat_lengkap" class="form-label required-field">Alamat Lengkap</label>
+                        <label for="alamat_lengkap" class="form-label">Alamat Lengkap <span class="tag-label">Wajib</span></label>
                         <textarea id="alamat_lengkap" class="form-control @error('alamat_lengkap') is-invalid @enderror" 
-                            name="alamat_lengkap" rows="3" placeholder="Alamat lengkap toko" required>{{ old('alamat_lengkap', $product->alamat_lengkap) }}</textarea>
+                            name="alamat_lengkap" rows="3" placeholder="Alamat lengkap toko Anda" required>{{ old('alamat_lengkap', $product->alamat_lengkap) }}</textarea>
                         @error('alamat_lengkap')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -235,9 +304,7 @@
                 
                 <!-- Product Image Section -->
                 <div class="form-container">
-                    <div class="section-title">
-                        <i class="bi bi-image"></i> Gambar Produk
-                    </div>
+                    <h5 class="mb-4 text-orange"><i class="bi bi-image me-2"></i>Gambar Produk <span class="tag-label">Wajib</span></h5>
                     
                     <div class="dropzone-wrapper">
                         @if($product->gambar)
@@ -266,9 +333,7 @@
                 
                 <!-- Sizes and Prices Section -->
                 <div class="form-container">
-                    <div class="section-title">
-                        <i class="bi bi-tag"></i> Ukuran dan Harga
-                    </div>
+                    <h5 class="mb-4 text-orange"><i class="bi bi-tag me-2"></i>Ukuran dan Harga</h5>
                     
                     <p class="wajib-field mb-4"><i class="bi bi-info-circle"></i> Pilih minimal satu ukuran yang tersedia</p>
                     
@@ -295,7 +360,7 @@
                             <div class="size-details" id="size_details_{{ $sizeName }}" style="{{ $size ? '' : 'display: none;' }}">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="sizes_{{ $sizeName }}_harga" class="form-label required-field">Harga</label>
+                                        <label for="sizes_{{ $sizeName }}_harga" class="form-label">Harga <span class="tag-label">Wajib</span></label>
                                         <div class="input-group">
                                             <span class="input-group-text">Rp</span>
                                             <input id="sizes_{{ $sizeName }}_harga" type="number" class="form-control" 
@@ -305,7 +370,7 @@
                                     </div>
                                     
                                     <div class="col-md-6 mb-3">
-                                        <label for="sizes_{{ $sizeName }}_stock" class="form-label required-field">Stok</label>
+                                        <label for="sizes_{{ $sizeName }}_stock" class="form-label">Stok <span class="tag-label">Wajib</span></label>
                                         <input id="sizes_{{ $sizeName }}_stock" type="number" class="form-control" 
                                             name="sizes[{{ $sizeName }}][stock]" value="{{ $size ? $size->stock : old('sizes.'.$sizeName.'.stock') }}" 
                                             placeholder="0" min="0">

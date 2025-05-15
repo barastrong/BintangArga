@@ -311,7 +311,7 @@
         /* Location Section */
         .location-section {
             padding: 20px;
-            background: #f5f5f5;
+            background-color: #f9f9f9;
             display: flex;
             flex-wrap: wrap;
         }
@@ -488,7 +488,7 @@
     </div>
 </section>
 
-<!-- Script for horizontal scrolling -->
+<!-- Scripts -->
 <script>
     function scrollContainer(containerId, direction) {
         const container = document.getElementById(containerId);

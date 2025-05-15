@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('content')
 <!DOCTYPE html>
 <html lang="en">
@@ -7,11 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <style>
     .container {
-            max-width: 1400px;
-    margin: 0 auto;
+        max-width: 1400px;
+        margin: 0 auto;
     }
     /* Custom Colors */
     .text-orange {
@@ -49,6 +49,20 @@
     
     .btn-orange:hover {
         box-shadow: 0 6px 15px rgba(255, 114, 0, 0.4);
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-danger:hover {
+        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
         transform: translateY(-2px);
         color: white;
     }
@@ -158,6 +172,13 @@
         transform: translateY(-5px);
     }
     
+    /* Divider */
+    .divider {
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(0,0,0,0.1), transparent);
+        margin: 2rem 0;
+    }
+    
     /* Animations */
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(10px); }
@@ -166,6 +187,55 @@
     
     .card {
         animation: fadeIn 0.6s ease-out forwards;
+    }
+    
+    .delete-section {
+        animation: fadeIn 0.8s ease-out forwards;
+    }
+    
+    /* Modal styling */
+    .modal .modal-content {
+        border: none;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+    
+    .modal .btn-danger:hover {
+        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+        transform: translateY(-2px);
+        background-color: #d63028;
+    }
+    
+    .modal .btn-light {
+        background-color: #f1f1f1;
+        border: none;
+        color: #333;
+        transition: all 0.3s ease;
+    }
+    
+    .modal .btn-light:hover {
+        background-color: #e0e0e0;
+        transform: translateY(-2px);
+    }
+    
+    /* Delete confirmation animation */
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(-50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-dialog {
+        animation: modalFadeIn 0.3s ease-out forwards;
+    }
+    
+    .modal-backdrop.show {
+        opacity: 0.7;
     }
     
     /* Responsive adjustments */
@@ -198,7 +268,7 @@
                 <div class="card-header bg-white d-flex align-items-center py-4 border-0 position-relative">
                     <div class="position-absolute top-0 start-0 h-100" style="width: 5px; background: linear-gradient(to bottom, #FF8C00, #FF5F00);"></div>
                     <div class="d-flex align-items-center">
-                        <div class="rounded-circle p-3 me-3"">
+                        <div class="rounded-circle p-3 me-3">
                             <i class="fas fa-user-edit" style="color: #FF7200; font-size: 1.2rem;"></i>
                         </div>
                         <h4 class="mb-0 fw-bold text-dark">Edit Profil Penjual</h4>
@@ -215,6 +285,18 @@
                                     <i class="fas fa-check-circle text-success"></i>
                                 </div>
                                 <div class="text-success fw-medium">{{ session('success') }}</div>
+                                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        </div>
+                    @endif
+                    
+                    @if (session('error'))
+                        <div class="alert alert-danger border-0 shadow-sm fade show mb-4 rounded-3" role="alert" style="background-color: rgba(220, 53, 69, 0.12);">
+                            <div class="d-flex align-items-center">
+                                <div class="p-2 bg-white rounded-circle me-3 shadow-sm">
+                                    <i class="fas fa-exclamation-circle text-danger"></i>
+                                </div>
+                                <div class="text-danger fw-medium">{{ session('error') }}</div>
                                 <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
                         </div>
@@ -267,7 +349,7 @@
                             <!-- Form Fields Section -->
                             <div class="col-lg-8">
                                 <div class="mb-4">
-                                    <label for="nama_penjual" class="form-label fw-medium mb-2">Nama Penjual</label>
+                                    <label for="nama_penjual" class="form-label fw-medium mb-2">Nama Penjual <span class="text-danger">*</span></label>
                                     <div class="input-group modern-input">
                                         <span class="input-group-text border-0">
                                             <i class="fas fa-user text-orange"></i>
@@ -284,7 +366,7 @@
                                 </div>
                                 
                                 <div class="mb-4">
-                                    <label for="email_penjual" class="form-label fw-medium mb-2">Email Penjual</label>
+                                    <label for="email_penjual" class="form-label fw-medium mb-2">Email Penjual <span class="text-danger">*</span></label>
                                     <div class="input-group modern-input">
                                         <span class="input-group-text border-0">
                                             <i class="fas fa-envelope text-orange"></i>
@@ -308,59 +390,142 @@
                             </div>
                         </div>
                     </form>
+                    
+                    <div class="divider"></div>
+                    
+                    <!-- Delete Account Section -->
+                    <div class="delete-section mt-4">
+                        <div class="card border-0 bg-light rounded-4">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="rounded-circle p-2 bg-danger bg-opacity-10 me-3">
+                                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                                    </div>
+                                    <h5 class="mb-0 fw-bold text-danger">Hapus Akun Penjual</h5>
+                                </div>
+                                
+                                <p class="text-muted mb-4">
+                                    Menghapus akun penjual akan menghapus semua produk dan data terkait secara permanen. Tindakan ini tidak dapat dibatalkan.
+                                </p>
+                                
+                                <button type="button" class="btn btn-danger rounded-pill px-4 py-2" id="deleteAccountBtn">
+                                    <i class="fas fa-trash-alt me-2"></i> Hapus Akun Penjual
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</body>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-body p-4 text-center">
+                <div class="mb-4 mt-3">
+                    <div class="bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-trash text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold mb-3">Hapus Akun Penjual</h5>
+                <p class="text-muted mb-4">
+                    Menghapus akun penjual akan menghapus semua produk dan data terkait secara permanen.<br>
+                    Apakah Anda yakin?
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button type="button" class="btn btn-light fw-medium px-4 py-2" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="button" class="btn btn-danger fw-medium px-4 py-2" id="confirmDeleteBtn">
+                        Hapus
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Form (Hidden) -->
+<form id="deleteSellerForm" action="{{ route('seller.destroy', $seller->id) }}" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
+
+<!-- Essential Scripts - Make sure these are loaded -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Profile image preview
-    const inputFile = document.getElementById('foto_profil');
-    const previewImage = document.getElementById('profilePreview');
-    const placeholderDiv = document.getElementById('profilePlaceholder');
-    const fileNameDiv = document.getElementById('fileName');
+    console.log('Document loaded');
     
-    if (inputFile) {
-        inputFile.addEventListener('change', function() {
-            const file = this.files[0];
-            
-            if (file) {
+    // Make sure Bootstrap is loaded
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap JS is not loaded. Please check your layout file.');
+        return;
+    } else {
+        console.log('Bootstrap is loaded successfully');
+    }
+    
+    // Delete account button - show confirmation modal
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+    if (deleteAccountBtn) {
+        console.log('Delete account button found');
+        deleteAccountBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Delete button clicked');
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
+        });
+    } else {
+        console.error('Delete account button not found');
+    }
+    
+    // Confirm delete button - submit the deletion form
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    if (confirmDeleteBtn) {
+        console.log('Confirm delete button found');
+        confirmDeleteBtn.addEventListener('click', function() {
+            console.log('Confirm delete clicked, submitting form');
+            document.getElementById('deleteSellerForm').submit();
+        });
+    } else {
+        console.error('Confirm delete button not found');
+    }
+    
+    // Handle profile photo preview
+    const profileInput = document.getElementById('foto_profil');
+    const profilePreview = document.getElementById('profilePreview');
+    const profilePlaceholder = document.getElementById('profilePlaceholder');
+    const fileName = document.getElementById('fileName');
+    
+    if (profileInput) {
+        profileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
                 const reader = new FileReader();
                 
-                reader.addEventListener('load', function() {
-                    if (previewImage) {
-                        previewImage.src = reader.result;
-                        previewImage.style.display = 'block';
+                reader.onload = function(e) {
+                    if (profilePreview) {
+                        profilePreview.src = e.target.result;
+                        profilePreview.style.display = 'block';
                     }
                     
-                    if (placeholderDiv) {
-                        placeholderDiv.style.display = 'none';
+                    if (profilePlaceholder) {
+                        profilePlaceholder.style.display = 'none';
                     }
-                    
-                    if (fileNameDiv) {
-                        // Limit filename length for display
-                        let displayName = file.name;
-                        if (displayName.length > 20) {
-                            displayName = displayName.substring(0, 17) + '...';
-                        }
-                        fileNameDiv.textContent = displayName;
-                    }
-                });
+                }
                 
-                reader.readAsDataURL(file);
+                reader.readAsDataURL(this.files[0]);
+                
+                if (fileName) {
+                    fileName.textContent = this.files[0].name;
+                }
             }
         });
     }
-    
-    // Add smooth animations to form elements
-    const formElements = document.querySelectorAll('.form-control, .btn');
-    formElements.forEach((element, index) => {
-        element.style.opacity = 0;
-        element.style.animation = `fadeIn 0.4s ease-out ${0.1 + (index * 0.05)}s forwards`;
-    });
 });
 </script>
+</body>
 </html>
 @endsection
