@@ -376,6 +376,7 @@ class PurchaseController extends Controller
             'quantities.*' => 'integer|min:1',
             'shipping_address' => 'required|string',
             'phone_number' => 'required|string',
+            'description' => 'nullable|string',
             'payment_method' => 'required|in:gopay,qris,nyicil'
         ]);
         
@@ -414,6 +415,7 @@ class PurchaseController extends Controller
                     'status_pembelian' => 'beli',
                     'shipping_address' => $request->shipping_address,
                     'phone_number' => $request->phone_number,
+                    'description' => $request->description,
                     'status' => 'pending',
                     'quantity' => $newQuantity,
                     'total_price' => $item->size->harga * $newQuantity,

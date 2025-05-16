@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Rating;
+use App\Models\Purchase;
 use App\Models\Seller;
 use App\Models\Size;
 use Illuminate\Support\Facades\DB;
@@ -14,13 +15,19 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+    
     public function index()
     {
-        $products = Product::with(['category', 'sizes', 'ratings', 'user'])
+        $products = Product::with(['category', 'sizes', 'ratings', 'user', 'purchases'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
         
+        foreach ($products as $product) {
+            $product->purchase_count = Purchase::where('product_id', $product->id)
+                ->where('status', 'completed')
+                ->count();
+        }
         $categories = Category::all();
         
         return view('products.index', compact('products', 'categories'));
@@ -121,16 +128,19 @@ class ProductController extends Controller
             $query->where('lokasi', $request->lokasi);
         }
 
-        // Search berdasarkan nama barang
         if ($request->has('search')) {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
 
-        // Ambil lokasi unik untuk dropdown
         $locations = Product::select('lokasi')->distinct()->get();
-
-        // Pagination (12 items per page)
+        
         $products = $query->paginate(12);
+        
+        foreach ($products as $product) {
+            $product->purchase_count = Purchase::where('product_id', $product->id)
+                ->where('status', 'completed')
+                ->count();
+        }
 
         return view('products.shop', compact('products', 'locations'));
     }
@@ -296,17 +306,20 @@ class ProductController extends Controller
             ->with('error', 'Terjadi kesalahan saat menghapus produk: ' . $e->getMessage());
     }
 }
-public function category($categoryId)
+public function category($categoryId,)
 {
-    // Find the category
     $category = Category::findOrFail($categoryId);
 
-    // Get products for this specific category
     $products = Product::with(['sizes', 'ratings'])
         ->where('category_id', $categoryId)
         ->paginate(12);
 
-    // Get all categories for potential navigation
+    foreach ($products as $product) {
+        $product->purchase_count = Purchase::where('product_id', $product->id)
+            ->where('status', 'completed')
+            ->count();
+    }
+
     $categories = Category::all();
 
     return view('products.category', compact('category', 'products', 'categories'));

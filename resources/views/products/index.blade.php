@@ -198,6 +198,13 @@
             margin-bottom: 10px;
         }
 
+        .product-price {
+            font-weight: bold;
+            color: #FF9800;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
         .rating {
             color: #ffd700;
             margin-top: 5px;
@@ -385,9 +392,11 @@
                 <h3>Store terbaik</h3>
                 <p>Lorem ipsum sumipsum</p>
             </div>
+            <a href="#BiggestRating">
             <div class="icon-container orange">
                 <i class="fas fa-arrow-right"></i>
             </div>
+        </a> 
         </div>
         
         <div class="feature-item">
@@ -430,7 +439,7 @@
 </section>
 
 <!-- Favorite Products Section - Updated with container and scroll buttons -->
-<section>
+<section id="BiggestRating">
     <h1>Barang Favorit Kami</h1>
     <div class="products-container">
         <button class="scroll-btn scroll-left" onclick="scrollContainer('products-grid', 'left')">
@@ -441,23 +450,21 @@
             <a href="{{ route('products.show', $product->id) }}" class="product-card">
                 <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
                 <h3>{{ $product->nama_barang }}</h3>
-                <p>{{ Str::limit($product->description, 50) }}</p>
-                <div class="seller-info">
+                @php
+                    $smallestSize = $product->sizes->sortBy('harga')->first();
+                    $priceRange = 'Rp '. number_format($smallestSize->harga, 0, ',', '.');
+                @endphp
+                <div class="product-price">{{ $priceRange }}</div>
+                <!-- <div class="seller-info">
                     <i class="fas fa-user"></i>
                     <span>{{ $product->seller->nama_penjual }}</span>
-                </div>
+                </div> -->
                 <div class="rating">
-                    @php
-                        $rating = $product->ratings->avg('rating') ?? 0;
-                    @endphp
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= $rating)
-                            <i class="fas fa-star"></i>
-                        @else
-                            <i class="far fa-star"></i>
-                        @endif
-                    @endfor
-                    ({{ $product->ratings->count() }})
+                    <i class="fas fa-star"></i>    
+                    {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
+                    <span style="color: #666; margin-left: 5px;">
+                        <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
+                    </span>
                 </div>
             </a>
             @endforeach

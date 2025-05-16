@@ -87,10 +87,11 @@
             margin-bottom: 0.5rem;
             color: var(--dark-gray);
         }
-        .product-description {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
+        .product-price {
+            font-weight: bold;
+            color: #FF9800;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
         .seller-info {
             display: flex;
@@ -102,9 +103,8 @@
             margin-right: 0.5rem;
         }
         .rating {
-            display: flex;
-            align-items: center;
-            color: #FFC107;
+            color: #ffd700;
+            margin-top: 5px;
         }
         .rating .star {
             margin-right: 0.3rem;
@@ -148,18 +148,25 @@
                 <svg class="hanger-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2L12 6M12 6C10.8954 6 10 6.89543 10 8C10 9.10457 10.8954 10 12 10M12 6C13.1046 6 14 6.89543 14 8C14 9.10457 13.1046 10 12 10M12 10L5 18H19L12 10Z"/>
                 </svg>
-                <img src="{{ Storage::url($product->sizes->first()->gambar_size) }}" alt="{{ $product->nama_barang }}">
+                <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
             </div>
             <div class="product-info">
                 <h3 class="product-title">{{ $product->nama_barang }}</h3>
-                <p class="product-description">{{ $product->description }}</p>
-                <div class="seller-info">
+                @php
+                    $smallestSize = $product->sizes->sortBy('harga')->first();
+                    $priceRange = 'Rp '. number_format($smallestSize->harga, 0, ',', '.');
+                @endphp
+                <div class="product-price">{{ $priceRange }}</div>
+                <!-- <div class="seller-info">
                     <i class="fas fa-user"></i>
                     <span>{{ $product->seller->nama_penjual }}</span>
-                </div>
+                </div> -->
                 <div class="rating">
-                    <span class="star">★</span>
-                    <span class="rating-value">{{ number_format($product->ratings->avg('rating') ?? 0, 1) }}</span>
+                    <i class="fas fa-star"></i>    
+                    {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
+                    <span style="color: #666; margin-left: 5px;">
+                        <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
+                    </span>
                 </div>
             </div>
         </a>

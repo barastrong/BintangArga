@@ -144,22 +144,16 @@
             font-size: 16px;
         }
         
-        .product-description {
-            color: #777;
-            font-size: 12px;
-            margin: 0 0 8px 0;
-            line-height: 1.4;
+        .product-price {
+            font-weight: bold;
+            color: #FF9800;
+            font-size: 16px;
+            margin-bottom: 10px;
         }
         
         .rating {
-            display: flex;
-            align-items: center;
-            margin-top: 8px;
-        }
-        
-        .star {
-            color: #FFA500;
-            font-size: 14px;
+            color: #ffd700;
+            margin-top: 5px;
         }
         
         .rating-value {
@@ -244,15 +238,22 @@
                 </div>
                 <a href="{{ route('products.show', $product->id) }}" class="product-card">
                 <div class="product-info">
-                    <h3 class="product-title">{{ $product->nama_barang }}</h3>
-                    <p class="product-description">{{ $product->description }}</p>
-                    <div class="seller-info">
+                <h3 class="product-title">{{ $product->nama_barang }}</h3>
+                @php
+                    $smallestSize = $product->sizes->sortBy('harga')->first();
+                    $priceRange = 'Rp '. number_format($smallestSize->harga, 0, ',', '.');
+                @endphp
+                <div class="product-price">{{ $priceRange }}</div>
+                <!-- <div class="seller-info">
                     <i class="fas fa-user"></i>
                     <span>{{ $product->seller->nama_penjual }}</span>
-                </div>
+                </div> -->
                     <div class="rating">
-                        <span class="star">★</span>
-                        <span class="rating-value">{{ number_format($product->ratings->avg('rating') ?? 0, 1) }}</span>
+                        <i class="fas fa-star"></i>    
+                        {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
+                        <span style="color: #666; margin-left: 5px;">
+                            <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
+                        </span>
                     </div>
                 </div>
             </a>
