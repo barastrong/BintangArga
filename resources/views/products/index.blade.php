@@ -9,7 +9,6 @@
     <title>Toko Baju</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        /* General Styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -133,7 +132,6 @@
             }
         }
 
-        /* Products Grid - Updated for horizontal scrolling */
         .products-container {
             position: relative;
             padding: 0 20px;
@@ -359,161 +357,168 @@
     </style>
 </head>
 <body>
-<div class="header-wrapper">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <h1>Lorem Ipsum</h1>
-    </div>
+    <div class="header-wrapper">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Kontol Terpecah pecah</h1>
+        </div>
 
-    <h2 class="features-title">Keunggulan Kami</h2>
-    
-    <!-- Features Section -->
-    <div class="features-section">
-        <div class="feature-item">
-            <div class="icon-container">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="feature-text">
-                <h3>Kami tersedia diberbagai platform</h3>
-                <p>Lorem ipsum sumipsum</p>
-            </div>
-            <a href="#Locate">
-            <div class="icon-container orange">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-            </a>
-        </div>
+        <h2 class="features-title">Keunggulan Kami</h2>
         
-        <div class="feature-item">
-            <div class="icon-container">
-                <i class="fas fa-store"></i>
-            </div>
-            <div class="feature-text">
-                <h3>Store terbaik</h3>
-                <p>Lorem ipsum sumipsum</p>
-            </div>
-            <a href="#BiggestRating">
-            <div class="icon-container orange">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-        </a> 
-        </div>
-        
-        <div class="feature-item">
-            <div class="icon-container">
-                <i class="fas fa-tag"></i>
-            </div>
-            <div class="feature-text">
-                <h3>Harga Bersaing</h3>
-                <p>Lorem ipsum sumipsum</p>
-            </div>
-            <div class="icon-container orange">
-                <i class="fas fa-arrow-right"></i>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Discount Categories Section - Updated with container and scroll buttons -->
-<section>
-    <h1>Category</h1>
-    <div class="discount-container">
-        <button class="scroll-btn scroll-left" onclick="scrollContainer('discount-grid', 'left')">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="discount-grid" id="discount-grid">
-            <!-- Use categories as discount sections -->
-            @foreach($categories as $category)
-            <a href="{{ route('products.category', $category->id) }}" class="discount-card">
-                <img src="{{ $category->gambar }}" alt="{{ $category->nama }}">
-                <div class="overlay">
-                    <h3>{{ $category->nama }}</h3>
+        <!-- Features Section -->
+        <div class="features-section">
+            <div class="feature-item">
+                <div class="icon-container">
+                    <i class="fas fa-users"></i>
                 </div>
-            </a>
-            @endforeach
-        </div>
-        <button class="scroll-btn scroll-right" onclick="scrollContainer('discount-grid', 'right')">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    </div>
-</section>
-
-<!-- Favorite Products Section - Updated with container and scroll buttons -->
-<section id="BiggestRating">
-    <h1>Barang Favorit Kami</h1>
-    <div class="products-container">
-        <button class="scroll-btn scroll-left" onclick="scrollContainer('products-grid', 'left')">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <div class="products-grid" id="products-grid">
-            @foreach($products as $product)
-            <a href="{{ route('products.show', $product->id) }}" class="product-card">
-                <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
-                <h3>{{ $product->nama_barang }}</h3>
-                @php
-                    $smallestSize = $product->sizes->sortBy('harga')->first();
-                    $priceRange = 'Rp '. number_format($smallestSize->harga, 0, ',', '.');
-                @endphp
-                <div class="product-price">{{ $priceRange }}</div>
-                <!-- <div class="seller-info">
-                    <i class="fas fa-user"></i>
-                    <span>{{ $product->seller->nama_penjual }}</span>
-                </div> -->
-                <div class="rating">
-                    <i class="fas fa-star"></i>    
-                    {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
-                    <span style="color: #666; margin-left: 5px;">
-                        <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
-                    </span>
+                <div class="feature-text">
+                    <h3>Kami tersedia diberbagai platform</h3>
+                    <p>Lorem ipsum sumipsum</p>
                 </div>
-            </a>
-            @endforeach
+                <a href="#Locate">
+                <div class="icon-container orange">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                </a>
+            </div>
+            
+            <div class="feature-item">
+                <div class="icon-container">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Store terbaik</h3>
+                    <p>Lorem ipsum sumipsum</p>
+                </div>
+                <a href="#BiggestRating">
+                <div class="icon-container orange">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a> 
+            </div>
+            
+            <div class="feature-item">
+                <div class="icon-container">
+                    <i class="fas fa-tag"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Harga Bersaing</h3>
+                    <p>Lorem ipsum sumipsum</p>
+                </div>
+                <div class="icon-container orange">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
         </div>
-        <button class="scroll-btn scroll-right" onclick="scrollContainer('products-grid', 'right')">
-            <i class="fas fa-chevron-right"></i>
-        </button>
     </div>
-</section>
 
-<!-- Location Section -->
-<section class="location-section" id="Locate">
-    <div class="map">
-        <h2>Lokasi Kantor Kami</h2>
-        <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.9871065035472!2d112.72276627605149!3d-7.466674473607052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e6d71181af21%3A0x4232ab0204ccbfe5!2sSMK%20TELKOM%20Sidoarjo!5e0!3m2!1sid!2sid!4v1740023359217!5m2!1sid!2sid"
-            width="100%"
-            height="350"
-            style="border:0;"
-            allowfullscreen=""
-            loading="lazy">
-        </iframe>
-    </div>
-    <div class="address">
-        <h3>SMK Telkom Sidoarjo</h3>
-        <p>Sekardangan</p>
-        <p>RT 00 RW 99</p>
-    </div>
-</section>
+    <!-- Discount Categories Section - Updated with container and scroll buttons -->
+    <section>
+        <h1>Category</h1>
+        <div class="discount-container">
+            <button class="scroll-btn scroll-left" onclick="scrollContainer('discount-grid', 'left')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="discount-grid" id="discount-grid">
+                <!-- Use categories as discount sections -->
+                @foreach($categories as $category)
+                <a href="{{ route('products.category', $category->id) }}" class="discount-card">
+                    <img src="{{ $category->gambar }}" alt="{{ $category->nama }}">
+                    <div class="overlay">
+                        <h3>{{ $category->nama }}</h3>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            <button class="scroll-btn scroll-right" onclick="scrollContainer('discount-grid', 'right')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </section>
 
-<!-- Scripts -->
-<script>
-    function scrollContainer(containerId, direction) {
-        const container = document.getElementById(containerId);
-        const scrollAmount = 300; // Adjust scroll amount as needed
-        
-        if (direction === 'left') {
-            container.scrollBy({
-                left: -scrollAmount,
-                behavior: 'smooth'
-            });
-        } else {
-            container.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
+    <!-- Favorite Products Section - Updated with container and scroll buttons -->
+    <section id="BiggestRating">
+        <h1>Barang Favorit Kami</h1>
+        <div class="products-container">
+            @if(count($products) > 0)
+            <button class="scroll-btn scroll-left" onclick="scrollContainer('products-grid', 'left')">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="products-grid" id="products-grid">
+                @foreach($products as $product)
+                <a href="{{ route('products.show', $product->id) }}" class="product-card">
+                    <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
+                    <h3>{{ $product->nama_barang }}</h3>
+                    @php
+                        $smallestSize = $product->sizes->sortBy('harga')->first();
+                        $priceRange = 'Rp '. number_format($smallestSize->harga, 0, ',', '.');
+                    @endphp
+                    <div class="product-price">{{ $priceRange }}</div>
+                    <!-- <div class="seller-info">
+                        <i class="fas fa-user"></i>
+                        <span>{{ $product->seller->nama_penjual }}</span>
+                    </div> -->
+                    <div class="rating">
+                        <i class="fas fa-star"></i>    
+                        {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
+                        <span style="color: #666; margin-left: 5px;">
+                            <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
+                        </span>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            <button class="scroll-btn scroll-right" onclick="scrollContainer('products-grid', 'right')">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            @else
+                <div class="no-favorites-message" style="text-align: center; padding: 30px; background-color: #f8f9fa; border-radius: 8px;">
+                    <i class="fas fa-star" style="font-size: 32px; color: #d3d3d3; margin-bottom: 15px;"></i>
+                    <p style="font-size: 18px; color: #6c757d;">Belum ada produk favorit dengan rating tinggi saat ini.</p>
+                    <p style="font-size: 14px; color: #6c757d; margin-top: 10px;">Produk dengan rating 4.0 ke atas akan ditampilkan di sini.</p>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section class="location-section" id="Locate">
+        <div class="map">
+            <h2>Lokasi Kantor Kami</h2>
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.9871065035472!2d112.72276627605149!3d-7.466674473607052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e6d71181af21%3A0x4232ab0204ccbfe5!2sSMK%20TELKOM%20Sidoarjo!5e0!3m2!1sid!2sid!4v1740023359217!5m2!1sid!2sid"
+                width="100%"
+                height="350"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy">
+            </iframe>
+        </div>
+        <div class="address">
+            <h3>SMK Telkom Sidoarjo</h3>
+            <p>Sekardangan</p>
+            <p>RT 00 RW 99</p>
+        </div>
+    </section>
+
+    <script>
+        function scrollContainer(containerId, direction) {
+            const container = document.getElementById(containerId);
+            const scrollAmount = 300; // Adjust scroll amount as needed
+            
+            if (direction === 'left') {
+                container.scrollBy({
+                    left: -scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else {
+                container.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
 @endsection

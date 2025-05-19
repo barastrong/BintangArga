@@ -194,48 +194,93 @@
     }
     
     /* Modal styling */
-    .modal .modal-content {
-        border: none;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-    
-    .modal .btn-danger {
-        background: linear-gradient(135deg, #dc3545, #c82333);
-        border: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-    }
-    
-    .modal .btn-danger:hover {
-        box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
-        transform: translateY(-2px);
-        background-color: #d63028;
-    }
-    
-    .modal .btn-light {
-        background-color: #f1f1f1;
-        border: none;
-        color: #333;
-        transition: all 0.3s ease;
-    }
-    
-    .modal .btn-light:hover {
-        background-color: #e0e0e0;
-        transform: translateY(-2px);
-    }
-    
-    /* Delete confirmation animation */
-    @keyframes modalFadeIn {
-        from { opacity: 0; transform: translateY(-50px); }
-        to { opacity: 1; transform: translateY(0); }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s ease-out;
     }
     
     .modal-dialog {
-        animation: modalFadeIn 0.3s ease-out forwards;
+        position: relative;
+        width: auto;
+        max-width: 500px;
+        margin: 10vh auto;
+        pointer-events: none;
+        animation: slideDown 0.4s ease-out;
     }
     
-    .modal-backdrop.show {
-        opacity: 0.7;
+    .modal-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        pointer-events: auto;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: none;
+        border-radius: 12px;
+        outline: 0;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: flex-end;
+        padding: 1rem 1rem 0.5rem 1rem;
+        border-bottom: 0;
+    }
+    
+    .modal-body {
+        position: relative;
+        flex: 1 1 auto;
+        padding: 1rem 2rem 2rem;
+    }
+    
+    .btn-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #000;
+        opacity: .5;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+    
+    .btn-close:hover {
+        opacity: 0.75;
+    }
+    
+    .warning-icon-container {
+        width: 90px;
+        height: 90px;
+        background-color: rgba(220, 53, 69, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem auto;
+    }
+    
+    .modal-open {
+        overflow: hidden;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes slideDown {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     
     /* Responsive adjustments */
@@ -421,26 +466,27 @@
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-body p-4 text-center">
-                <div class="mb-4 mt-3">
-                    <div class="bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                        <i class="fas fa-trash text-danger" style="font-size: 2rem;"></i>
-                    </div>
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="warning-icon-container">
+                    <i class="fas fa-exclamation-triangle text-danger" style="font-size: 2.5rem;"></i>
                 </div>
-                <h5 class="fw-bold mb-3">Hapus Akun Penjual</h5>
+                <h4 class="fw-bold mb-3">Hapus Akun Penjual</h4>
                 <p class="text-muted mb-4">
                     Menghapus akun penjual akan menghapus semua produk dan data terkait secara permanen.<br>
-                    Apakah Anda yakin?
+                    <span class="fw-medium">Tindakan ini tidak dapat dibatalkan.</span>
                 </p>
-                <div class="d-flex justify-content-center gap-2">
-                    <button type="button" class="btn btn-light fw-medium px-4 py-2" data-bs-dismiss="modal">
-                        Batal
+                <div style="display: flex; justify-content: center; gap: 12px;">
+                    <button type="button" class="btn btn-light fw-medium px-4 py-2 rounded-pill" data-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Batal
                     </button>
-                    <button type="button" class="btn btn-danger fw-medium px-4 py-2" id="confirmDeleteBtn">
-                        Hapus
+                    <button type="button" class="btn btn-danger fw-medium px-4 py-2 rounded-pill" id="confirmDeleteBtn">
+                        <i class="fas fa-trash-alt me-2"></i> Hapus Akun
                     </button>
                 </div>
             </div>
@@ -454,77 +500,89 @@
     @method('DELETE')
 </form>
 
-<!-- Essential Scripts - Make sure these are loaded -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JavaScript for file preview and delete confirmation -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Document loaded');
-    
-    // Make sure Bootstrap is loaded
-    if (typeof bootstrap === 'undefined') {
-        console.error('Bootstrap JS is not loaded. Please check your layout file.');
-        return;
-    } else {
-        console.log('Bootstrap is loaded successfully');
-    }
-    
-    // Delete account button - show confirmation modal
-    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
-    if (deleteAccountBtn) {
-        console.log('Delete account button found');
-        deleteAccountBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Delete button clicked');
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-            deleteModal.show();
-        });
-    } else {
-        console.error('Delete account button not found');
-    }
-    
-    // Confirm delete button - submit the deletion form
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    if (confirmDeleteBtn) {
-        console.log('Confirm delete button found');
-        confirmDeleteBtn.addEventListener('click', function() {
-            console.log('Confirm delete clicked, submitting form');
-            document.getElementById('deleteSellerForm').submit();
-        });
-    } else {
-        console.error('Confirm delete button not found');
-    }
-    
-    // Handle profile photo preview
-    const profileInput = document.getElementById('foto_profil');
-    const profilePreview = document.getElementById('profilePreview');
-    const profilePlaceholder = document.getElementById('profilePlaceholder');
-    const fileName = document.getElementById('fileName');
-    
-    if (profileInput) {
-        profileInput.addEventListener('change', function() {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    if (profilePreview) {
-                        profilePreview.src = e.target.result;
-                        profilePreview.style.display = 'block';
-                    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Profile photo preview
+        const fileInput = document.getElementById('foto_profil');
+        const fileNameDisplay = document.getElementById('fileName');
+        const profilePreview = document.getElementById('profilePreview');
+        const profilePlaceholder = document.getElementById('profilePlaceholder');
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
                     
-                    if (profilePlaceholder) {
-                        profilePlaceholder.style.display = 'none';
-                    }
+                    reader.onload = function(e) {
+                        if (profilePreview) {
+                            profilePreview.src = e.target.result;
+                            profilePreview.style.display = 'block';
+                            
+                            if (profilePlaceholder) {
+                                profilePlaceholder.style.display = 'none';
+                            }
+                        } else if (profilePlaceholder) {
+                            // If preview doesn't exist, create one
+                            const newPreview = document.createElement('img');
+                            newPreview.src = e.target.result;
+                            newPreview.className = 'profile-preview';
+                            newPreview.id = 'profilePreview';
+                            newPreview.alt = 'Foto Profil';
+                            
+                            profilePlaceholder.parentNode.insertBefore(newPreview, profilePlaceholder);
+                            profilePlaceholder.style.display = 'none';
+                        }
+                        
+                        // Display file name
+                        fileNameDisplay.textContent = this.files[0].name;
+                    };
+                    
+                    reader.readAsDataURL(this.files[0]);
                 }
-                
-                reader.readAsDataURL(this.files[0]);
-                
-                if (fileName) {
-                    fileName.textContent = this.files[0].name;
-                }
+            });
+        }
+        
+        // Delete account modal functionality
+        const deleteBtn = document.getElementById('deleteAccountBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const deleteSellerForm = document.getElementById('deleteSellerForm');
+        const deleteModal = document.getElementById('deleteConfirmModal');
+        const closeModalBtns = document.querySelectorAll('[data-dismiss="modal"]');
+        
+        // Show modal when delete button is clicked
+        if (deleteBtn && deleteModal) {
+            deleteBtn.addEventListener('click', function() {
+                deleteModal.style.display = 'block';
+                document.body.classList.add('modal-open');
+            });
+        }
+        
+        // Close modal when close buttons are clicked
+        if (closeModalBtns.length > 0) {
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    deleteModal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                });
+            });
+        }
+        
+        // Submit form when confirm button is clicked
+        if (confirmDeleteBtn && deleteSellerForm) {
+            confirmDeleteBtn.addEventListener('click', function() {
+                deleteSellerForm.submit();
+            });
+        }
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target == deleteModal) {
+                deleteModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
             }
         });
-    }
-});
+    });
 </script>
 </body>
 </html>

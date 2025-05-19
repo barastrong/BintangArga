@@ -19,7 +19,11 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with(['category', 'sizes', 'ratings', 'user', 'purchases'])
-            ->orderBy('created_at', 'desc')
+            ->select('products.*')
+            ->leftJoin(DB::raw('(SELECT product_id, AVG(rating) as avg_rating FROM ratings GROUP BY product_id) as avg_ratings'), 
+                                            'products.id', '=', 'avg_ratings.product_id')
+            ->where('avg_ratings.avg_rating', '>=', 4.0)
+            ->orderBy('avg_ratings.avg_rating', 'desc')
             ->take(5)
             ->get();
         

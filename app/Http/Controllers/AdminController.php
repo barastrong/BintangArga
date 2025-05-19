@@ -13,7 +13,7 @@ class AdminController extends Controller
 {
     
     public function index(){
-        $users = User::latest()->paginate(10);
+        $users = User::paginate(10);
         return view('admin.index', ['users' => $users]);
     }
     
@@ -53,7 +53,7 @@ class AdminController extends Controller
     }
     
     public function products(){
-        $products = Product::latest()->paginate(10);
+        $products = Product::paginate(10);
         return view('admin.products', ['products' => $products]);
     }
     /**
@@ -125,7 +125,7 @@ class AdminController extends Controller
     }
 
     public function purchases(){
-    $purchases = Purchase::with(['user', 'product', 'size', 'seller'])->latest()->paginate(10);
+    $purchases = Purchase::with(['user', 'product', 'size', 'seller'])->paginate(10);
     return view('admin.purchases', ['purchases' => $purchases]);
     }
 

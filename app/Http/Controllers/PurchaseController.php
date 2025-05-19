@@ -35,7 +35,6 @@ class PurchaseController extends Controller
                 'size_id' => 'required|exists:sizes,id',
                 'quantity' => 'required|integer|min:1',
                 'status_pembelian' => 'required|in:beli,keranjang',
-                'payment_method' => 'nullable|string',
             ];
             
             // Add additional rules for direct purchase
@@ -47,7 +46,6 @@ class PurchaseController extends Controller
                 ]);
             }
             
-            // Validate the request
             $validatedData = $request->validate($rules);
             
             DB::beginTransaction();
@@ -66,8 +64,9 @@ class PurchaseController extends Controller
             // Calculate total price
             $total_price = $size->harga * $request->quantity;
     
-            // Check if the same product with the same size already exists in cart
+            // Check if it's a cart item or direct purchase
             if ($request->status_pembelian === 'keranjang') {
+                // Add to cart logic
                 $existingCartItem = Purchase::where([
                     'user_id' => Auth::id(),
                     'product_id' => $request->product_id,
@@ -109,8 +108,14 @@ class PurchaseController extends Controller
                         'payment_method' => $request->payment_method ?? 'pending'
                     ]);
                 }
+                
+                // Cart items don't reduce stock immediately
+                $redirectRoute = 'cart.index';
+                $successMessage = 'Item berhasil ditambahkan ke keranjang';
+                
             } else {
-                // For direct purchase, always create a new entry
+                // Direct purchase logic
+                // Create a new purchase record
                 $purchase = Purchase::create([
                     'user_id' => Auth::id(),
                     'seller_id' => $seller_id,
@@ -131,6 +136,17 @@ class PurchaseController extends Controller
                 $size->update([
                     'stock' => $size->stock - $request->quantity
                 ]);
+                
+                // Create array of cart items for checkout
+                $selectedItems = [$purchase];
+                $totalPrice = $total_price;
+                
+                // Direct purchase should go to checkout
+                $redirectRoute = 'cart.checkout';
+                $successMessage = 'Pesanan berhasil dibuat';
+                
+                // Store these items in the session for checkout
+                session(['selected_items' => [$purchase->id]]);
             }
     
             DB::commit();
@@ -139,17 +155,18 @@ class PurchaseController extends Controller
             if ($isAjax) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Item berhasil ditambahkan ke keranjang'
+                    'message' => $successMessage
                 ]);
             }
     
-            // Handle redirect based on purchase type
-            if ($request->status_pembelian === 'keranjang') {
-                return redirect()->route('cart.index')
-                    ->with('success', 'Item berhasil ditambahkan ke keranjang');
+            // For direct purchase, redirect to checkout instead of purchase show
+            if ($request->status_pembelian === 'beli') {
+                // Pass the purchase ID as a cart item to checkout
+                return redirect()->route('cart.checkout', ['cart_items' => [$purchase->id]])
+                    ->with('success', $successMessage);
             } else {
-                return redirect()->route('purchases.show', $purchase)
-                    ->with('success', 'Pesanan berhasil dibuat');
+                return redirect()->route($redirectRoute)
+                    ->with('success', $successMessage);
             }
     
         } catch (\Exception $e) {
@@ -226,7 +243,6 @@ class PurchaseController extends Controller
                 ->with('error', 'Hanya pembelian yang telah selesai yang dapat diberi rating.');
         }
         
-        // Check if the purchase has already been rated
         if (isset($purchase->rating)) {
             return redirect()->back()
                 ->with('error', 'Anda sudah memberikan rating untuk pesanan ini.');
@@ -239,14 +255,14 @@ class PurchaseController extends Controller
         ]);
         
         try {
-            // Update the purchase with rating information
             $purchase->update([
                 'rating' => $validated['rating'],
                 'review' => $validated['review'],
-                'has_been_rated' => true
+                'has_been_rated' => true,
+                'status' => 'selesai'
             ]);
             
-            // Create or update rating record for product statistics
+
             Rating::updateOrCreate(
                 [
                     'product_id' => $purchase->product_id,
@@ -299,16 +315,15 @@ class PurchaseController extends Controller
 
     public function checkoutFromCart(Request $request)
     {
+        // Validate request
         $request->validate([
             'cart_items' => 'required|array',
             'cart_items.*' => 'exists:purchases,id',
         ]);
-    
-        // Display checkout form with selected items
+        
+        // Get the selected items - either from cart or direct purchase
         $selectedItems = Purchase::whereIn('id', $request->cart_items)
             ->where('user_id', Auth::id())
-            ->where('status_pembelian', 'keranjang')
-            ->where('status', 'keranjang')
             ->with(['product', 'size'])
             ->get();
             
@@ -431,7 +446,6 @@ class PurchaseController extends Controller
             
             DB::commit();
             
-            // Redirect to the specific purchase's show page or to the purchases index if no item was processed
             if ($firstProcessedItem) {
                 return redirect()->route('purchases.show', $firstProcessedItem)
                     ->with('success', 'Pesanan berhasil diproses');

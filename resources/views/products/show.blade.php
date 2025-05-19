@@ -178,6 +178,7 @@
                     @csrf
                     <input type="hidden" name="product_id" id="productId">
                     <input type="hidden" name="size_id" id="sizeId">
+                       <input type="hidden" name="status_pembelian" value="beli">
                     
                     <!-- Product Details -->
                     <div class="mb-6">
@@ -255,184 +256,174 @@
 </div>
 </body>
 <script>
-    function updateMainImage(imageUrl) {
-        document.getElementById('mainImage').src = imageUrl;
-    }
+// Script to handle form submission validation and direct checkout
+function updateMainImage(imageUrl) {
+    document.getElementById('mainImage').src = imageUrl;
+}
 
-    let currentSizeId = null;
-    let currentStock = 0;
-    let currentPrice = 0;
+let currentSizeId = null;
+let currentStock = 0;
+let currentPrice = 0;
 
-    function openPurchaseModal(sizeId, sizeName, price, stock, productId) {
-        currentSizeId = sizeId;
-        currentStock = stock;
-        currentPrice = price;
-        
-        document.getElementById('sizeId').value = sizeId;
-        document.getElementById('productId').value = productId;
-        document.getElementById('selectedSize').textContent = sizeName;
-        document.getElementById('selectedPrice').textContent = formatPrice(price);
-        document.getElementById('availableStock').textContent = stock;
-        document.getElementById('quantity').value = 1;
+function openPurchaseModal(sizeId, sizeName, price, stock, productId) {
+    currentSizeId = sizeId;
+    currentStock = stock;
+    currentPrice = price;
+    
+    document.getElementById('sizeId').value = sizeId;
+    document.getElementById('productId').value = productId;
+    document.getElementById('selectedSize').textContent = sizeName;
+    document.getElementById('selectedPrice').textContent = formatPrice(price);
+    document.getElementById('availableStock').textContent = stock;
+    document.getElementById('quantity').value = 1;
+    updateSubtotal();
+    
+    document.getElementById('purchaseModal').classList.remove('hidden');
+}
+
+function closePurchaseModal() {
+    document.getElementById('purchaseModal').classList.add('hidden');
+    document.getElementById('purchaseForm').reset();
+}
+
+function updateQuantity(delta) {
+    const quantityInput = document.getElementById('quantity');
+    const currentQty = parseInt(quantityInput.value);
+    const newQty = currentQty + delta;
+    
+    if (newQty >= 1 && newQty <= currentStock) {
+        quantityInput.value = newQty;
         updateSubtotal();
-        
-        document.getElementById('purchaseModal').classList.remove('hidden');
     }
+}
 
-    function closePurchaseModal() {
-        document.getElementById('purchaseModal').classList.add('hidden');
-        document.getElementById('purchaseForm').reset();
+function updateSubtotal() {
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const subtotal = quantity * currentPrice;
+    document.getElementById('subtotal').textContent = formatPrice(subtotal);
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('id-ID').format(price);
+}
+
+// Close modal when clicking outside
+document.getElementById('purchaseModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePurchaseModal();
     }
+});
 
-    function updateQuantity(delta) {
-        const quantityInput = document.getElementById('quantity');
-        const currentQty = parseInt(quantityInput.value);
-        const newQty = currentQty + delta;
-        
-        if (newQty >= 1 && newQty <= currentStock) {
-            quantityInput.value = newQty;
-            updateSubtotal();
-        }
-    }
+// Form validation before submit
+document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+    const requiredFields = ['shipping_address', 'phone_number', 'description'];
+    let isValid = true;
 
-    function updateSubtotal() {
-        const quantity = parseInt(document.getElementById('quantity').value);
-        const subtotal = quantity * currentPrice;
-        document.getElementById('subtotal').textContent = formatPrice(subtotal);
-    }
-
-    function formatPrice(price) {
-        return new Intl.NumberFormat('id-ID').format(price);
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('purchaseModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closePurchaseModal();
+    requiredFields.forEach(field => {
+        const element = document.getElementById(field);
+        if (!element.value.trim()) {
+            isValid = false;
+            element.classList.add('border-red-500');
+        } else {
+            element.classList.remove('border-red-500');
         }
     });
 
-    // Form validation before submit
-    document.getElementById('purchaseForm').addEventListener('submit', function(e) {
-        // Add hidden status_pembelian field with value 'beli'
-        const statusInput = document.createElement('input');
-        statusInput.type = 'hidden';
-        statusInput.name = 'status_pembelian';
-        statusInput.value = 'beli';
-        this.appendChild(statusInput);
-        
-        const requiredFields = ['shipping_address', 'phone_number', 'description'];
-        let isValid = true;
-
-        requiredFields.forEach(field => {
-            const element = document.getElementById(field);
-            if (!element.value.trim()) {
-                isValid = false;
-                element.classList.add('border-red-500');
-            } else {
-                element.classList.remove('border-red-500');
-            }
-        });
-
-        if (!isValid) {
-            e.preventDefault();
-            alert('Mohon lengkapi semua data yang diperlukan');
-        }
-    });
-
-    function addToCart() {
-        // Get form values
-        const productId = document.getElementById('productId').value;
-        const sizeId = document.getElementById('sizeId').value;
-        const quantity = document.getElementById('quantity').value;
-        
-        // Validate required fields are present
-        if (!productId || !sizeId || !quantity) {
-            alert('Missing required product information');
-            return;
-        }
-        
-        // Get CSRF token from meta tag
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        
-        // Use FormData for a traditional form submit
-        const formData = new FormData();
-        formData.append('product_id', productId);
-        formData.append('size_id', sizeId);
-        formData.append('quantity', quantity);
-        formData.append('payment', 'Temporary');
-        formData.append('status_pembelian', 'keranjang');
-        formData.append('payment_method', 'pending');
-        formData.append('shipping_address', 'Temporary'); 
-        formData.append('phone_number', 'Temporary');     
-        formData.append('description', 'Added to cart');
-        formData.append('_token', csrfToken);
-        
-        // Send AJAX request
-        fetch('{{ route("purchases.store") }}', {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',  // Important to identify AJAX request
-                'X-CSRF-TOKEN': csrfToken
-            },
-            body: formData
-        })
-        .then(response => {
-            // Check if the response is JSON
-            const contentType = response.headers.get('content-type');
-            if (contentType && contentType.includes('application/json')) {
-                return response.json().then(data => {
-                    if (!response.ok) {
-                        return Promise.reject(data);
-                    }
-                    return data;
-                });
-            } else {
-                // If not JSON, there's an error - the server returned HTML
-                return Promise.reject({
-                    message: 'Server returned an unexpected response format. Please try again later.'
-                });
-            }
-        })
-        .then(data => {
-            // Success message
-            const notification = document.createElement('div');
-            notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
-            notification.textContent = 'Item ditambahkan ke keranjang!';
-            document.body.appendChild(notification);
-            
-            // Remove notification after 3 seconds
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-            
-            // Update cart count
-            updateCartCount();
-            
-            // Close the modal
-            closePurchaseModal();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Check if it's an authentication error
-            if (error.message && error.message.includes('Unauthenticated')) {
-                window.location.href = "{{ route('login') }}";
-            } else {
-                alert('Error menambahkan item ke keranjang: ' + (error.message || 'Unknown error'));
-            }
-        });
+    if (!isValid) {
+        e.preventDefault();
+        alert('Mohon lengkapi semua data yang diperlukan');
     }
+});
 
-    function updateCartCount() {
-        fetch('{{ route("cart.count") }}')
-            .then(response => response.json())
-            .then(data => {
-                const cartCount = document.getElementById('cartCount');
-                if (cartCount) {
-                    cartCount.textContent = data.count;
+function addToCart() {
+    // Get form values
+    const productId = document.getElementById('productId').value;
+    const sizeId = document.getElementById('sizeId').value;
+    const quantity = document.getElementById('quantity').value;
+    
+    // Validate required fields are present
+    if (!productId || !sizeId || !quantity) {
+        alert('Missing required product information');
+        return;
+    }
+    
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // Use FormData for a traditional form submit
+    const formData = new FormData();
+    formData.append('product_id', productId);
+    formData.append('size_id', sizeId);
+    formData.append('quantity', quantity);
+    formData.append('payment', 'Temporary');
+    formData.append('status_pembelian', 'keranjang');
+    formData.append('payment_method', 'pending');
+    formData.append('shipping_address', 'Temporary'); 
+    formData.append('phone_number', 'Temporary');     
+    formData.append('description', 'Added to cart');
+    formData.append('_token', csrfToken);
+    
+    // Send AJAX request
+    fetch('{{ route("purchases.store") }}', {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',  // Important to identify AJAX request
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: formData
+    })
+    .then(response => {
+        // Check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json().then(data => {
+                if (!response.ok) {
+                    return Promise.reject(data);
                 }
+                return data;
             });
-    }
+        } else {
+            // If not JSON, there's an error - the server returned HTML
+            return Promise.reject({
+                message: 'Server returned an unexpected response format. Please try again later.'
+            });
+        }
+    })
+    .then(data => {
+        // Success message
+        const notification = document.createElement('div');
+        notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.textContent = 'Item ditambahkan ke keranjang!';
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+        
+        updateCartCount();
+        
+        closePurchaseModal();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (error.message && error.message.includes('Unauthenticated')) {
+            window.location.href = "{{ route('login') }}";
+        } else {
+            alert('Error menambahkan item ke keranjang: ' + (error.message || 'Unknown error'));
+        }
+    });
+}
+
+function updateCartCount() {
+    fetch('{{ route("cart.count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const cartCount = document.getElementById('cartCount');
+            if (cartCount) {
+                cartCount.textContent = data.count;
+            }
+        });
+}
 </script>
 </html>
 @endsection

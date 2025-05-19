@@ -26,9 +26,6 @@
                 <div class="flex justify-between items-center mb-6">
                     <h1 class="text-2xl font-semibold text-orange-600">Purchase Details</h1>
                     <div class="flex space-x-2">
-                        <a href="{{ route('admin.purchases') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition">
-                            Cancel
-                        </a>
                         <form action="{{ route('admin.purchases.delete', $purchase->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this purchase?');" class="inline">
                             @csrf
                             @method('DELETE')

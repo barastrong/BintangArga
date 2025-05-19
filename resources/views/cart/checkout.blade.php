@@ -85,7 +85,8 @@
                     <!-- Product Item with New Design -->
                     <div class="product-card mb-4" id="item-{{ $item->id }}">
                         <div class="product-image">
-                            <img src="{{ Storage::url($item->product->sizes->first()->gambar_size) }}" 
+                            <img src="{{ Storage::url($item->size->gambar_size) }}" 
+                                alt="{{ $item->product->nama_barang }} - {{ $item->size->size }}"  
                                  alt="{{ $item->product->nama_barang }}" 
                                  class="object-contain">
                         </div>

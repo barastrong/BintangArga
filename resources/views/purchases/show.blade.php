@@ -56,6 +56,7 @@
                             {{ $purchase->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
                             {{ $purchase->status === 'process' ? 'bg-orange-100 text-orange-800' : '' }}
                             {{ $purchase->status === 'completed' ? 'bg-green-100 text-green-800' : '' }}
+                            {{ $purchase->status === 'selesai' ? 'bg-green-100 text-green-800' : '' }}
                             {{ $purchase->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
                             {{ ucfirst($purchase->status) }}
                         </span>

@@ -201,9 +201,28 @@
         .seller-info i {
             color: #666;
         }
+
+            /* Particle background styles */
+    .particle-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+    #particleCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
     </style>
 </head>
 <body>
+    <div class="particle-background">
+  <canvas id="particleCanvas"></canvas>
+</div>
     <div class="container">
         <div class="page-header">
             <h1 class="page-title">Explorasi UMKM</h1>
@@ -278,6 +297,7 @@
         </div>
     </div>
 
+    <script src="/js/particles.js"></script>
     <script>
 function toggleDropdown() {
     const content = document.getElementById("locationOptions");
