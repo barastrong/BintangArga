@@ -147,9 +147,25 @@
                     </div>
                 </div>
 
+                <div class="mb-4 pb-4 border-b">
+                    <div class="flex justify-between mb-2">
+                        <span>Tax (10%)</span>
+                        <span id="tax-amount">Rp {{ number_format($totalPrice *0.1 , 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span>Delivery Tax (3%)</span>
+                        <span id="delivery-tax">Rp {{ number_format($totalPrice * 0.03, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between mb-2 font-semibold">
+                        <span>Total</span>
+                        <span id="total-price">Rp {{ number_format($totalPrice + ($totalPrice * 0.1) + ($totalPrice * 0.03), 0, ',', '.') }}</span>
+                    </div>
+                </div>
+                    
                 <form id="checkout-form" action="{{ route('cart.process') }}" method="POST">
                     @csrf
-                    
+                    <input type="hidden" name="total_with_tax" id="input-total-with-tax" value="{{ $totalPrice + ($totalPrice * 0.1) }}">
+
                     <div id="cart-items-container">
                         @foreach($selectedItems as $item)
                             <input type="hidden" name="cart_items[]" value="{{ $item->id }}" id="input-item-{{ $item->id }}">
@@ -173,10 +189,10 @@
                                 </label>
                             </div>
                             
-                            <div class="border rounded p-3 cursor-pointer hover:border-orange-850 payment-option" data-method="nyicil">
-                                <input type="radio" name="payment_method" value="nyicil" id="payment_nyicil" class="hidden">
-                                <label for="payment_nyicil" class="cursor-pointer flex flex-col items-center">
-                                    <span class="text-sm font-medium">Nyicil</span>
+                            <div class="border rounded p-3 cursor-pointer hover:border-orange-850 payment-option" data-method="dana">
+                                <input type="radio" name="payment_method" value="dana" id="payment_dana" class="hidden">
+                                <label for="payment_dana" class="cursor-pointer flex flex-col items-center">
+                                    <span class="text-sm font-medium">Dana</span>
                                 </label>
                             </div>
                         </div>
@@ -236,54 +252,66 @@
         popup.classList.add('translate-x-full');
     }, 3000);
 }
-function updateQuantity(itemId, action) {
-    const quantityElement = document.getElementById(`quantity-${itemId}`);
-    const priceElement = document.getElementById(`price-${itemId}`);
-    const quantityInput = document.getElementById(`input-quantity-${itemId}`);
-    const stockElement = document.getElementById(`stock-${itemId}`);
-    
-    let currentQuantity = parseInt(quantityElement.innerText);
-    const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
-    const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
-    
-    // Increase or decrease quantity
-    if (action === 'increase') {
-        if (currentQuantity + 1 > stockAvailable) {
-            showErrorPopup(`Stock tidak mencukupi. Tersedia: ${stockAvailable}`);
-            return;
+ function updateQuantity(itemId, action) {
+        const quantityElement = document.getElementById(`quantity-${itemId}`);
+        const priceElement = document.getElementById(`price-${itemId}`);
+        const quantityInput = document.getElementById(`input-quantity-${itemId}`);
+        const stockElement = document.getElementById(`stock-${itemId}`);
+        
+        let currentQuantity = parseInt(quantityElement.innerText);
+        const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
+        const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
+        
+        // Increase or decrease quantity
+        if (action === 'increase') {
+            if (currentQuantity + 1 > stockAvailable) {
+                showErrorPopup(`Stock tidak mencukupi. Tersedia: ${stockAvailable}`);
+                return;
+            }
+            currentQuantity++;
+        } else if (action === 'decrease' && currentQuantity > 1) {
+            currentQuantity--;
         }
-        currentQuantity++;
-    } else if (action === 'decrease' && currentQuantity > 1) {
-        currentQuantity--;
+        
+        // Update displayed quantity
+        quantityElement.innerText = currentQuantity;
+        
+        // Update hidden input for form submission
+        quantityInput.value = currentQuantity;
+        
+        // Update price display
+        const newPrice = unitPrice * currentQuantity;
+        priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
+        
+        // Update overall subtotal, tax, and total
+        updateSubtotal();
+        
+        // Send AJAX request to update quantity in database
+        fetch(`/cart/update/${itemId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                quantity: currentQuantity
+            })
+        }).then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.error || 'Error updating quantity');
+                });
+            }
+            return response.json();
+        }).then(data => {
+            if (data.success) {
+                console.log('Quantity updated successfully');
+            }
+        }).catch(error => {
+            console.error('Error updating quantity:', error);
+            showErrorPopup(error.message);
+        });
     }
-    
-    // Update displayed quantity
-    quantityElement.innerText = currentQuantity;
-    
-    // Update hidden input for form submission
-    quantityInput.value = currentQuantity;
-    
-    // Update price display
-    const newPrice = unitPrice * currentQuantity;
-    priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
-    
-    // Update subtotal
-    updateSubtotal();
-    
-    // Send AJAX request to update quantity in database
-    fetch(`/cart/update/${itemId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({
-            quantity: currentQuantity
-        })
-    }).catch(error => {
-        console.error('Error updating quantity:', error);
-    });
-}
 
 // Modify form submission validation to handle stock validation
 document.getElementById('checkout-form').addEventListener('submit', function(event) {
@@ -353,9 +381,28 @@ document.getElementById('checkout-form').addEventListener('submit', function(eve
             subtotal += unitPrice * quantity;
         });
         
+        subtotal = Math.round(subtotal * 100) / 100;
         document.getElementById('subtotal').innerText = `Rp ${formatNumber(subtotal)}`;
+
+        const tax = Math.round(subtotal * 0.1 * 100) / 100;
+        
+        // Update tax display
+        document.getElementById('tax-amount').innerText = `Rp ${formatNumber(tax)}`;
+        
+        // Calculate total with tax - round to avoid floating point issues
+        const totalWithTax = Math.round((subtotal + tax) * 100) / 100;
+        
+        // Update total price display
+        document.getElementById('total-price').innerText = `Rp ${formatNumber(totalWithTax)}`;
+        
+        // Also update hidden input for form submission if needed
+        if (document.getElementById('input-total-with-tax')) {
+            document.getElementById('input-total-with-tax').value = totalWithTax;
+        }
     }
     
+    window.updateQuantity = updateQuantity;
+
     // Function to format number as currency
     function formatNumber(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

@@ -315,19 +315,16 @@ class PurchaseController extends Controller
 
     public function checkoutFromCart(Request $request)
     {
-        // Validate request
         $request->validate([
             'cart_items' => 'required|array',
             'cart_items.*' => 'exists:purchases,id',
         ]);
-        
-        // Get the selected items - either from cart or direct purchase
+
         $selectedItems = Purchase::whereIn('id', $request->cart_items)
             ->where('user_id', Auth::id())
             ->with(['product', 'size'])
             ->get();
             
-        // Calculate totals
         $totalPrice = $selectedItems->sum(function($item) {
             return $item->quantity * $item->size->harga;
         });
@@ -347,7 +344,6 @@ class PurchaseController extends Controller
 
     public function updateCartItem(Request $request, Purchase $purchase)
     {
-        // Check authorization
         if (Auth::id() !== $purchase->user_id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -392,7 +388,8 @@ class PurchaseController extends Controller
             'shipping_address' => 'required|string',
             'phone_number' => 'required|string',
             'description' => 'nullable|string',
-            'payment_method' => 'required|in:gopay,qris,nyicil'
+            'payment_method' => 'required|in:gopay,qris,nyicil',
+            'total_with_tax' => 'nullable|numeric'
         ]);
         
         try {
@@ -400,8 +397,6 @@ class PurchaseController extends Controller
             
             $cartItems = Purchase::whereIn('id', $request->cart_items)
                 ->where('user_id', Auth::id())
-                ->where('status_pembelian', 'keranjang')
-                ->where('status', 'keranjang')
                 ->with(['size', 'product'])
                 ->get();
             
@@ -409,23 +404,26 @@ class PurchaseController extends Controller
             $firstProcessedItem = null;
             
             foreach ($cartItems as $item) {
-                // Get the updated quantity from the request
-                $newQuantity = $request->quantities[$item->id] ?? $item->quantity;
+                $newQuantity = (int)$request->quantities[$item->id];
                 
-                // Check stock availability
                 if ($item->size->stock < $newQuantity) {
                     throw new \Exception("Stock untuk {$item->product->nama_barang} - {$item->size->size} tidak mencukupi. Tersedia: {$item->size->stock}");
                 }
                 
-                // Get seller ID from the product
                 $seller_id = $item->product->seller_id;
                 
-                // Update stock
-                $item->size->update([
-                    'stock' => $item->size->stock - $newQuantity
-                ]);
+                if ($item->status_pembelian === 'keranjang' && $item->status === 'keranjang') {
+                    $item->size->update([
+                        'stock' => $item->size->stock - $newQuantity
+                    ]);
+                }
                 
-                // Update purchase with the new quantity and payment method
+                $basePrice = (int)($item->size->harga * $newQuantity);
+                
+                $tax = (int)($basePrice * 0.1);
+
+                $totalWithTax = $basePrice + $tax;
+            
                 $item->update([
                     'status_pembelian' => 'beli',
                     'shipping_address' => $request->shipping_address,
@@ -433,7 +431,7 @@ class PurchaseController extends Controller
                     'description' => $request->description,
                     'status' => 'pending',
                     'quantity' => $newQuantity,
-                    'total_price' => $item->size->harga * $newQuantity,
+                    'total_price' => $totalWithTax, // Now includes tax
                     'payment_method' => $request->payment_method,
                     'seller_id' => $seller_id
                 ]);
