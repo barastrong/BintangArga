@@ -360,7 +360,7 @@
     <div class="header-wrapper">
         <!-- Hero Section -->
         <div class="hero-section">
-            <h1>Kontol Terpecah pecah</h1>
+            <h1>Hello World</h1>
         </div>
 
         <h2 class="features-title">Keunggulan Kami</h2>
