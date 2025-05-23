@@ -15,6 +15,14 @@
         border-indigo-500: solid;
         color: #4f46e5;
     }
+    .time-estimate {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
 </style>
 <body>
 <div class="container mx-auto px-4 py-8">
@@ -81,7 +89,9 @@
                                 </div>
                             </div>
                             <div class="mt-4 flex justify-between items-center">
-                                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">Dikemas</span>
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">Dikemas</span>
+                                </div>
                                 <div class="text-right">
                                     <p class="text-gray-600">Total harga</p>
                                     <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
@@ -127,7 +137,13 @@
                                 </div>
                             </div>
                             <div class="mt-4 flex justify-between items-center">
-                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">Diproses</span>
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">Diproses</span>
+                                    <div class="time-estimate">
+                                        <i class="fas fa-shipping-fast mr-1"></i>
+                                        Estimasi kirim: {{ \Carbon\Carbon::now()->addDays(2)->format('d M') }} - {{ \Carbon\Carbon::now()->addDays(3)->format('d M Y') }}
+                                    </div>
+                                </div>
                                 <div class="text-right">
                                     <p class="text-gray-600">Total harga</p>
                                     <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
@@ -169,7 +185,9 @@
                                 </div>
                             </div>
                             <div class="mt-4 flex justify-between items-center">
-                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Dikirim</span>
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Dikirim</span>
+                                </div>
                                 <div class="text-right">
                                     <p class="text-gray-600">Total harga</p>
                                     <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
@@ -211,7 +229,9 @@
                                 </div>
                             </div>
                             <div class="mt-4 flex justify-between items-center">
-                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Selesai</span>
+                                <div class="flex items-center space-x-3">
+                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Selesai</span>
+                                </div>
                                 <div class="text-right">
                                     <p class="text-gray-600">Total harga</p>
                                     <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>

@@ -33,15 +33,43 @@
             align-items: center;
         }
         .quantity-btn {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             background-color: #fff;
             border: 1px solid #ddd;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .quantity-btn:hover {
+            background-color: #f8f8f8;
+            border-color: #bbb;
+        }
+        .quantity-input {
+            width: 60px;
+            height: 32px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-left: none;
+            border-right: none;
+            font-size: 14px;
+            outline: none;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        .quantity-input:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 1px #fbbf24;
+        }
+        /* Hide spinner arrows in Chrome, Safari, Edge */
+        .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
         .total-price {
             text-align: right;
@@ -93,7 +121,7 @@
                         <button type="button" 
                                 class="remove-btn" 
                                 onclick="removeItem({{ $item->id }}, '{{ $item->product->nama_barang }}')">
-                            ×
+                            x
                         </button>
                         <div class="product-details">
                             <h3 class="text-lg font-medium">{{ $item->product->nama_barang }}</h3>
@@ -107,11 +135,17 @@
                                     <button type="button" 
                                             class="quantity-btn" 
                                             onclick="updateQuantity({{ $item->id }}, 'decrease')">
-                                        −
+                                        -
                                     </button>
-                                    <span id="quantity-{{ $item->id }}" class="mx-4">
-                                        {{ $item->quantity }}
-                                    </span>
+                                    <input type="number" 
+                                           id="quantity-{{ $item->id }}" 
+                                           class="quantity-input"
+                                           value="{{ $item->quantity }}"
+                                           min="0"
+                                           max="{{ $item->size->stock }}"
+                                           onchange="updateQuantityManual({{ $item->id }})"
+                                           onkeyup="updateQuantityManual({{ $item->id }})"
+                                           onblur="validateQuantity({{ $item->id }})">
                                     <button type="button" 
                                             class="quantity-btn" 
                                             onclick="updateQuantity({{ $item->id }}, 'increase')">
@@ -229,36 +263,37 @@
 
 <script>
     function showErrorPopup(message) {
-    // Create popup element if it doesn't exist
-    if (!document.getElementById('error-popup')) {
-        const popup = document.createElement('div');
-        popup.id = 'error-popup';
-        popup.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded shadow-lg z-50 transform transition-all duration-300 translate-x-full';
-        popup.style.maxWidth = '350px';
-        document.body.appendChild(popup);
+        // Create popup element if it doesn't exist
+        if (!document.getElementById('error-popup')) {
+            const popup = document.createElement('div');
+            popup.id = 'error-popup';
+            popup.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+            popup.style.maxWidth = '350px';
+            document.body.appendChild(popup);
+        }
+        
+        // Get popup element and set message
+        const popup = document.getElementById('error-popup');
+        popup.innerHTML = message;
+        
+        // Show popup with animation
+        setTimeout(() => {
+            popup.classList.remove('translate-x-full');
+        }, 10);
+        
+        // Hide popup after 3 seconds
+        setTimeout(() => {
+            popup.classList.add('translate-x-full');
+        }, 3000);
     }
-    
-    // Get popup element and set message
-    const popup = document.getElementById('error-popup');
-    popup.innerHTML = message;
-    
-    // Show popup with animation
-    setTimeout(() => {
-        popup.classList.remove('translate-x-full');
-    }, 10);
-    
-    // Hide popup after 3 seconds
-    setTimeout(() => {
-        popup.classList.add('translate-x-full');
-    }, 3000);
-}
- function updateQuantity(itemId, action) {
+
+    function updateQuantity(itemId, action) {
         const quantityElement = document.getElementById(`quantity-${itemId}`);
         const priceElement = document.getElementById(`price-${itemId}`);
         const quantityInput = document.getElementById(`input-quantity-${itemId}`);
         const stockElement = document.getElementById(`stock-${itemId}`);
         
-        let currentQuantity = parseInt(quantityElement.innerText);
+        let currentQuantity = parseInt(quantityElement.value);
         const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
         const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
         
@@ -273,8 +308,8 @@
             currentQuantity--;
         }
         
-        // Update displayed quantity
-        quantityElement.innerText = currentQuantity;
+        // Update input value
+        quantityElement.value = currentQuantity;
         
         // Update hidden input for form submission
         quantityInput.value = currentQuantity;
@@ -287,6 +322,62 @@
         updateSubtotal();
         
         // Send AJAX request to update quantity in database
+        updateQuantityInDatabase(itemId, currentQuantity);
+    }
+
+    function updateQuantityManual(itemId) {
+        const quantityElement = document.getElementById(`quantity-${itemId}`);
+        const priceElement = document.getElementById(`price-${itemId}`);
+        const quantityInput = document.getElementById(`input-quantity-${itemId}`);
+        const stockElement = document.getElementById(`stock-${itemId}`);
+        
+        let currentQuantity = parseInt(quantityElement.value);
+        const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
+        const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
+        
+        // Validate quantity
+        if (isNaN(currentQuantity) || currentQuantity < 1) {
+            currentQuantity = 1;
+            quantityElement.value = currentQuantity;
+        } else if (currentQuantity > stockAvailable) {
+            showErrorPopup(`Stock tidak mencukupi. Tersedia: ${stockAvailable}`);
+            currentQuantity = stockAvailable;
+            quantityElement.value = currentQuantity;
+        }
+        
+        // Update hidden input for form submission
+        quantityInput.value = currentQuantity;
+        
+        // Update price display
+        const newPrice = unitPrice * currentQuantity;
+        priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
+        
+        // Update overall subtotal, tax, and total
+        updateSubtotal();
+    }
+
+    function validateQuantity(itemId) {
+        const quantityElement = document.getElementById(`quantity-${itemId}`);
+        const stockElement = document.getElementById(`stock-${itemId}`);
+        
+        let currentQuantity = parseInt(quantityElement.value);
+        const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
+        
+        // Final validation on blur
+        if (isNaN(currentQuantity) || currentQuantity < 1) {
+            currentQuantity = 1;
+            quantityElement.value = currentQuantity;
+        } else if (currentQuantity > stockAvailable) {
+            currentQuantity = stockAvailable;
+            quantityElement.value = currentQuantity;
+        }
+        
+        // Update in database
+        updateQuantityInDatabase(itemId, currentQuantity);
+    }
+
+    function updateQuantityInDatabase(itemId, quantity) {
+        // Send AJAX request to update quantity in database
         fetch(`/cart/update/${itemId}`, {
             method: 'POST',
             headers: {
@@ -294,7 +385,7 @@
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
             body: JSON.stringify({
-                quantity: currentQuantity
+                quantity: quantity
             })
         }).then(response => {
             if (!response.ok) {
@@ -313,38 +404,38 @@
         });
     }
 
-// Modify form submission validation to handle stock validation
-document.getElementById('checkout-form').addEventListener('submit', function(event) {
-    // Check if payment method is selected
-    const paymentSelected = document.querySelector('input[name="payment_method"]:checked');
-    if (!paymentSelected) {
-        event.preventDefault();
-        document.getElementById('payment-method-error').classList.remove('hidden');
-    }
-    
-    // Check stock availability for all items before submission
-    let stockError = false;
-    const cartItems = document.querySelectorAll('[id^="item-"]');
-    
-    cartItems.forEach(item => {
-        const itemId = item.id.split('-')[1];
-        const quantityElement = document.getElementById(`quantity-${itemId}`);
-        const stockElement = document.getElementById(`stock-${itemId}`);
-        
-        if (stockElement) {
-            const quantity = parseInt(quantityElement.innerText);
-            const stock = parseInt(stockElement.value);
-            
-            if (quantity > stock) {
-                event.preventDefault();
-                stockError = true;
-                const productName = document.querySelector(`#item-${itemId} h3`).innerText;
-                const sizeName = document.querySelector(`#item-${itemId} div:nth-child(4)`).innerText;
-                showErrorPopup(`Stock untuk ${productName} - ${sizeName} tidak mencukupi. Tersedia: ${stock}`);
-            }
+    // Modify form submission validation to handle stock validation
+    document.getElementById('checkout-form').addEventListener('submit', function(event) {
+        // Check if payment method is selected
+        const paymentSelected = document.querySelector('input[name="payment_method"]:checked');
+        if (!paymentSelected) {
+            event.preventDefault();
+            document.getElementById('payment-method-error').classList.remove('hidden');
         }
+        
+        // Check stock availability for all items before submission
+        let stockError = false;
+        const cartItems = document.querySelectorAll('[id^="item-"]');
+        
+        cartItems.forEach(item => {
+            const itemId = item.id.split('-')[1];
+            const quantityElement = document.getElementById(`quantity-${itemId}`);
+            const stockElement = document.getElementById(`stock-${itemId}`);
+            
+            if (stockElement) {
+                const quantity = parseInt(quantityElement.value);
+                const stock = parseInt(stockElement.value);
+                
+                if (quantity > stock) {
+                    event.preventDefault();
+                    stockError = true;
+                    const productName = document.querySelector(`#item-${itemId} h3`).innerText;
+                    const sizeName = document.querySelector(`#item-${itemId} div:nth-child(4)`).innerText;
+                    showErrorPopup(`Stock untuk ${productName} - ${sizeName} tidak mencukupi. Tersedia: ${stock}`);
+                }
+            }
+        });
     });
-});
     
     function removeItem(itemId, itemName) {
         // Remove item from DOM
@@ -376,7 +467,7 @@ document.getElementById('checkout-form').addEventListener('submit', function(eve
             const itemId = element.id.split('-')[1];
             const quantityElement = document.getElementById(`quantity-${itemId}`);
             const unitPrice = parseFloat(element.getAttribute('data-unit-price'));
-            const quantity = parseInt(quantityElement.innerText);
+            const quantity = parseInt(quantityElement.value);
             
             subtotal += unitPrice * quantity;
         });
@@ -385,12 +476,14 @@ document.getElementById('checkout-form').addEventListener('submit', function(eve
         document.getElementById('subtotal').innerText = `Rp ${formatNumber(subtotal)}`;
 
         const tax = Math.round(subtotal * 0.1 * 100) / 100;
+        const deliveryTax = Math.round(subtotal * 0.03 * 100) / 100;
         
         // Update tax display
         document.getElementById('tax-amount').innerText = `Rp ${formatNumber(tax)}`;
+        document.getElementById('delivery-tax').innerText = `Rp ${formatNumber(deliveryTax)}`;
         
         // Calculate total with tax - round to avoid floating point issues
-        const totalWithTax = Math.round((subtotal + tax) * 100) / 100;
+        const totalWithTax = Math.round((subtotal + tax + deliveryTax) * 100) / 100;
         
         // Update total price display
         document.getElementById('total-price').innerText = `Rp ${formatNumber(totalWithTax)}`;
@@ -401,8 +494,6 @@ document.getElementById('checkout-form').addEventListener('submit', function(eve
         }
     }
     
-    window.updateQuantity = updateQuantity;
-
     // Function to format number as currency
     function formatNumber(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -431,16 +522,6 @@ document.getElementById('checkout-form').addEventListener('submit', function(eve
             // Hide error message if shown
             document.getElementById('payment-method-error').classList.add('hidden');
         });
-    });
-    
-    // Form submission validation
-    document.getElementById('checkout-form').addEventListener('submit', function(event) {
-        // Check if payment method is selected
-        const paymentSelected = document.querySelector('input[name="payment_method"]:checked');
-        if (!paymentSelected) {
-            event.preventDefault();
-            document.getElementById('payment-method-error').classList.remove('hidden');
-        }
     });
 
     @if(session('error'))
