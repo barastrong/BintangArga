@@ -17,7 +17,7 @@ class PurchaseController extends Controller
         $purchases = Auth::user()->purchases()
         ->with(['product', 'size'])
         ->orderBy('created_at', 'desc')
-        ->get(); // Changed to get() to allow filtering by status in the view
+        ->get();
             
     return view('purchases.index', compact('purchases'));
     }

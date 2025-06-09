@@ -50,7 +50,7 @@ Route::middleware('auth', 'verified')->group(function () {
     // Carts Route
     Route::get('/cart', [PurchaseController::class, 'viewCart'])->name('cart.index');
     Route::post('/cart/update/{purchase}', [PurchaseController::class, 'updateCartItem'])->name('cart.update');
-    Route::post('/cart/remove/{purchase}', [PurchaseController::class, 'removeFromCart'])->name('cart.remove');
+    Route::delete('/cart/remove/{purchase}', [PurchaseController::class, 'removeFromCart'])->name('cart.remove');
     Route::match(['get','post'],'/cart/checkout', [PurchaseController::class, 'checkoutFromCart'])->name('cart.checkout');
     Route::post('/cart/process', [PurchaseController::class, 'processCheckout'])->name('cart.process');
     Route::get('/cart/count', [PurchaseController::class, 'getCartCount'])->name('cart.count');

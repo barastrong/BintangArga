@@ -143,8 +143,8 @@
                                            value="{{ $item->quantity }}"
                                            min="0"
                                            max="{{ $item->size->stock }}"
-                                           onchange="updateQuantityManual({{ $item->id }})"
-                                           onkeyup="updateQuantityManual({{ $item->id }})"
+                                           onchange="updateQuantityManual({{ $item -> id }})"
+                                           onkeyup="updateQuantityManual({{ $item -> id }})"
                                            onblur="validateQuantity({{ $item->id }})">
                                     <button type="button" 
                                             class="quantity-btn" 

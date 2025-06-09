@@ -1,6 +1,4 @@
-@extends('layouts.app')
 
-@section('content')
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,642 +7,238 @@
     <title>Edit Produk</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
+    <link rel="stylesheet" href="{{ asset('css/edit-product.css') }}">
 </head>
-<style>
-    :root {
-        --orange-primary: #ff7a00;
-        --orange-secondary: #ff9c40;
-        --orange-light: #fff8f3;
-        --light-gray: #f8f9fa;
-        --border-color: #e9ecef;
-    }
-    
-    body {
-        background-color: #f5f5f5;
-        font-family: 'Inter', sans-serif;
-        text-decoration: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    a{
-        text-decoration: none;
-    }
-    .bg-orange {
-        background-color: var(--orange-primary) !important;
-    }
-    
-    .text-orange {
-        color: var(--orange-primary) !important;
-    }
-    
-    .border-orange {
-        border-color: var(--orange-primary) !important;
-    }
-    
-    .btn-orange {
-        background-color: var(--orange-primary);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-orange:hover {
-        background-color: var(--orange-secondary);
-        transform: translateY(-2px);
-    }
-    
-    .form-container {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        padding: 30px;
-        margin-bottom: 20px;
-    }
-    
-    .section-title {
-        color: var(--orange-primary);
-        font-weight: 600;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .section-title i {
-        margin-right: 10px;
-        font-size: 20px;
-    }
-    
-    .form-label {
-        font-weight: 500;
-        color: #495057;
-        margin-bottom: 8px;
-    }
-    
-    .tag-label {
-        font-size: 0.7rem;
-        background-color: rgba(255, 103, 21, 0.1);
-        color: var(--orange-primary);
-        padding: 2px 8px;
-        border-radius: 20px;
-        margin-left: 5px;
-        font-weight: 500;
-        }
-
-    .form-control, .form-select {
-        padding: 12px 16px;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        font-size: 15px;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: var(--orange-primary);
-        box-shadow: 0 0 0 0.25rem rgba(255, 122, 0, 0.25);
-    }
-    
-    .dropzone-area {
-        border: 2px dashed var(--orange-primary);
-        border-radius: 12px;
-        background-color: var(--orange-light);
-        padding: 30px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .dropzone-area:hover {
-        background-color: #fff0e6;
-    }
-    
-    .size-container {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    
-    .size-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-    
-    .size-badge {
-        background-color: var(--orange-primary);
-        color: white;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-weight: 600;
-        margin-right: 10px;
-    }
-    
-    .nav-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 40px;
-    }
-    
-    .required-field::after {
-        content: "*";
-        color: red;
-        margin-left: 4px;
-    }
-    
-    .wajib-field {
-        font-size: 12px;
-        color: #6c757d;
-    }
-
-    /* Style for progress steps */
-    .progress-steps {
-        display: flex;
-        margin-bottom: 30px;
-        border-bottom: 1px solid #e9ecef;
-        padding-bottom: 20px;
-    }
-
-    .step-item {
-        display: flex;
-        align-items: center;
-        margin-right: 40px;
-    }
-
-    .step-number {
-        width: 24px;
-        height: 24px;
-        background-color: var(--orange-primary);
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 14px;
-        margin-right: 10px;
-    }
-
-    .step-text {
-        font-weight: 500;
-        color: var(--orange-primary);
-    }
-
-    /* Location icon style */
-    .location-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #6c757d;
-    }
-
-    .location-input {
-        padding-left: 40px !important;
-    }
-</style>
 <body>
-<div class="container py-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="mb-4">
-                <h2 class="text-orange fw-bold mb-0">Edit Produk</h2>
-                <p class="mb-3">Lengkapi informasi produk Anda di bawah ini</p>
-            </div>
-            
-            <!-- Progress Steps -->
-            <div class="progress-steps">
-                <div class="step-item">
-                    <div class="step-number">1</div>
-                    <div class="step-text">Informasi Produk</div>
-                </div>
-                <div class="step-item">
-                    <div class="step-number">2</div>
-                    <div class="step-text">Ukuran dan Harga</div>
-                </div>
-            </div>
-            
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <h4>Tambah Produk Baru</h4>
+            <p>Lengkapi informasi produk Anda di bawah ini</p>
+        </div>
+
+        <div class="form-content">
+            <!-- Error Display -->
             @if ($errors->any())
-                <div class="alert alert-danger rounded-3">
-                    <ul class="mb-0">
+                <div class="alert alert-danger">
+                    <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                 </div>
             @endif
-            
+
             <form method="POST" action="{{ route('products.update', $product->id) }}" enctype="multipart/form-data" id="productForm">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="seller_id" value="{{ $seller->id }}">
-                
+
                 <!-- Product Information Section -->
-                <div class="form-container">
-                    <h5 class="mb-4 text-orange"><i class="bi bi-info-circle me-2"></i>Informasi Produk</h5>
-                    
-                    <div class="mb-3">
-                        <label for="category_id" class="form-label">Kategori <span class="tag-label">Wajib</span></label>
-                        <select id="category_id" class="form-select @error('category_id') is-invalid @enderror" name="category_id" required>
-                            <option value="">Pilih Kategori</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
-                                    {{ $category->nama }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('category_id')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="bi bi-info-circle"></i>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="nama_barang" class="form-label">Nama Barang <span class="tag-label">Wajib</span></label>
-                        <input id="nama_barang" type="text" class="form-control @error('nama_barang') is-invalid @enderror" 
-                            name="nama_barang" value="{{ old('nama_barang', $product->nama_barang) }}" 
-                            placeholder="Masukkan nama produk" required>
-                        @error('nama_barang')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Deskripsi <span class="tag-label">Wajib</span></label>
-                        <textarea id="description" class="form-control @error('description') is-invalid @enderror" 
-                            name="description" rows="4" placeholder="Jelaskan detail produk Anda" required>{{ old('description', $product->description) }}</textarea>
-                        @error('description')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="lokasi" class="form-label">Lokasi Toko <span class="tag-label">Wajib</span></label>
-                        <div class="position-relative">
-                            <i class="bi bi-geo-alt location-icon"></i>
-                            <input id="lokasi" type="text" class="form-control location-input @error('lokasi') is-invalid @enderror" 
-                                name="lokasi" value="{{ old('lokasi', $product->lokasi) }}" 
-                                placeholder="Kota atau provinsi" required>
-                        </div>
-                        @error('lokasi')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="alamat_lengkap" class="form-label">Alamat Lengkap <span class="tag-label">Wajib</span></label>
-                        <textarea id="alamat_lengkap" class="form-control @error('alamat_lengkap') is-invalid @enderror" 
-                            name="alamat_lengkap" rows="3" placeholder="Alamat lengkap toko Anda" required>{{ old('alamat_lengkap', $product->alamat_lengkap) }}</textarea>
-                        @error('alamat_lengkap')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    <h5 class="section-title">Informasi Produk</h5>
                 </div>
-                
+
+                <div class="form-group">
+                    <label for="category_id" class="form-label">
+                        Kategori <span class="required-tag">Wajib</span>
+                    </label>
+                    <select id="category_id" class="form-select @error('category_id') is-invalid @enderror" name="category_id" required>
+                        <option value="">Pilih Kategori</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                {{ $category->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('category_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="nama_barang" class="form-label">
+                        Nama Barang <span class="required-tag">Wajib</span>
+                    </label>
+                    <input id="nama_barang" type="text" class="form-control @error('nama_barang') is-invalid @enderror" 
+                        name="nama_barang" value="{{ old('nama_barang', $product->nama_barang) }}" 
+                        placeholder="Masukkan nama produk" required>
+                    @error('nama_barang')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        Deskripsi <span class="required-tag">Wajib</span>
+                    </label>
+                    <textarea id="description" class="form-control @error('description') is-invalid @enderror" 
+                        name="description" rows="4" placeholder="Jelaskan detail produk Anda" required>{{ old('description', $product->description) }}</textarea>
+                    @error('description')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="lokasi" class="form-label">
+                        Lokasi Toko <span class="required-tag">Wajib</span>
+                    </label>
+                    <div class="location-wrapper">
+                        <i class="bi bi-geo-alt location-icon"></i>
+                        <input id="lokasi" type="text" class="form-control location-input @error('lokasi') is-invalid @enderror" 
+                            name="lokasi" value="{{ old('lokasi', $product->lokasi) }}" 
+                            placeholder="Kota atau provinsi" required>
+                    </div>
+                    @error('lokasi')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="alamat_lengkap" class="form-label">
+                        Alamat Lengkap <span class="required-tag">Wajib</span>
+                    </label>
+                    <textarea id="alamat_lengkap" class="form-control @error('alamat_lengkap') is-invalid @enderror" 
+                        name="alamat_lengkap" rows="3" placeholder="Alamat lengkap toko Anda" required>{{ old('alamat_lengkap', $product->alamat_lengkap) }}</textarea>
+                    @error('alamat_lengkap')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <!-- Product Image Section -->
-                <div class="form-container">
-                    <h5 class="mb-4 text-orange"><i class="bi bi-image me-2"></i>Gambar Produk <span class="tag-label">Wajib</span></h5>
-                    
-                    <div class="dropzone-wrapper">
-                        @if($product->gambar)
-                            <div class="preview-zone visible mb-3">
-                                <img src="{{ asset('storage/' . $product->gambar) }}" alt="Gambar Produk" class="img-fluid rounded" style="max-height: 300px;">
-                            </div>
-                            <button type="button" class="btn btn-outline-secondary btn-change-image mb-3">
-                                <i class="bi bi-arrow-repeat"></i> Ganti Gambar
-                            </button>
-                        @endif
-                        
-                        <div class="dropzone-area @if($product->gambar) d-none @endif">
-                            <input type="file" class="form-control d-none" id="gambar" name="gambar" accept="image/*">
-                            <div class="text-center">
-                                <i class="bi bi-cloud-arrow-up text-orange" style="font-size: 48px;"></i>
-                                <h5 class="mt-3">Klik untuk upload gambar</h5>
-                                <p class="text-muted small">JPG, PNG maks. 5MB</p>
-                            </div>
-                        </div>
-                        
-                        @error('gambar')
-                            <div class="text-danger mt-2">{{ $message }}</div>
-                        @enderror
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="bi bi-image"></i>
                     </div>
+                    <h5 class="section-title">Gambar Produk <span class="required-tag">Wajib</span></h5>
                 </div>
-                
+
+                <div class="form-group">
+                    @if($product->gambar)
+                        <div class="image-preview" id="imagePreview">
+                            <img src="{{ asset('storage/' . $product->gambar) }}" alt="Gambar Produk">
+                        </div>
+                        <button type="button" class="change-image-btn" id="changeImageBtn">
+                            <i class="bi bi-arrow-repeat"></i> Ganti Gambar
+                        </button>
+                    @endif
+                    
+                    <div class="upload-section" id="uploadSection" @if($product->gambar) style="display: none;" @endif>
+                        <input type="file" id="gambar" name="gambar" accept="image/*">
+                        <div class="upload-icon">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                        </div>
+                        <div class="upload-text">Klik untuk upload gambar</div>
+                        <div class="upload-subtitle">JPG, PNG maks. 5MB</div>
+                    </div>
+                    
+                    @error('gambar')
+                        <div class="text-danger mt-2">{{ $message }}</div>
+                    @enderror
+                </div>
+
                 <!-- Sizes and Prices Section -->
-                <div class="form-container">
-                    <h5 class="mb-4 text-orange"><i class="bi bi-tag me-2"></i>Ukuran dan Harga</h5>
-                    
-                    <p class="wajib-field mb-4"><i class="bi bi-info-circle"></i> Pilih minimal satu ukuran yang tersedia</p>
-                    
-                    @php 
-                        $availableSizes = ['S', 'M', 'L', 'XL'];
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                    <h5 class="section-title">Ukuran dan Harga</h5>
+                </div>
+
+                <div class="required-notice">
+                    <i class="bi bi-info-circle"></i>
+                    Pilih minimal satu ukuran yang tersedia
+                </div>
+
+                @php 
+                    $availableSizes = ['S', 'M', 'L', 'XL'];
+                @endphp
+
+                @foreach($availableSizes as $sizeName)
+                    @php
+                        $size = $product->sizes->where('size', $sizeName)->first();
                     @endphp
                     
-                    @foreach($availableSizes as $sizeName)
-                        @php
-                            $size = $product->sizes->where('size', $sizeName)->first();
-                        @endphp
+                    <div class="size-container">
+                        <div class="size-header" onclick="toggleSize('{{ $sizeName }}')">
+                            <label class="size-label">
+                                <input class="size-checkbox" type="checkbox" id="size_active_{{ $sizeName }}" 
+                                    name="size_active[{{ $sizeName }}]" {{ $size ? 'checked' : '' }}
+                                    onclick="event.stopPropagation();">
+                                Ukuran 
+                                <span class="size-badge">{{ $sizeName }}</span>
+                            </label>
+                        </div>
                         
-                        <div class="size-container">
-                            <div class="size-header">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="size_active_{{ $sizeName }}" 
-                                        name="size_active[{{ $sizeName }}]" {{ $size ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="size_active_{{ $sizeName }}">
-                                        <span class="size-badge">Ukuran {{ $sizeName }}</span>
+                        <div class="size-details {{ $size ? 'active' : '' }}" id="size_details_{{ $sizeName }}">
+                            <div class="row">
+                                <div class="col-md-6 form-group">
+                                    <label for="sizes_{{ $sizeName }}_harga" class="form-label">
+                                        Harga <span class="required-tag">Wajib</span>
                                     </label>
-                                </div>
-                            </div>
-                            
-                            <div class="size-details" id="size_details_{{ $sizeName }}" style="{{ $size ? '' : 'display: none;' }}">
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="sizes_{{ $sizeName }}_harga" class="form-label">Harga <span class="tag-label">Wajib</span></label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">Rp</span>
-                                            <input id="sizes_{{ $sizeName }}_harga" type="number" class="form-control" 
-                                                name="sizes[{{ $sizeName }}][harga]" value="{{ $size ? $size->harga : old('sizes.'.$sizeName.'.harga') }}" 
-                                                placeholder="0" min="0">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6 mb-3">
-                                        <label for="sizes_{{ $sizeName }}_stock" class="form-label">Stok <span class="tag-label">Wajib</span></label>
-                                        <input id="sizes_{{ $sizeName }}_stock" type="number" class="form-control" 
-                                            name="sizes[{{ $sizeName }}][stock]" value="{{ $size ? $size->stock : old('sizes.'.$sizeName.'.stock') }}" 
+                                    <div class="price-input-group">
+                                        <span class="currency-label">Rp</span>
+                                        <input id="sizes_{{ $sizeName }}_harga" type="number" class="form-control price-input" 
+                                            name="sizes[{{ $sizeName }}][harga]" value="{{ $size ? $size->harga : old('sizes.'.$sizeName.'.harga') }}" 
                                             placeholder="0" min="0">
                                     </div>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <label for="sizes_{{ $sizeName }}_gambar" class="form-label">Gambar Ukuran (Opsional)</label>
-                                    
-                                    <div class="size-dropzone-wrapper">
-                                        @if($size && $size->gambar_size)
-                                            <div class="size-preview-zone visible mb-2">
-                                                <img src="{{ asset('storage/' . $size->gambar_size) }}" alt="Gambar Ukuran {{ $sizeName }}" class="img-fluid rounded" style="max-height: 100px;">
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary btn-change-size-image mb-2" data-size="{{ $sizeName }}">
-                                                <i class="bi bi-arrow-repeat"></i> Ganti
-                                            </button>
-                                        @endif
-                                        
-                                        <div class="size-dropzone-area @if($size && $size->gambar_size) d-none @endif p-3 border rounded text-center" style="background-color: #f8f9fa;">
-                                            <input id="sizes_{{ $sizeName }}_gambar" type="file" class="form-control d-none" name="sizes[{{ $sizeName }}][gambar]" accept="image/*">
-                                            <div class="text-center">
-                                                <i class="bi bi-cloud-arrow-up text-orange"></i>
-                                                <p class="mb-0 small">Klik untuk upload gambar ukuran</p>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6 form-group">
+                                    <label for="sizes_{{ $sizeName }}_stock" class="form-label">
+                                        Stok <span class="required-tag">Wajib</span>
+                                    </label>
+                                    <input id="sizes_{{ $sizeName }}_stock" type="number" class="form-control" 
+                                        name="sizes[{{ $sizeName }}][stock]" value="{{ $size ? $size->stock : old('sizes.'.$sizeName.'.stock') }}" 
+                                        placeholder="0" min="0">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sizes_{{ $sizeName }}_gambar" class="form-label">
+                                    Gambar Ukuran (Opsional)
+                                </label>
+                                
+                                @if($size && $size->gambar_size)
+                                    <div class="size-image-preview" id="sizeImagePreview_{{ $sizeName }}">
+                                        <img src="{{ asset('storage/' . $size->gambar_size) }}" alt="Gambar Ukuran {{ $sizeName }}">
+                                    </div>
+                                    <button type="button" class="change-image-btn" onclick="changeSizeImage('{{ $sizeName }}')">
+                                        <i class="bi bi-arrow-repeat"></i> Ganti
+                                    </button>
+                                @endif
+                                
+                                <div class="size-image-upload" id="sizeImageUpload_{{ $sizeName }}" 
+                                     @if($size && $size->gambar_size) style="display: none;" @endif
+                                     onclick="document.getElementById('sizes_{{ $sizeName }}_gambar').click()">
+                                    <input id="sizes_{{ $sizeName }}_gambar" type="file" name="sizes[{{ $sizeName }}][gambar]" accept="image/*">
+                                    <div>
+                                        <i class="bi bi-cloud-arrow-up" style="color: var(--orange-primary);"></i>
+                                        <p class="mb-0 small">Klik untuk upload gambar ukuran</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-                
-                <!-- Navigation Buttons -->
-                <div class="nav-buttons">
-                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Kembali
-                    </a>
-                    <button type="submit" class="btn btn-orange">
-                        Simpan Produk <i class="bi bi-check-circle ms-1"></i>
-                    </button>
-                </div>
+                    </div>
+                @endforeach
             </form>
         </div>
-    </div>
-</div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Size checkbox toggle functionality
-        const sizeCheckboxes = document.querySelectorAll('input[name^="size_active"]');
-        
-        sizeCheckboxes.forEach(function(checkbox) {
-            checkbox.addEventListener('change', function() {
-                const sizeName = this.id.replace('size_active_', '');
-                const sizeDetails = document.getElementById('size_details_' + sizeName);
-                
-                if (this.checked) {
-                    $(sizeDetails).slideDown(300);
-                } else {
-                    $(sizeDetails).slideUp(300);
-                }
-            });
-        });
-        
-        // Main product image upload
-        const mainDropzoneArea = document.querySelector('.dropzone-area');
-        const mainFileInput = document.getElementById('gambar');
-        const mainPreviewZone = document.querySelector('.preview-zone');
-        const mainChangeBtn = document.querySelector('.btn-change-image');
-        
-        if (mainDropzoneArea && mainFileInput) {
-            mainDropzoneArea.addEventListener('click', function() {
-                mainFileInput.click();
-            });
-            
-            mainFileInput.addEventListener('change', function() {
-                if (this.files.length) {
-                    const file = this.files[0];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        // Create preview if it doesn't exist yet
-                        if (!mainPreviewZone) {
-                            const previewDiv = document.createElement('div');
-                            previewDiv.classList.add('preview-zone', 'visible', 'mb-3');
-                            mainDropzoneArea.parentNode.insertBefore(previewDiv, mainDropzoneArea);
-                            
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            img.classList.add('img-fluid', 'rounded');
-                            img.style.maxHeight = '300px';
-                            previewDiv.appendChild(img);
-                            
-                            // Create change button
-                            const changeBtn = document.createElement('button');
-                            changeBtn.type = 'button';
-                            changeBtn.classList.add('btn', 'btn-outline-secondary', 'btn-change-image', 'mb-3', 'mt-2');
-                            changeBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Ganti Gambar';
-                            mainDropzoneArea.parentNode.insertBefore(changeBtn, mainDropzoneArea);
-                            
-                            changeBtn.addEventListener('click', function() {
-                                mainDropzoneArea.classList.remove('d-none');
-                                previewDiv.classList.add('d-none');
-                            });
-                            
-                            mainDropzoneArea.classList.add('d-none');
-                        } else {
-                            // Update existing preview
-                            const img = mainPreviewZone.querySelector('img') || document.createElement('img');
-                            img.src = e.target.result;
-                            img.classList.add('img-fluid', 'rounded');
-                            img.style.maxHeight = '300px';
-                            
-                            if (!mainPreviewZone.querySelector('img')) {
-                                mainPreviewZone.appendChild(img);
-                            }
-                            
-                            mainPreviewZone.classList.remove('d-none');
-                            mainDropzoneArea.classList.add('d-none');
-                            
-                            if (mainChangeBtn) {
-                                mainChangeBtn.classList.remove('d-none');
-                            }
-                        }
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
-            
-            if (mainChangeBtn) {
-                mainChangeBtn.addEventListener('click', function() {
-                    mainDropzoneArea.classList.remove('d-none');
-                    if (mainPreviewZone) {
-                        mainPreviewZone.classList.add('d-none');
-                    }
-                    this.classList.add('d-none');
-                });
-            }
-        }
-        
-        // Size image uploads
-        const sizeDropzoneAreas = document.querySelectorAll('.size-dropzone-area');
-        
-        sizeDropzoneAreas.forEach(function(dropzoneArea) {
-            const sizeFileInput = dropzoneArea.querySelector('input[type="file"]');
-            
-            if (sizeFileInput) {
-                dropzoneArea.addEventListener('click', function() {
-                    sizeFileInput.click();
-                });
-                
-                sizeFileInput.addEventListener('change', function() {
-                    if (this.files.length) {
-                        const file = this.files[0];
-                        const reader = new FileReader();
-                        const sizeName = this.id.replace('sizes_', '').replace('_gambar', '');
-                        
-                        reader.onload = function(e) {
-                            const previewZone = document.querySelector(`.size-preview-zone[data-size="${sizeName}"]`) || 
-                                               document.createElement('div');
-                            
-                            if (!previewZone.classList.contains('size-preview-zone')) {
-                                previewZone.classList.add('size-preview-zone', 'visible', 'mb-2');
-                                previewZone.setAttribute('data-size', sizeName);
-                                dropzoneArea.parentNode.insertBefore(previewZone, dropzoneArea);
-                                
-                                const img = document.createElement('img');
-                                img.src = e.target.result;
-                                img.classList.add('img-fluid', 'rounded');
-                                img.style.maxHeight = '100px';
-                                img.alt = `Gambar Ukuran ${sizeName}`;
-                                previewZone.appendChild(img);
-                                
-                                // Create change button
-                                const changeBtn = document.createElement('button');
-                                changeBtn.type = 'button';
-                                changeBtn.classList.add('btn', 'btn-sm', 'btn-outline-secondary', 'btn-change-size-image', 'mb-2', 'mt-2');
-                                changeBtn.setAttribute('data-size', sizeName);
-                                changeBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Ganti';
-                                dropzoneArea.parentNode.insertBefore(changeBtn, dropzoneArea);
-                                
-                                changeBtn.addEventListener('click', function() {
-                                    dropzoneArea.classList.remove('d-none');
-                                    previewZone.classList.add('d-none');
-                                    this.classList.add('d-none');
-                                });
-                                
-                                dropzoneArea.classList.add('d-none');
-                            } else {
-                                // Update existing preview
-                                const img = previewZone.querySelector('img') || document.createElement('img');
-                                img.src = e.target.result;
-                                
-                                if (!previewZone.querySelector('img')) {
-                                    previewZone.appendChild(img);
-                                }
-                                
-                                previewZone.classList.remove('d-none');
-                                dropzoneArea.classList.add('d-none');
-                                
-                                const changeBtn = document.querySelector(`.btn-change-size-image[data-size="${sizeName}"]`);
-                                if (changeBtn) {
-                                    changeBtn.classList.remove('d-none');
-                                }
-                            }
-                        };
-                        
-                        reader.readAsDataURL(file);
-                    }
-                });
-            }
-        });
-        
-        // Existing change buttons for size images
-        const sizeChangeBtns = document.querySelectorAll('.btn-change-size-image');
-        
-        sizeChangeBtns.forEach(function(btn) {
-            const sizeName = btn.getAttribute('data-size');
-            const dropzoneArea = document.querySelector(`.size-dropzone-area[data-size="${sizeName}"]`) || 
-                                document.querySelector('.size-dropzone-area');
-            const previewZone = document.querySelector(`.size-preview-zone[data-size="${sizeName}"]`) || 
-                               document.querySelector('.size-preview-zone');
-            
-            btn.addEventListener('click', function() {
-                if (dropzoneArea) {
-                    dropzoneArea.classList.remove('d-none');
-                }
-                if (previewZone) {
-                    previewZone.classList.add('d-none');
-                }
-                btn.classList.add('d-none');
-            });
-        });
-        
-        // Form validation
-        const form = document.getElementById('productForm');
-        
-        form.addEventListener('submit', function(e) {
-            let isValid = true;
-            const activeSize = document.querySelectorAll('input[name^="size_active"]:checked');
-            
-            if (activeSize.length === 0) {
-                alert('Pilih minimal satu ukuran untuk produk ini!');
-                isValid = false;
-            } else {
-                activeSize.forEach(checkbox => {
-                    const sizeName = checkbox.id.replace('size_active_', '');
-                    const hargaInput = document.getElementById(`sizes_${sizeName}_harga`);
-                    const stockInput = document.getElementById(`sizes_${sizeName}_stock`);
-                    
-                    if (!hargaInput.value || hargaInput.value <= 0) {
-                        alert(`Masukkan harga yang valid untuk ukuran ${sizeName}!`);
-                        hargaInput.focus();
-                        isValid = false;
-                    }
-                    
-                    if (!stockInput.value || stockInput.value < 0) {
-                        alert(`Masukkan stock yang valid untuk ukuran ${sizeName}!`);
-                        stockInput.focus();
-                        isValid = false;
-                    }
-                });
-            }
-            
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-    });
-</script>
+        <!-- Navigation Buttons -->
+        <div class="nav-buttons">
+            <a href="{{ route('seller.dashboard') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+            <button type="submit" form="productForm" class="btn-save">
+                Simpan Produk <i class="bi bi-check-circle"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/edit-product.js') }}"></script>
 </body>
 </html>
-@endsection
