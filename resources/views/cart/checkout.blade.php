@@ -14,7 +14,7 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: relative; /* Added for absolute positioning of remove button */
+            position: relative;
         }
         .product-image {
             width: 215px;
@@ -65,7 +65,6 @@
             border-color: #fbbf24;
             box-shadow: 0 0 0 1px #fbbf24;
         }
-        /* Hide spinner arrows in Chrome, Safari, Edge */
         .quantity-input::-webkit-outer-spin-button,
         .quantity-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -75,7 +74,6 @@
             text-align: right;
             margin-top: 20px;
         }
-        /* New styles for remove button */
         .remove-btn {
             position: absolute;
             top: 10px;
@@ -104,13 +102,11 @@
     <h1 class="text-2xl font-bold mb-8">Checkout</h1>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Selected Items -->
         <div class="lg:col-span-2">
             <div class="bg-white rounded-lg shadow-sm p-6">
                 <h2 class="text-lg font-semibold mb-4">Selected Items</h2>
                 
                 @foreach($selectedItems as $item)
-                    <!-- Product Item with New Design -->
                     <div class="product-card mb-4" id="item-{{ $item->id }}">
                         <div class="product-image">
                             <img src="{{ Storage::url($item->size->gambar_size) }}" 
@@ -168,8 +164,7 @@
                 @endforeach
             </div>
         </div>
-
-        <!-- Checkout Form -->
+        
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow-sm p-6 sticky top-4">
                 <h2 class="text-lg font-semibold mb-4">Order Summary</h2>
@@ -263,7 +258,6 @@
 
 <script>
     function showErrorPopup(message) {
-        // Create popup element if it doesn't exist
         if (!document.getElementById('error-popup')) {
             const popup = document.createElement('div');
             popup.id = 'error-popup';
@@ -272,16 +266,13 @@
             document.body.appendChild(popup);
         }
         
-        // Get popup element and set message
         const popup = document.getElementById('error-popup');
         popup.innerHTML = message;
         
-        // Show popup with animation
         setTimeout(() => {
             popup.classList.remove('translate-x-full');
         }, 10);
         
-        // Hide popup after 3 seconds
         setTimeout(() => {
             popup.classList.add('translate-x-full');
         }, 3000);
@@ -297,7 +288,6 @@
         const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
         const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
         
-        // Increase or decrease quantity
         if (action === 'increase') {
             if (currentQuantity + 1 > stockAvailable) {
                 showErrorPopup(`Stock tidak mencukupi. Tersedia: ${stockAvailable}`);
@@ -308,17 +298,13 @@
             currentQuantity--;
         }
         
-        // Update input value
         quantityElement.value = currentQuantity;
         
-        // Update hidden input for form submission
         quantityInput.value = currentQuantity;
         
-        // Update price display
         const newPrice = unitPrice * currentQuantity;
         priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
         
-        // Update overall subtotal, tax, and total
         updateSubtotal();
         
         // Send AJAX request to update quantity in database
