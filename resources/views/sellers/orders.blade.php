@@ -1,13 +1,9 @@
-@extends('layouts.app')
-
-@section('content')
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <style>
     /* Custom Colors */
@@ -322,9 +318,6 @@
                             </div>
                             <h5 class="fw-bold mb-3">Belum Ada Pesanan</h5>
                             <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">Pesanan dari pelanggan akan muncul di sini. Pastikan produk Anda selalu tersedia dan menarik.</p>
-                            <a href="#" class="btn btn-outline-orange px-4 py-2 rounded-pill">
-                                <i class="fas fa-plus-circle me-2"></i> Tambah Produk Baru
-                            </a>
                         </div>
                     @endif
                 </div>
@@ -357,4 +350,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 </html>
-@endsection

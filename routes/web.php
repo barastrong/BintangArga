@@ -24,17 +24,17 @@ Route::get('/category/{categoryId}', [ProductController::class, 'category'])->na
 Route::get('/api/cities/{province}', [LocationController::class, 'getCities'])->name('api.cities');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
-    Route::post('/seller/register', [SellerController::class, 'store'])->name('seller.store');
-    Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
-    Route::get('/seller/edit', [SellerController::class, 'edit'])->name('seller.edit');
-    Route::put('/seller/update', [SellerController::class, 'update'])->name('seller.update');
-    Route::get('/seller/products', [SellerController::class, 'products'])->name('seller.products');
-    Route::delete('/seller/{id}', [SellerController::class, 'destroy'])->name('seller.destroy');
-
-    // New orders routes
-    Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
-    Route::put('/seller/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.update-status');
+Route::prefix('seller')->name('seller.')->group(function(){
+    Route::get('/register', [SellerController::class, 'create'])->name('register');
+    Route::post('/register', [SellerController::class, 'store'])->name('store');
+    Route::get('/dashboard', [SellerController::class, 'dashboard'])->name('dashboard');
+    Route::get('/edit', [SellerController::class, 'edit'])->name('edit');
+    Route::put('/update', [SellerController::class, 'update'])->name('update');
+    Route::get('/products', [SellerController::class, 'products'])->name('products');
+    Route::delete('/{id}', [SellerController::class, 'destroy'])->name('destroy'); 
+    Route::get('/orders', [SellerController::class, 'orders'])->name('orders');
+    Route::put('/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('orders.update-status');
+});
     
     // Product 
     Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');

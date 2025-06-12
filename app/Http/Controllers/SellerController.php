@@ -182,7 +182,7 @@ class SellerController extends Controller
     public function destroy($id)
     {
         // Check if user is authorized to delete this seller
-        if (!Auth::user()->isAdmin() && Auth::user()->seller->id != $id) {
+        if (!Auth::user()->role === 'admin' && Auth::user()->seller->id != $id) {
             return redirect()->route('seller.dashboard')
                 ->with('error', 'Anda tidak memiliki izin untuk menghapus profil penjual ini');
         }
@@ -213,9 +213,5 @@ class SellerController extends Controller
             return redirect()->route('products.index')
                 ->with('success', 'Profil penjual berhasil dihapus');
         }
-        
-        // If admin deleted a profile, redirect to admin dashboard or sellers list
-        return redirect()->route('sellers.index')
-            ->with('success', 'Profil penjual berhasil dihapus');
     }
 }
