@@ -9,7 +9,17 @@ class Product extends Model
 {
     use HasFactory;
     protected $table = 'products';
-    protected $fillable = ['category_id', 'nama_barang', 'description', 'gambar','alamat_lengkap','lokasi', 'seller_id'];
+    protected $fillable = [
+        'category_id', 
+        'nama_barang', 
+        'description', 
+        'gambar',
+        'alamat_lengkap',
+        'lokasi', 
+        'seller_id',
+        'province_id',
+        'city_id'
+    ];
 
     public function category()
     {
@@ -26,6 +36,16 @@ class Product extends Model
         return $this->hasMany(Rating::class);
     }
 
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
     public function getMinPriceAttribute()
     {
         return $this->sizes->min('harga');
@@ -40,14 +60,17 @@ class Product extends Model
     {
         return $this->sizes->sum('stock');
     }
+    
     public function purchases()
     {
         return $this->hasMany(Purchase::class);
     }
+    
     public function seller()
     {
         return $this->belongsTo(Seller::class);
     }
+    
     public function user()
     {
         return $this->belongsTo(User::class);

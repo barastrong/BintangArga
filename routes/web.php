@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SocialAuthController;
 
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
@@ -20,6 +21,7 @@ Route::get('/shop', [ProductController::class, 'shop'])->name('shop');
 Route::get('/product/create', [ProductController::class, 'create'])->name('products.create');
 Route::post('/product/store', [ProductController::class, 'store'])->name('products.store');
 Route::get('/category/{categoryId}', [ProductController::class, 'category'])->name('products.category');
+Route::get('/api/cities/{province}', [LocationController::class, 'getCities'])->name('api.cities');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
@@ -56,6 +58,7 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/cart/count', [PurchaseController::class, 'getCartCount'])->name('cart.count');
     Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
 
+    Route::get('/profile-index', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

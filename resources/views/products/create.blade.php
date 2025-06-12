@@ -9,6 +9,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <style>
     /* Main Layout & Typography */
@@ -159,6 +160,23 @@ body {
   box-shadow: none;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+
+/* Loading States */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Image Upload */
@@ -406,12 +424,32 @@ body {
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="lokasi" class="form-label">Lokasi Toko <span class="tag-label">Wajib</span></label>
+                            <label for="province_id" class="form-label">Provinsi <span class="tag-label">Wajib</span></label>
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="fas fa-map-marker-alt"></i>
                                 </span>
-                                <input type="text" name="lokasi" id="lokasi" class="form-control" placeholder="Kota atau provinsi" required>
+                                <select name="province_id" id="province_id" class="form-select" required>
+                                    <option value="">Pilih Provinsi</option>
+                                    @foreach($provinces as $province)
+                                        <option value="{{ $province->id }}">{{ $province->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="city_id" class="form-label">Kota/Kabupaten <span class="tag-label">Wajib</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-building"></i>
+                                </span>
+                                <select name="city_id" id="city_id" class="form-select" required disabled>
+                                    <option value="">Pilih provinsi terlebih dahulu</option>
+                                </select>
+                            </div>
+                            <div class="invalid-feedback" id="city_error" style="display: none;">
+                                Gagal memuat data kota. Silakan coba lagi.
                             </div>
                         </div>
 
@@ -535,6 +573,85 @@ body {
 </body>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Set up CSRF token for AJAX requests
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // Province-City functionality
+    const provinceSelect = document.getElementById('province_id');
+    const citySelect = document.getElementById('city_id');
+    const cityError = document.getElementById('city_error');
+    
+    provinceSelect.addEventListener('change', function() {
+        const provinceId = this.value;
+        
+        // Reset city dropdown and hide any previous errors
+        citySelect.innerHTML = '';
+        citySelect.disabled = true;
+        citySelect.classList.remove('is-invalid');
+        cityError.style.display = 'none';
+        
+        if (provinceId) {
+            // Show loading state
+            citySelect.innerHTML = '<option value=""><span class="loading-spinner"></span>Memuat kota...</option>';
+            
+            // Construct the API URL
+            const apiUrl = `/api/cities/${provinceId}`;
+            
+            // Fetch cities for selected province
+            fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Clear loading state
+                citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                
+                // Check if data is array and has items
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.id;
+                        option.textContent = city.name;
+                        citySelect.appendChild(option);
+                    });
+                    
+                    citySelect.disabled = false;
+                } else {
+                    // Handle case where no cities are found
+                    citySelect.innerHTML = '<option value="">Tidak ada kota ditemukan</option>';
+                    console.warn('No cities found for province:', provinceId);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                
+                // Show error state
+                citySelect.innerHTML = '<option value="">Error memuat kota</option>';
+                citySelect.classList.add('is-invalid');
+                cityError.textContent = 'Gagal memuat data kota. Silakan coba lagi atau refresh halaman.';
+                cityError.style.display = 'block';
+                
+                // Show user-friendly alert
+                showAlert('Gagal memuat data kota. Silakan coba lagi.', 'warning');
+            });
+        } else {
+            // Reset to default state
+            citySelect.innerHTML = '<option value="">Pilih provinsi terlebih dahulu</option>';
+            citySelect.disabled = true;
+        }
+    });
+    
     // Preview gambar produk
     document.getElementById('gambar').addEventListener('change', function(e) {
         previewImage(this, 'preview');
@@ -552,7 +669,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (activeSizes.length === 0) {
             e.preventDefault();
-            showAlert('Mohon pilih minimal satu ukuran');
+            showAlert('Mohon pilih minimal satu ukuran', 'danger');
             return;
         }
         
@@ -561,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const hargaInput = document.getElementById(`harga_${size}`);
             const stockInput = document.getElementById(`stock_${size}`);
             
-            if (!hargaInput.value) {
+            if (!hargaInput.value || hargaInput.value <= 0) {
                 isValid = false;
                 hargaInput.classList.add('is-invalid');
                 document.getElementById(`harga_feedback_${size}`).style.display = 'block';
@@ -570,7 +687,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById(`harga_feedback_${size}`).style.display = 'none';
             }
             
-            if (!stockInput.value) {
+            if (!stockInput.value || stockInput.value < 0) {
                 isValid = false;
                 stockInput.classList.add('is-invalid');
                 document.getElementById(`stock_feedback_${size}`).style.display = 'block';
@@ -582,7 +699,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!isValid) {
             e.preventDefault();
-            showAlert('Mohon lengkapi semua data untuk ukuran yang dipilih');
+            showAlert('Mohon lengkapi semua data untuk ukuran yang dipilih', 'danger');
         }
     });
 });

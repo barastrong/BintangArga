@@ -9,6 +9,8 @@ use App\Models\Rating;
 use App\Models\Purchase;
 use App\Models\Seller;
 use App\Models\Size;
+use App\Models\Province;
+use App\Models\City;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +20,7 @@ class ProductController extends Controller
     
     public function index()
     {
-        $products = Product::with(['category', 'sizes', 'ratings', 'user', 'purchases'])
+        $products = Product::with(['category', 'sizes', 'ratings', 'user', 'purchases', 'province', 'city'])
             ->select('products.*')
             ->leftJoin(DB::raw('(SELECT product_id, AVG(rating) as avg_rating FROM ratings GROUP BY product_id) as avg_ratings'), 
                                             'products.id', '=', 'avg_ratings.product_id')
@@ -29,9 +31,10 @@ class ProductController extends Controller
         
         foreach ($products as $product) {
             $product->purchase_count = Purchase::where('product_id', $product->id)
-                ->where('status', 'completed')
+                ->whereIn('status', ['completed', 'selesai'])
                 ->count();
         }
+
         $categories = Category::all();
         
         return view('products.index', compact('products', 'categories'));
@@ -40,10 +43,10 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all();
-
+        $provinces = Province::orderBy('name')->get();
         $seller = Seller::where('user_id', Auth::id())->first();
         
-        return view('products.create', compact('categories', 'seller'));
+        return view('products.create', compact('categories', 'provinces', 'seller'));
     }
 
     public function store(Request $request)
@@ -52,7 +55,8 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'nama_barang' => 'required|string|max:255',
             'description' => 'required|string',
-            'lokasi' => 'required|string|max:255',
+            'province_id' => 'required|exists:provinces,id',
+            'city_id' => 'required|exists:cities,id',
             'alamat_lengkap' => 'required|string',
             'gambar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'seller_id' => 'required|exists:sellers,id',
@@ -67,7 +71,8 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'nama_barang' => $request->nama_barang,
                 'description' => $request->description,
-                'lokasi' => $request->lokasi,
+                'province_id' => $request->province_id,
+                'city_id' => $request->city_id,
                 'alamat_lengkap' => $request->alamat_lengkap,
                 'gambar' => $gambarPath,
             ]);
@@ -116,7 +121,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::with(['sizes', 'ratings', 'user'])->findOrFail($id);
+        $product = Product::with(['sizes', 'ratings', 'user', 'province', 'city'])->findOrFail($id);
         $averageRating = $product->ratings->avg('rating') ?? 0;
         
         return view('products.show', compact('product', 'averageRating'));
@@ -125,46 +130,60 @@ class ProductController extends Controller
     public function shop(Request $request)
     {
         // Query builder untuk products
-        $query = Product::with(['sizes', 'ratings']);
+        $query = Product::with(['sizes', 'ratings', 'province', 'city']);
 
-        // Filter berdasarkan lokasi jika ada
-        if ($request->has('lokasi')) {
-            $query->where('lokasi', $request->lokasi);
+        // Filter berdasarkan provinsi jika ada
+        if ($request->has('province_id') && $request->province_id) {
+            $query->where('province_id', $request->province_id);
+        }
+
+        // Filter berdasarkan kota jika ada
+        if ($request->has('city_id') && $request->city_id) {
+            $query->where('city_id', $request->city_id);
         }
 
         if ($request->has('search')) {
             $query->where('nama_barang', 'like', '%' . $request->search . '%');
         }
 
-        $locations = Product::select('lokasi')->distinct()->get();
+        $provinces = Province::orderBy('name')->get();
+        $cities = collect(); // Empty collection by default
+        
+        // If province is selected, get its cities
+        if ($request->has('province_id') && $request->province_id) {
+            $cities = City::where('province_id', $request->province_id)->orderBy('name')->get();
+        }
         
         $products = $query->paginate(12);
         
         foreach ($products as $product) {
             $product->purchase_count = Purchase::where('product_id', $product->id)
-                ->where('status', 'completed')
+                ->whereIn('status', ['completed', 'selesai'])
                 ->count();
         }
 
-        return view('products.shop', compact('products', 'locations'));
+
+        return view('products.shop', compact('products', 'provinces', 'cities'));
     }
 
     public function edit($id)
-{
-    $product = Product::with('sizes')->findOrFail($id);
-    
-    // Check if the current user is the owner of the product
-    $seller = Seller::where('user_id', Auth::id())->first();
-    
-    if (!$seller || $product->seller_id != $seller->id) {
-        return redirect()->route('products.index')
-            ->with('error', 'Anda tidak memiliki izin untuk mengedit produk ini');
+    {
+        $product = Product::with(['sizes', 'province', 'city'])->findOrFail($id);
+        
+        // Check if the current user is the owner of the product
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller || $product->seller_id != $seller->id) {
+            return redirect()->route('products.index')
+                ->with('error', 'Anda tidak memiliki izin untuk mengedit produk ini');
+        }
+        
+        $categories = Category::all();
+        $provinces = Province::orderBy('name')->get();
+        $cities = City::where('province_id', $product->province_id)->orderBy('name')->get();
+        
+        return view('products.edit', compact('product', 'categories', 'provinces', 'cities', 'seller'));
     }
-    
-    $categories = Category::all();
-    
-    return view('products.edit', compact('product', 'categories', 'seller'));
-}
 
     public function update(Request $request, $id)
     {
@@ -182,7 +201,8 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'nama_barang' => 'required|string|max:255',
             'description' => 'required|string',
-            'lokasi' => 'required|string|max:255',
+            'province_id' => 'required|exists:provinces,id',
+            'city_id' => 'required|exists:cities,id',
             'alamat_lengkap' => 'required|string',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -193,7 +213,8 @@ class ProductController extends Controller
                 'category_id' => $request->category_id,
                 'nama_barang' => $request->nama_barang,
                 'description' => $request->description,
-                'lokasi' => $request->lokasi,
+                'province_id' => $request->province_id,
+                'city_id' => $request->city_id,
                 'alamat_lengkap' => $request->alamat_lengkap,
             ];
             
@@ -268,64 +289,68 @@ class ProductController extends Controller
                 ->withInput();
         }
     }
+
     public function destroy($id)
-{
-    $product = Product::findOrFail($id);
-    
-    // Check if the current user is the owner of the product
-    $seller = Seller::where('user_id', Auth::id())->first();
-    
-    if (!$seller || $product->seller_id != $seller->id) {
-        return redirect()->route('products.index')
-            ->with('error', 'Anda tidak memiliki izin untuk menghapus produk ini');
-    }
-    
-    try {
-        DB::beginTransaction();
+    {
+        $product = Product::findOrFail($id);
         
-        // Hapus semua ukuran produk dan gambarnya
-        foreach ($product->sizes as $size) {
-            if ($size->gambar_size) {
-                Storage::disk('public')->delete($size->gambar_size);
+        // Check if the current user is the owner of the product
+        $seller = Seller::where('user_id', Auth::id())->first();
+        
+        if (!$seller || $product->seller_id != $seller->id) {
+            return redirect()->route('products.index')
+                ->with('error', 'Anda tidak memiliki izin untuk menghapus produk ini');
+        }
+        
+        try {
+            DB::beginTransaction();
+            
+            // Hapus semua ukuran produk dan gambarnya
+            foreach ($product->sizes as $size) {
+                if ($size->gambar_size) {
+                    Storage::disk('public')->delete($size->gambar_size);
+                }
+                $size->delete();
             }
-            $size->delete();
+            
+            // Hapus gambar produk
+            if ($product->gambar) {
+                Storage::disk('public')->delete($product->gambar);
+            }
+            
+            // Hapus produk
+            $product->delete();
+            
+            DB::commit();
+            
+            return redirect()->route('products.index')
+                ->with('success', 'Produk berhasil dihapus');
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            return back()
+                ->with('error', 'Terjadi kesalahan saat menghapus produk: ' . $e->getMessage());
         }
-        
-        // Hapus gambar produk
-        if ($product->gambar) {
-            Storage::disk('public')->delete($product->gambar);
-        }
-        
-        // Hapus produk
-        $product->delete();
-        
-        DB::commit();
-        
-        return redirect()->route('products.index')
-            ->with('success', 'Produk berhasil dihapus');
-    } catch (\Exception $e) {
-        DB::rollback();
-        
-        return back()
-            ->with('error', 'Terjadi kesalahan saat menghapus produk: ' . $e->getMessage());
-    }
-}
-public function category($categoryId,)
-{
-    $category = Category::findOrFail($categoryId);
-
-    $products = Product::with(['sizes', 'ratings'])
-        ->where('category_id', $categoryId)
-        ->paginate(12);
-
-    foreach ($products as $product) {
-        $product->purchase_count = Purchase::where('product_id', $product->id)
-            ->where('status', 'completed')
-            ->count();
     }
 
-    $categories = Category::all();
+    public function category($categoryId)
+    {
+        $category = Category::findOrFail($categoryId);
 
-    return view('products.category', compact('category', 'products', 'categories'));
-}
+        $products = Product::with(['sizes', 'ratings', 'province', 'city'])
+            ->where('category_id', $categoryId)
+            ->paginate(12);
+
+        foreach ($products as $product) {
+            $product->purchase_count = Purchase::where('product_id', $product->id)
+                ->whereIn('status', ['completed', 'selesai'])
+                ->count();
+        }
+
+
+        $categories = Category::all();
+
+        return view('products.category', compact('category', 'products', 'categories'));
+    }
+    
 }

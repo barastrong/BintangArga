@@ -26,8 +26,27 @@
         .page-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-input, .filter-select {
+                width: 100%;
+                min-width: auto;
+            }
         }
         
         .page-title {
@@ -39,58 +58,78 @@
         
         .search-container {
             display: flex;
-            gap: 10px;
+            gap: 15px;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e9ecef;
         }
         
         .search-input {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            width: 220px;
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            width: 250px;
             font-size: 14px;
-            color: #777;
+            color: #495057;
+            transition: all 0.3s ease;
         }
         
-        .location-dropdown {
-            background-color: #FFA500;
+        .search-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        
+        .search-input::placeholder {
+            color: #adb5bd;
+        }
+        
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #495057;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        
+        .filter-select:hover {
+            border-color: #007bff;
+        }
+        
+        .filter-btn {
+            background: linear-gradient(135deg, #FFA500, #FF8C00);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 10px 20px;
+            border-radius: 8px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
             font-size: 14px;
-            position: relative;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(255, 165, 0, 0.3);
         }
         
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-            border-radius: 4px;
-            top: 100%;
-            left: 0;
-            margin-top: 5px;
+        .filter-btn:hover {
+            background: linear-gradient(135deg, #FF8C00, #FF7F00);
+            box-shadow: 0 4px 8px rgba(255, 165, 0, 0.4);
+            transform: translateY(-1px);
         }
         
-        .location-dropdown:hover .dropdown-content {
-            display: block;
-        }
-        
-        .dropdown-content a {
-            color: black;
-            padding: 10px 16px;
-            text-decoration: none;
-            display: block;
-            font-size: 14px;
-        }
-        
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
+        .filter-btn:active {
+            transform: translateY(0);
         }
         
         .product-grid {
@@ -105,10 +144,14 @@
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.2s;
+            text-decoration: none;
+            color: inherit;
         }
         
         .product-card:hover {
             transform: translateY(-5px);
+            text-decoration: none;
+            color: inherit;
         }
         
         .product-image {
@@ -163,6 +206,23 @@
             color: #555;
         }
         
+        .location-info {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+            font-size: 12px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .location-info i {
+            font-size: 10px;
+        }
+        
         .pagination {
             display: flex;
             justify-content: center;
@@ -189,6 +249,7 @@
         .pagination span {
             background-color: white;
         }
+        
         .seller-info {
             display: flex;
             align-items: center;
@@ -202,143 +263,149 @@
             color: #666;
         }
 
-            /* Particle background styles */
-    .particle-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      pointer-events: none;
-    }
-    #particleCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
+        /* Particle background styles */
+        .particle-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        #particleCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
     </style>
 </head>
 <body>
     <div class="particle-background">
-  <canvas id="particleCanvas"></canvas>
-</div>
+        <canvas id="particleCanvas"></canvas>
+    </div>
+    
     <div class="container">
         <div class="page-header">
             <h1 class="page-title">Explorasi UMKM</h1>
             
             <div class="search-container">
-                <form action="{{ route('shop') }}" method="GET" style="display: flex; gap: 10px;">
-                    <input type="text" name="search" class="search-input" placeholder="Cari..." value="{{ request('search') }}">
-                </form>
+                <form action="{{ route('shop') }}" method="GET" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" name="search" class="search-input" placeholder="Cari produk..." value="{{ request('search') }}">
                     
-                <div class="location-dropdown" id="locationDropdown">
-                    <span onclick="toggleDropdown()">Pilih Daerah <i id="dropdownArrow">&uarr;</i></span>
-                    <div class="dropdown-content" id="locationOptions">
-                        <a href="{{ route('shop') }}" class="location-option">Semua Daerah</a>
-                        @php
-                            $uniqueLocations = $products->pluck('lokasi')->unique();
-                        @endphp
-                        
-                        @foreach($uniqueLocations as $location)
-                            <a href="{{ route('shop', ['lokasi' => $location]) }}" class="location-option">{{ $location }}</a>
+                    <select name="province_id" class="filter-select" id="provinceSelect">
+                        <option value="">Semua Provinsi</option>
+                        @foreach($provinces as $province)
+                            <option value="{{ $province->id }}" {{ request('province_id') == $province->id ? 'selected' : '' }}>
+                                {{ $province->name }}
+                            </option>
                         @endforeach
-                    </div>
-                </div>
+                    </select>
+                    
+                    <select name="city_id" class="filter-select" id="citySelect">
+                        <option value="">Semua Kota</option>
+                        @foreach($cities as $city)
+                            <option value="{{ $city->id }}" {{ request('city_id') == $city->id ? 'selected' : '' }}>
+                                {{ $city->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    
+                    <button type="submit" class="filter-btn">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                </form>
             </div>
         </div>
         
-        <div class="product-grid">
-            @foreach($products as $product)
-            <div class="product-card">
-                <div class="product-image">
-                <i class="fas fa-hanger hanger-icon"></i>
-                <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
-                </div>
+        @if($products->count() > 0)
+            <div class="product-grid">
+                @foreach($products as $product)
                 <a href="{{ route('products.show', $product->id) }}" class="product-card">
-                <div class="product-info">
-                <h3 class="product-title">{{ $product->nama_barang }}</h3>
-                @php
-                    $smallestSize = $product->sizes->sortBy('harga')->first();
-                    $priceRange = 'Rp '. number_format($smallestSize->harga, 0, ',', '.');
-                @endphp
-                <div class="product-price">{{ $priceRange }}</div>
-                <!-- <div class="seller-info">
-                    <i class="fas fa-user"></i>
-                    <span>{{ $product->seller->nama_penjual }}</span>
-                </div> -->
-                    <div class="rating">
-                        <i class="fas fa-star"></i>    
-                        {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
-                        <span style="color: #666; margin-left: 5px;">
-                            <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
-                        </span>
+                    <div class="product-image">
+                        <i class="fas fa-hanger hanger-icon"></i>
+                        <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
                     </div>
-                </div>
-            </a>
+                    <div class="product-info">
+                        <h3 class="product-title">{{ $product->nama_barang }}</h3>
+                        
+                        @php
+                            $smallestSize = $product->sizes->sortBy('harga')->first();
+                            $priceRange = $smallestSize ? 'Rp '. number_format($smallestSize->harga, 0, ',', '.') : 'Harga tidak tersedia';
+                        @endphp
+                        <div class="product-price">{{ $priceRange }}</div>
+                        
+                        <div class="location-info">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>{{ $product->city->name ?? 'Kota tidak diketahui' }}, {{ $product->province->name ?? 'Provinsi tidak diketahui' }}</span>
+                        </div>
+                        
+                        <div class="rating">
+                            <i class="fas fa-star"></i>    
+                            {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
+                            <span style="color: #666; margin-left: 5px;">
+                                <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
             </div>
-            @endforeach
-        </div>  
+        @else
+            <div style="text-align: center; padding: 50px; color: #666;">
+                <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px;"></i>
+                <h3>Tidak ada produk ditemukan</h3>
+                <p>Coba ubah kata kunci pencarian atau filter lokasi Anda.</p>
+            </div>
+        @endif
         
+        @if($products->hasPages())
         <div class="pagination">
             @if($products->onFirstPage())
                 <span style="color: #aaa;">Prev</span>
             @else
-                <a href="{{ $products->previousPageUrl() }}">Prev</a>
+                <a href="{{ $products->appends(request()->query())->previousPageUrl() }}">Prev</a>
             @endif
             
-            <span>{{ $products->currentPage() }}</span>
+            <span>{{ $products->currentPage() }} dari {{ $products->lastPage() }}</span>
             
             @if($products->hasMorePages())
-                <a href="{{ $products->nextPageUrl() }}">Next</a>
+                <a href="{{ $products->appends(request()->query())->nextPageUrl() }}">Next</a>
             @else
                 <span style="color: #aaa;">Next</span>
             @endif
         </div>
+        @endif
     </div>
 
     <script src="/js/particles.js"></script>
     <script>
-function toggleDropdown() {
-    const content = document.getElementById("locationOptions");
-    const arrow = document.getElementById("dropdownArrow");
-    
-    if (content.style.display === "block") {
-        content.style.display = "none";
-        arrow.innerHTML = "&uarr;";
-    } else {
-        content.style.display = "block";
-        arrow.innerHTML = "&darr;";
-    }
-}
-
-// Don't close dropdown when clicking inside it
-document.getElementById("locationOptions").addEventListener("click", function(e) {
-    e.stopPropagation();
-});
-
-function filterLocations() {
-    const input = document.getElementById("locationSearch");
-    const filter = input.value.toUpperCase();
-    const options = document.getElementsByClassName("location-option");
-    
-    for (let i = 0; i < options.length; i++) {
-        const txtValue = options[i].textContent || options[i].innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            options[i].style.display = "";
-        } else {
-            options[i].style.display = "none";
-        }
-    }
-}
-
-// Close dropdown when clicking outside
-window.onclick = function(event) {
-    if (!event.target.matches('.location-dropdown span') && !event.target.matches('#dropdownArrow')) {
-        document.getElementById("locationOptions").style.display = "none";
-        document.getElementById("dropdownArrow").innerHTML = "&uarr;";
-    }
-}
+        // Handle province change to load cities
+        document.getElementById('provinceSelect').addEventListener('change', function() {
+            const provinceId = this.value;
+            const citySelect = document.getElementById('citySelect');
+            
+            // Clear city options
+            citySelect.innerHTML = '<option value="">Semua Kota</option>';
+            
+            if (provinceId) {
+                // Fetch cities for the selected province
+                fetch(`/api/cities/${provinceId}`)
+                    .then(response => response.json())
+                    .then(cities => {
+                        cities.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.id;
+                            option.textContent = city.name;
+                            citySelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cities:', error);
+                    });
+            }
+        });
     </script>
 </body>
 </html>

@@ -78,7 +78,15 @@
                                 <x-slot name="trigger">
                                     <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                                         <div class="flex items-center">
-                                            <img class="h-8 w-8 rounded-full object-cover mr-2" src="{{ Auth::user()->profile_photo_url ?? 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF' }}" alt="{{ Auth::user()->name }}">
+                                           @if(Auth::user()->profile_image)
+                                                <img class="h-8 w-8 rounded-full object-cover mr-2" 
+                                                    src="{{ asset('storage/' . Auth::user()->profile_image) }}" 
+                                                    alt="{{ Auth::user()->name }}">
+                                            @else
+                                                <img class="h-8 w-8 rounded-full object-cover mr-2" 
+                                                    src="{{ 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->name).'&color=7F9CF5&background=EBF4FF' }}" 
+                                                    alt="{{ Auth::user()->name }}">
+                                            @endif
                                             <div>{{ Auth::user()->name }}</div>
                                         </div>
 
@@ -89,7 +97,7 @@
                                 </x-slot>
 
                                 <x-slot name="content">
-                                    <x-dropdown-link :href="route('profile.edit')">
+                                    <x-dropdown-link :href="route('profile.index')">
                                         <i class="fas fa-user mr-2"></i> Profile
                                     </x-dropdown-link>
                                     
