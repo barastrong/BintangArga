@@ -1,412 +1,140 @@
 @extends('layouts.app')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Explorasi UMKM</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f8f8;
-            color: #333;
-        }
+<div class="bg-gray-50">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .page-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .search-container {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .search-input, .filter-select {
-                width: 100%;
-                min-width: auto;
-            }
-        }
-        
-        .page-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #000;
-            margin: 0;
-        }
-        
-        .search-container {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            background-color: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e9ecef;
-        }
-        
-        .search-input {
-            padding: 10px 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            width: 250px;
-            font-size: 14px;
-            color: #495057;
-            transition: all 0.3s ease;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-        
-        .search-input::placeholder {
-            color: #adb5bd;
-        }
-        
-        .filter-select {
-            padding: 10px 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #495057;
-            background-color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 150px;
-        }
-        
-        .filter-select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-        }
-        
-        .filter-select:hover {
-            border-color: #007bff;
-        }
-        
-        .filter-btn {
-            background: linear-gradient(135deg, #FFA500, #FF8C00);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(255, 165, 0, 0.3);
-        }
-        
-        .filter-btn:hover {
-            background: linear-gradient(135deg, #FF8C00, #FF7F00);
-            box-shadow: 0 4px 8px rgba(255, 165, 0, 0.4);
-            transform: translateY(-1px);
-        }
-        
-        .filter-btn:active {
-            transform: translateY(0);
-        }
-        
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-        }
-        
-        .product-card {
-            background-color: white;
-            box-shadow: 1px 1px 2px gray;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: transform 0.2s;
-            text-decoration: none;
-            color: inherit;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            text-decoration: none;
-            color: inherit;
-        }
-        
-        .product-image {
-            height: 200px;
-            overflow: hidden;
-            position: relative;
-            background-color: #eee;
-        }
-        
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .hanger-icon {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 35px;
-            height: 35px;
-            color: #777;
-        }
-        
-        .product-info {
-            padding: 12px;
-        }
-        
-        .product-title {
-            font-weight: bold;
-            margin: 0 0 8px 0;
-            font-size: 16px;
-        }
-        
-        .product-price {
-            font-weight: bold;
-            color: #FF9800;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-        
-        .rating {
-            color: #ffd700;
-            margin-top: 5px;
-        }
-        
-        .rating-value {
-            margin-left: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #555;
-        }
-        
-        .location-info {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #666;
-            font-size: 12px;
-            margin: 5px 0;
-            background-color: #f8f9fa;
-            padding: 4px 8px;
-            border-radius: 12px;
-            border: 1px solid #e9ecef;
-        }
-        
-        .location-info i {
-            font-size: 10px;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            align-items: center;
-        }
-        
-        .pagination a, .pagination span {
-            padding: 8px 12px;
-            margin: 0 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-decoration: none;
-            color: #333;
-            font-size: 14px;
-            background-color: white;
-            transition: background-color 0.2s;
-        }
-        
-        .pagination a:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .pagination span {
-            background-color: white;
-        }
-        
-        .seller-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 14px;
-            margin: 8px 0;
-        }
-
-        .seller-info i {
-            color: #666;
-        }
-
-        /* Particle background styles */
-        .particle-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-        
-        #particleCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-    </style>
-</head>
-<body>
-    <div class="particle-background">
-        <canvas id="particleCanvas"></canvas>
-    </div>
-    
-    <div class="container">
-        <div class="page-header">
-            <h1 class="page-title">Explorasi UMKM</h1>
-            
-            <div class="search-container">
-                <form action="{{ route('shop') }}" method="GET" style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" name="search" class="search-input" placeholder="Cari produk..." value="{{ request('search') }}">
-                    
-                    <select name="province_id" class="filter-select" id="provinceSelect">
-                        <option value="">Semua Provinsi</option>
-                        @foreach($provinces as $province)
-                            <option value="{{ $province->id }}" {{ request('province_id') == $province->id ? 'selected' : '' }}>
-                                {{ $province->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    
-                    <select name="city_id" class="filter-select" id="citySelect">
-                        <option value="">Semua Kota</option>
-                        @foreach($cities as $city)
-                            <option value="{{ $city->id }}" {{ request('city_id') == $city->id ? 'selected' : '' }}>
-                                {{ $city->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    
-                    <button type="submit" class="filter-btn">
-                        <i class="fas fa-search"></i> Cari
-                    </button>
+        <!-- Header & Filter -->
+        <header class="mb-8 p-6 bg-white rounded-xl shadow-sm">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Eksplorasi UMKM</h1>
+                    <p class="text-gray-500 mt-1">Temukan produk terbaik dari seluruh penjuru.</p>
+                </div>
+                
+                <!-- Form Filter -->
+                <form action="{{ route('shop') }}" method="GET" class="w-full md:w-auto">
+                    <div class="flex flex-col sm:flex-row gap-2">
+                        <input type="text" name="search" class="w-full sm:w-48 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" placeholder="Cari produk..." value="{{ request('search') }}">
+                        
+                        <select name="province_id" id="provinceSelect" class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Semua Provinsi</option>
+                            @foreach($provinces as $province)
+                                <option value="{{ $province->id }}" {{ request('province_id') == $province->id ? 'selected' : '' }}>
+                                    {{ $province->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        
+                        <select name="city_id" id="citySelect" class="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500">
+                            <option value="">Semua Kota</option>
+                            {{-- Opsi kota akan diisi oleh JavaScript --}}
+                            @if(request('city_id') && $cities->where('id', request('city_id'))->first())
+                                <option value="{{ request('city_id') }}" selected>{{ $cities->where('id', request('city_id'))->first()->name }}</option>
+                            @endif
+                        </select>
+                        
+                        <button type="submit" class="w-full sm:w-auto bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-600 transition-colors flex items-center justify-center gap-2">
+                            <i class="fas fa-search"></i>
+                            <span>Cari</span>
+                        </button>
+                    </div>
                 </form>
             </div>
-        </div>
-        
-        @if($products->count() > 0)
-            <div class="product-grid">
-                @foreach($products as $product)
-                <a href="{{ route('products.show', $product->id) }}" class="product-card">
-                    <div class="product-image">
-                        <i class="fas fa-hanger hanger-icon"></i>
-                        <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">{{ $product->nama_barang }}</h3>
-                        
-                        @php
-                            $smallestSize = $product->sizes->sortBy('harga')->first();
-                            $priceRange = $smallestSize ? 'Rp '. number_format($smallestSize->harga, 0, ',', '.') : 'Harga tidak tersedia';
-                        @endphp
-                        <div class="product-price">{{ $priceRange }}</div>
-                        
-                        <div class="location-info">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>{{ $product->city->name ?? 'Kota tidak diketahui' }}, {{ $product->province->name ?? 'Provinsi tidak diketahui' }}</span>
-                        </div>
-                        
-                        <div class="rating">
-                            <i class="fas fa-star"></i>    
-                            {{ number_format($product->ratings->avg('rating') ?? 0, 1) }} |
-                            <span style="color: #666; margin-left: 5px;">
-                                <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
-                            </span>
-                        </div>
-                    </div>
-                </a>
-                @endforeach
-            </div>
-        @else
-            <div style="text-align: center; padding: 50px; color: #666;">
-                <i class="fas fa-search" style="font-size: 48px; margin-bottom: 20px;"></i>
-                <h3>Tidak ada produk ditemukan</h3>
-                <p>Coba ubah kata kunci pencarian atau filter lokasi Anda.</p>
-            </div>
-        @endif
-        
-        @if($products->hasPages())
-        <div class="pagination">
-            @if($products->onFirstPage())
-                <span style="color: #aaa;">Prev</span>
-            @else
-                <a href="{{ $products->appends(request()->query())->previousPageUrl() }}">Prev</a>
-            @endif
-            
-            <span>{{ $products->currentPage() }} dari {{ $products->lastPage() }}</span>
-            
-            @if($products->hasMorePages())
-                <a href="{{ $products->appends(request()->query())->nextPageUrl() }}">Next</a>
-            @else
-                <span style="color: #aaa;">Next</span>
-            @endif
-        </div>
-        @endif
-    </div>
+        </header>
 
-    <script src="/js/particles.js"></script>
-    <script>
-        // Handle province change to load cities
-        document.getElementById('provinceSelect').addEventListener('change', function() {
-            const provinceId = this.value;
-            const citySelect = document.getElementById('citySelect');
-            
-            // Clear city options
+        <!-- Product Grid -->
+        <main>
+            @if($products->count() > 0)
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    @foreach($products as $product)
+                    <a href="{{ route('products.show', $product->id) }}" class="bg-white rounded-xl shadow-md overflow-hidden group transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                        <div class="relative">
+                            <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}" class="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            {{-- Opsi: Tambahkan overlay jika perlu --}}
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-gray-800 truncate" title="{{ $product->nama_barang }}">{{ $product->nama_barang }}</h3>
+                            
+                            @php
+                                $smallestSize = $product->sizes->sortBy('harga')->first();
+                                $priceRange = $smallestSize ? 'Rp '. number_format($smallestSize->harga, 0, ',', '.') : 'Stok habis';
+                            @endphp
+                            <p class="text-lg font-bold text-orange-500 mt-1">{{ $priceRange }}</p>
+                            
+                            <div class="text-xs text-gray-500 mt-2 flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full w-fit">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ $product->city->name ?? 'N/A' }}</span>
+                            </div>
+                            
+                            <div class="flex items-center text-sm text-gray-500 mt-3 pt-3 border-t">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="ml-1 font-semibold">{{ number_format($product->ratings->avg('rating') ?? 0, 1) }}</span>
+                                <span class="mx-2">|</span>
+                                <span>{{ $product->purchase_count ?? 0 }} terjual</span>
+                            </div>
+                        </div>
+                    </a>
+                    @endforeach
+                </div>
+                
+                <!-- Pagination -->
+                <div class="mt-10">
+                    {{ $products->appends(request()->query())->links() }}
+                </div>
+            @else
+                <div class="text-center py-20 px-6 bg-white rounded-lg shadow-md">
+                    <i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-2xl font-semibold text-gray-700">Produk Tidak Ditemukan</p>
+                    <p class="text-gray-500 mt-2">Coba ubah kata kunci pencarian atau filter lokasi Anda.</p>
+                </div>
+            @endif
+        </main>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinceSelect = document.getElementById('provinceSelect');
+        const citySelect = document.getElementById('citySelect');
+        const selectedCityId = "{{ request('city_id') }}"; // Ambil city_id dari request
+
+        function fetchCities(provinceId) {
+            // Clear city options, keep the "Semua Kota"
             citySelect.innerHTML = '<option value="">Semua Kota</option>';
             
             if (provinceId) {
-                // Fetch cities for the selected province
                 fetch(`/api/cities/${provinceId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
                     .then(cities => {
                         cities.forEach(city => {
                             const option = document.createElement('option');
                             option.value = city.id;
                             option.textContent = city.name;
+                            // Jika city.id sama dengan city_id dari request, set sebagai selected
+                            if (city.id == selectedCityId) {
+                                option.selected = true;
+                            }
                             citySelect.appendChild(option);
                         });
                     })
-                    .catch(error => {
-                        console.error('Error fetching cities:', error);
-                    });
+                    .catch(error => console.error('Error fetching cities:', error));
             }
+        }
+
+        // Event listener untuk saat provinsi diganti
+        provinceSelect.addEventListener('change', function() {
+            fetchCities(this.value);
         });
-    </script>
-</body>
-</html>
+
+        // Jika sudah ada provinsi yang terpilih saat halaman dimuat (misal setelah filter),
+        // panggil fetchCities untuk mengisi kota yang sesuai.
+        if (provinceSelect.value) {
+            fetchCities(provinceSelect.value);
+        }
+    });
+</script>
 @endsection
