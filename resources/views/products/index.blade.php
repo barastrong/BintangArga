@@ -1,9 +1,8 @@
 @extends ('layouts.app')
 
 @section ('content')
-
 <!-- Hero Section -->
-<header class="relative h-[60vh] md:h-[70vh] bg-cover bg-center" style="background-image: url('/banner.png');">
+<header class="relative h-[60vh] md:h-[90vh] bg-cover bg-center" style="background-image: url('/banner2.png');">
     <div class="absolute inset-0 bg-black bg-opacity-30"></div>
     <div class="relative h-full flex items-center justify-center text-center px-4">
         <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight drop-shadow-lg">
@@ -11,13 +10,13 @@
         </h1>
     </div>
 </header>
-
-<div class="py-12 md:py-20">
+<br>
+<br>
+<br>
+<div class="bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <!-- Features Section -->
-        <section>
-            <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Keunggulan Kami</h2>
+        <section class="py-16 sm:py-24">
+            <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">Keunggulan Kami</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <a href="#location" class="block bg-white p-6 rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                     <div class="flex items-center">
@@ -55,29 +54,41 @@
             </div>
         </section>
 
-        <!-- Categories Section -->
-        <section class="mt-16 md:mt-24" id="categories">
-            <h2 class="text-3xl font-bold text-gray-800 mb-8">Kategori Pilihan</h2>
-            <div class="relative">
-                <div id="discount-grid" class="flex space-x-6 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-                    @foreach($categories as $category)
-                    <a href="{{ route('products.category', $category->id) }}" class="flex-shrink-0 w-60 md:w-72 group">
-                        <div class="relative rounded-xl overflow-hidden shadow-lg transform group-hover:scale-105 group-hover:shadow-2xl transition-all duration-300">
-                            <img src="{{ $category->gambar }}" alt="{{ $category->nama }}" class="h-40 w-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
-                            <div class="absolute bottom-0 left-0 p-4">
-                                <h3 class="text-white text-xl font-bold tracking-wide">{{ $category->nama }}</h3>
-                            </div>
-                        </div>
-                    </a>
-                    @endforeach
-                </div>
-            </div>
-        </section>
+    </div>
+</div>
 
-        <!-- Favorite Products Section -->
-        <section class="mt-16 md:mt-24" id="favorites">
-            <h2 class="text-3xl font-bold text-gray-800 mb-8">Barang Favorit Kami</h2>
+<br>
+<br>
+<br>
+<!-- Categories Section -->
+<section class="py-16 sm:py-24 bg-white" id="categories">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">Kategori Pilihan</h2>
+        <div class="relative">
+            <div id="discount-grid" class="flex space-x-6 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+                @foreach($categories as $category)
+                <a href="{{ route('products.category', $category->id) }}" class="flex-shrink-0 w-60 md:w-72 group">
+                    <div class="relative rounded-xl overflow-hidden shadow-lg transform group-hover:scale-105 group-hover:shadow-2xl transition-all duration-300">
+                        <img src="{{ $category->gambar }}" alt="{{ $category->nama }}" class="h-40 w-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-4">
+                            <h3 class="text-white text-xl font-bold tracking-wide">{{ $category->nama }}</h3>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+<br>
+<br>
+<br>
+<!-- Favorite Products Section -->
+<div class="bg-gray-50">
+    <section class="py-16 sm:py-24" id="favorites">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-12 text-center">Barang Favorit Kami</h2>
             @if(count($products) > 0)
                 <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                     @foreach($products as $product)
@@ -107,12 +118,19 @@
                     <p class="text-sm text-gray-500 mt-1">Produk dengan rating tinggi akan tampil di sini.</p>
                 </div>
             @endif
-        </section>
+        </div>
+    </section>
+</div>
 
-        <!-- Location Section -->
-        <section class="mt-16 md:mt-24 bg-white rounded-xl shadow-lg overflow-hidden" id="location">
+<br>
+<br>
+
+<!-- Location Section -->
+<section class="py-16 sm:py-24 bg-white" id="location">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
             <div class="grid grid-cols-1 lg:grid-cols-2">
-                <div class="p-8 md:p-12 flex flex-col justify-center">
+                <div class="p-8 md:p-12 flex flex-col justify-center text-center lg:text-left">
                     <h2 class="text-3xl font-bold text-gray-800">Kunjungi Kantor Kami</h2>
                     <div class="mt-6 space-y-2">
                         <h3 class="text-xl font-semibold text-orange-600">SMK Telkom Sidoarjo</h3>
@@ -120,7 +138,7 @@
                         <p class="text-gray-600">Sidoarjo, Jawa Timur, 61215</p>
                     </div>
                 </div>
-                <div class="h-64 lg:h-full">
+                <div class="h-80 lg:h-full">
                     <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.9871065035472!2d112.72276627605149!3d-7.466674473607052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e6d71181af21%3A0x4232ab0204ccbfe5!2sSMK%20TELKOM%20Sidoarjo!5e0!3m2!1sid!2sid!4v1740023359217!5m2!1sid!2sid"
                         width="100%"
@@ -132,8 +150,8 @@
                     </iframe>
                 </div>
             </div>
-        </section>
-
+        </div>
     </div>
-</div>
+</section>
+
 @endsection
