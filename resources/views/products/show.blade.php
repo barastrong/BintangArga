@@ -211,8 +211,6 @@
 
 {{-- Letakkan script di sini, di dalam section 'content' atau di @push('scripts') jika layoutmu mendukung --}}
 <script>
-// Script kamu yang sudah ada bisa ditaruh di sini.
-// ... (salin semua script dari kode aslimu ke sini) ...
 function updateMainImage(imageUrl) {
     document.getElementById('mainImage').src = imageUrl;
 }
