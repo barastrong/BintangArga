@@ -9,553 +9,100 @@
     <title>Toko Baju</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            line-height: 1.6;
-            background-color: #fafafa;
-        }
-        
-        h1 {
-            font-size: clamp(20px, 4vw, 28px);
-            margin: 30px 20px 15px;
-            font-weight: 600;
-        }
-        
-        h2 {
-            font-size: clamp(18px, 3.5vw, 24px);
-            margin: 30px 20px 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        .section {
-            padding: 40px 0;
-        }
-        
-        .header-wrapper {
-            margin-bottom: 30px;
-        }
-        
-        .hero-section {
-            position: relative;
-            height: clamp(250px, 40vw, 350px);
-            background-image: url('/banner.png');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            display: flex;
-            align-items: center;
-            padding: 0 clamp(20px, 5vw, 50px);
-        }
-        
-        .hero-section h1 {
-            font-size: clamp(28px, 6vw, 48px);
-            font-weight: 800;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-            margin: 0;
-        }
-        
-        .features-title {
-            font-size: clamp(16px, 3vw, 20px);
-            font-weight: 600;
-            margin: 30px 20px 20px;
-            text-align: left;
-        }
-        
-        .features-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 0 20px;
-            margin-bottom: 20px;
-        }
-        
-        .feature-item {
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border: 1px solid #f0f0f0;
-        }
-        
-        .feature-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
-        }
-        
-        .icon-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #f8f9fa;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-        
-        .icon-container i {
-            color: #FF9800;
-            font-size: 20px;
-        }
-        
-        .icon-container.orange {
-            background-color: #FF9800;
-            transition: all 0.3s ease;
-        }
-        
-        .icon-container.orange:hover {
-            background-color: #f57c00;
-            transform: scale(1.1);
-        }
-        
-        .icon-container.orange i {
-            color: white;
-        }
-        
-        .feature-text {
-            flex: 1;
-            padding-right: 10px;
-        }
-        
-        .feature-text h3 {
-            margin: 0 0 8px 0;
-            font-size: clamp(14px, 2.5vw, 16px);
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .feature-text p {
-            margin: 0;
-            font-size: clamp(12px, 2vw, 14px);
-            color: #6c757d;
-            line-height: 1.4;
-        }
-
-        .products-container, .discount-container {
-            position: relative;
-            padding: 0 20px;
-            margin-bottom: 20px;
-        }
-
-        .products-grid, .discount-grid {
-            display: flex;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            padding: 20px 0;
-            gap: clamp(10px, 2vw, 20px);
-            scrollbar-width: thin;
-            scrollbar-color: #FF9800 #f1f1f1;
-        }
-
-        .products-grid::-webkit-scrollbar,
-        .discount-grid::-webkit-scrollbar {
+        /* Custom scrollbar styles untuk webkit browsers */
+        .custom-scrollbar::-webkit-scrollbar {
             height: 6px;
         }
-
-        .products-grid::-webkit-scrollbar-thumb,
-        .discount-grid::-webkit-scrollbar-thumb {
-            background-color: #FF9800;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #f59e0b;
             border-radius: 20px;
         }
-
-        .products-grid::-webkit-scrollbar-track,
-        .discount-grid::-webkit-scrollbar-track {
+        .custom-scrollbar::-webkit-scrollbar-track {
             background-color: #f1f1f1;
             border-radius: 20px;
         }
-
-        .product-card {
-            flex: 0 0 clamp(180px, 25vw, 220px);
-            border: 1px solid #e8e8e8;
-            padding: 15px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            background: white;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        
+        /* Custom gradient overlay */
+        .gradient-overlay {
+            background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.8));
         }
         
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border-color: #FF9800;
-        }
-
-        .product-card img {
-            width: 100%;
-            height: clamp(150px, 20vw, 200px);
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 12px;
-        }
-        
-        .product-card h3 {
-            margin: 0 0 8px 0;
-            font-size: clamp(14px, 2.5vw, 16px);
-            font-weight: 600;
-            color: #333;
-            line-height: 1.3;
+        /* Custom clamp utilities */
+        .text-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
-        .product-card p {
-            color: #666;
-            font-size: clamp(12px, 2vw, 14px);
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .product-price {
-            font-weight: 700;
-            color: #FF9800;
-            font-size: clamp(14px, 2.5vw, 18px);
-            margin-bottom: 10px;
-        }
-        
-        .rating {
-            color: #ffd700;
-            margin-top: 8px;
-            font-size: clamp(12px, 2vw, 14px);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .rating span {
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        .discount-card {
-            flex: 0 0 clamp(200px, 30vw, 280px);
-            position: relative;
-            height: clamp(150px, 25vw, 220px);
-            overflow: hidden;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transition: all 0.3s ease;
-        }
-
-        .discount-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        .discount-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        
-        .discount-card:hover img {
-            transform: scale(1.08);
-        }
-
-        .discount-card .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.8));
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 20px;
-        }
-        
-        .discount-card h3 {
-            margin: 0;
-            font-size: clamp(14px, 2.5vw, 18px);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-        }
-        
-        .scroll-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: clamp(35px, 5vw, 45px);
-            height: clamp(35px, 5vw, 45px);
-            background: rgba(255, 152, 0, 0.9);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: clamp(14px, 2.5vw, 18px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0.8;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        }
-        
-        .scroll-btn:hover {
-            opacity: 1;
-            background: rgba(255, 152, 0, 1);
-            transform: translateY(-50%) scale(1.1);
-        }
-        
-        .scroll-left {
-            left: 10px;
-        }
-        
-        .scroll-right {
-            right: 10px;
-        }
-
-        .location-section {
-            padding: 40px 20px;
-            background-color: #f8f9fa;
-            margin-top: 40px;
-        }
-        
-        .location-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
-        
-        .map {
-            width: 100%;
-        }
-        
-        .map h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: clamp(18px, 3vw, 24px);
-        }
-        
-        .map iframe {
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .address {
-            padding: 30px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-        
-        .address h3 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: clamp(24px, 4vw, 32px);
-            color: #333;
-            font-weight: 700;
-        }
-        
-        .address p {
-            margin: 8px 0;
-            font-size: clamp(16px, 2.5vw, 20px);
-            color: #666;
-            line-height: 1.5;
-        }
-        
-        .seller-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: clamp(12px, 2vw, 14px);
-            margin: 8px 0;
-        }
-
-        .seller-info i {
-            color: #666;
-        }
-
-        .no-favorites-message {
-            text-align: center;
-            padding: 40px 20px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            margin: 20px 0;
-        }
-
-        .no-favorites-message i {
-            font-size: clamp(24px, 4vw, 32px);
-            color: #d3d3d3;
-            margin-bottom: 15px;
-        }
-
-        .no-favorites-message p:first-of-type {
-            font-size: clamp(16px, 2.5vw, 18px);
-            color: #6c757d;
-            margin-bottom: 10px;
-        }
-
-        .no-favorites-message p:last-of-type {
-            font-size: clamp(12px, 2vw, 14px);
-            color: #6c757d;
-            margin-top: 10px;
-        }
-
-        /* Mobile Responsive Improvements */
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 10px;
-            }
-            
-            .features-section {
-                grid-template-columns: 1fr;
-                padding: 0 15px;
-            }
-            
-            .feature-item {
-                padding: 15px;
-            }
-            
-            .products-container, .discount-container {
-                padding: 0 15px;
-            }
-            
-            .location-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .address {
-                padding: 20px;
-            }
-            
-            .scroll-btn {
-                display: none;
-            }
-            
-            .hero-section {
-                padding: 0 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .features-section {
-                padding: 0 10px;
-            }
-            
-            .products-container, .discount-container {
-                padding: 0 10px;
-            }
-            
-            .location-section {
-                padding: 20px 10px;
-            }
-            
-            .feature-item {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px 15px;
-            }
-            
-            .icon-container {
-                margin-right: 0;
-                margin-bottom: 15px;
-            }
-            
-            .feature-text {
-                padding-right: 0;
-            }
-        }
-
-        /* Performance optimizations */
-        .product-card,
-        .discount-card,
-        .feature-item {
-            will-change: transform;
-        }
-
-        /* Smooth scrolling for all browsers */
-        html {
-            scroll-behavior: smooth;
-        }
     </style>
 </head>
-<body>
-    <div class="header-wrapper">
+<body class="font-sans bg-gray-50 text-gray-800 leading-relaxed">
+    <div class="mb-8">
         <!-- Hero Section -->
-        <div class="hero-section">
-            <h1>Hello World</h1>
+        <div class="relative h-64 md:h-80 lg:h-96 bg-cover bg-center flex items-center px-5 md:px-12 text-white" 
+             style="background-image: url('/banner.png')">
+            <h1 class="text-2xl md:text-4xl lg:text-5xl font-extrabold drop-shadow-lg">
+                Temukan Gaya Terbaikmu
+            </h1>
         </div>
 
-        <h2 class="features-title">Keunggulan Kami</h2>
+        <h2 class="text-lg md:text-xl lg:text-2xl font-semibold mt-8 mb-5 mx-5 text-left">
+            Keunggulan Kami
+        </h2>
         
         <!-- Features Section -->
-        <div class="features-section">
-            <div class="feature-item">
-                <div class="icon-container">
-                    <i class="fas fa-users"></i>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 px-5 mb-5">
+            <div class="flex flex-col md:flex-row items-center p-5 bg-white rounded-xl shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mr-0 md:mr-4 mb-4 md:mb-0 flex-shrink-0">
+                    <i class="fas fa-users text-orange-500 text-xl"></i>
                 </div>
-                <div class="feature-text">
-                    <h3>Kami tersedia diberbagai platform</h3>
-                    <p>Lorem ipsum sumipsum</p>
+                <div class="flex-1 text-center md:text-left pr-0 md:pr-3">
+                    <h3 class="text-sm md:text-base font-semibold text-gray-800 mb-2">
+                        Kami tersedia diberbagai platform
+                    </h3>
+                    <p class="text-xs md:text-sm text-gray-500">
+                        Lorem ipsum sumipsum
+                    </p>
                 </div>
                 <a href="#Locate">
-                    <div class="icon-container orange">
+                    <div class="flex items-center justify-center w-12 h-12 bg-orange-500 rounded-full text-white transition-all duration-300 hover:bg-orange-600 hover:scale-110 shadow-md">
                         <i class="fas fa-arrow-right"></i>
                     </div>
                 </a>
             </div>
             
-            <div class="feature-item">
-                <div class="icon-container">
-                    <i class="fas fa-store"></i>
+            <div class="flex flex-col md:flex-row items-center p-5 bg-white rounded-xl shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mr-0 md:mr-4 mb-4 md:mb-0 flex-shrink-0">
+                    <i class="fas fa-store text-orange-500 text-xl"></i>
                 </div>
-                <div class="feature-text">
-                    <h3>Store terbaik</h3>
-                    <p>Lorem ipsum sumipsum</p>
+                <div class="flex-1 text-center md:text-left pr-0 md:pr-3">
+                    <h3 class="text-sm md:text-base font-semibold text-gray-800 mb-2">
+                        Store terbaik
+                    </h3>
+                    <p class="text-xs md:text-sm text-gray-500">
+                        Lorem ipsum sumipsum
+                    </p>
                 </div>
                 <a href="#BiggestRating">
-                    <div class="icon-container orange">
+                    <div class="flex items-center justify-center w-12 h-12 bg-orange-500 rounded-full text-white transition-all duration-300 hover:bg-orange-600 hover:scale-110 shadow-md">
                         <i class="fas fa-arrow-right"></i>
                     </div>
                 </a> 
             </div>
             
-            <div class="feature-item">
-                <div class="icon-container">
-                    <i class="fas fa-tag"></i>
+            <div class="flex flex-col md:flex-row items-center p-5 bg-white rounded-xl shadow-lg border border-gray-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <div class="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mr-0 md:mr-4 mb-4 md:mb-0 flex-shrink-0">
+                    <i class="fas fa-tag text-orange-500 text-xl"></i>
                 </div>
-                <div class="feature-text">
-                    <h3>Harga Bersaing</h3>
-                    <p>Lorem ipsum sumipsum</p>
+                <div class="flex-1 text-center md:text-left pr-0 md:pr-3">
+                    <h3 class="text-sm md:text-base font-semibold text-gray-800 mb-2">
+                        Harga Bersaing
+                    </h3>
+                    <p class="text-xs md:text-sm text-gray-500">
+                        Lorem ipsum sumipsum
+                    </p>
                 </div>
-                <div class="icon-container orange">
+                <div class="flex items-center justify-center w-12 h-12 bg-orange-500 rounded-full text-white transition-all duration-300 hover:bg-orange-600 hover:scale-110 shadow-md">
                     <i class="fas fa-arrow-right"></i>
                 </div>
             </div>
@@ -563,87 +110,93 @@
     </div>
 
     <!-- Discount Categories Section -->
-    <section class="section">
-        <h1>Category</h1>
-        <div class="discount-container">
-            <button class="scroll-btn scroll-left" onclick="scrollContainer('discount-grid', 'left')">
-                <i class="fas fa-chevron-left"></i>
+    <section class="py-10">
+        <h1 class="text-xl md:text-2xl lg:text-3xl font-semibold mt-8 mb-4 mx-5">Category</h1>
+        <div class="relative px-5 mb-5">
+            <button class="absolute left-3 top-1/2 transform -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 bg-orange-500 bg-opacity-90 border-none rounded-full text-white flex items-center justify-center cursor-pointer z-10 opacity-80 transition-all duration-300 hover:opacity-100 hover:bg-orange-500 hover:scale-110 shadow-lg hidden md:flex"
+                    onclick="scrollContainer('discount-grid', 'left')">
+                <i class="fas fa-chevron-left text-sm md:text-lg"></i>
             </button>
-            <div class="discount-grid" id="discount-grid">
+            <div class="flex overflow-x-auto scroll-smooth py-5 gap-3 md:gap-5 custom-scrollbar" id="discount-grid">
                 @foreach($categories as $category)
-                <a href="{{ route('products.category', $category->id) }}" class="discount-card">
-                    <img src="{{ $category->gambar }}" alt="{{ $category->nama }}">
-                    <div class="overlay">
-                        <h3>{{ $category->nama }}</h3>
+                <a href="{{ route('products.category', $category->id) }}" class="flex-none w-50 md:w-60 lg:w-70 relative h-36 md:h-48 lg:h-56 overflow-hidden rounded-xl shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
+                    <img src="{{ $category->gambar }}" alt="{{ $category->nama }}" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                    <div class="absolute inset-0 gradient-overlay text-white flex flex-col justify-end p-5">
+                        <h3 class="text-sm md:text-lg font-bold uppercase tracking-wide">{{ $category->nama }}</h3>
                     </div>
                 </a>
                 @endforeach
             </div>
-            <button class="scroll-btn scroll-right" onclick="scrollContainer('discount-grid', 'right')">
-                <i class="fas fa-chevron-right"></i>
+            <button class="absolute right-3 top-1/2 transform -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 bg-orange-500 bg-opacity-90 border-none rounded-full text-white flex items-center justify-center cursor-pointer z-10 opacity-80 transition-all duration-300 hover:opacity-100 hover:bg-orange-500 hover:scale-110 shadow-lg hidden md:flex"
+                    onclick="scrollContainer('discount-grid', 'right')">
+                <i class="fas fa-chevron-right text-sm md:text-lg"></i>
             </button>
         </div>
     </section>
 
     <!-- Favorite Products Section -->
-    <section class="section" id="BiggestRating">
-        <h1>Barang Favorit Kami</h1>
-        <div class="products-container">
+    <section class="py-10" id="BiggestRating">
+        <h1 class="text-xl md:text-2xl lg:text-3xl font-semibold mt-8 mb-4 mx-5">Barang Favorit Kami</h1>
+        <div class="relative px-5 mb-5">
             @if(count($products) > 0)
-            <button class="scroll-btn scroll-left" onclick="scrollContainer('products-grid', 'left')">
-                <i class="fas fa-chevron-left"></i>
+            <button class="absolute left-3 top-1/2 transform -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 bg-orange-500 bg-opacity-90 border-none rounded-full text-white flex items-center justify-center cursor-pointer z-10 opacity-80 transition-all duration-300 hover:opacity-100 hover:bg-orange-500 hover:scale-110 shadow-lg hidden md:flex"
+                    onclick="scrollContainer('products-grid', 'left')">
+                <i class="fas fa-chevron-left text-sm md:text-lg"></i>
             </button>
-            <div class="products-grid" id="products-grid">
+            <div class="flex overflow-x-auto scroll-smooth py-5 gap-3 md:gap-5 custom-scrollbar" id="products-grid">
                 @foreach($products as $product)
-                <a href="{{ route('products.show', $product->id) }}" class="product-card">
-                    <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}">
-                    <h3>{{ $product->nama_barang }}</h3>
+                <a href="{{ route('products.show', $product->id) }}" class="flex-none w-44 md:w-52 lg:w-56 border border-gray-200 p-4 rounded-xl transition-all duration-300 bg-white shadow-lg hover:-translate-y-2 hover:shadow-xl hover:border-orange-500">
+                    <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_barang }}" class="w-full h-36 md:h-44 lg:h-48 object-cover rounded-lg mb-3">
+                    <h3 class="text-sm md:text-base font-semibold text-gray-800 leading-tight text-clamp-2 mb-2">{{ $product->nama_barang }}</h3>
                     @php
                         $smallestSize = $product->sizes->sortBy('harga')->first();
                         $priceRange = 'Rp '. number_format($smallestSize->harga, 0, ',', '.');
                     @endphp
-                    <div class="product-price">{{ $priceRange }}</div>
-                    <div class="rating">
+                    <div class="font-bold text-orange-500 text-sm md:text-lg mb-3">{{ $priceRange }}</div>
+                    <div class="text-yellow-400 text-xs md:text-sm flex items-center gap-1">
                         <i class="fas fa-star"></i>    
                         {{ number_format($product->ratings->avg('rating') ?? 0, 1) }}
-                        <span>
+                        <span class="text-gray-500 flex items-center gap-1">
                             <i class="fas fa-shopping-cart"></i> {{ $product->purchase_count ?? 0 }} terjual
                         </span>
                     </div>
                 </a>
                 @endforeach
             </div>
-            <button class="scroll-btn scroll-right" onclick="scrollContainer('products-grid', 'right')">
-                <i class="fas fa-chevron-right"></i>
+            <button class="absolute right-3 top-1/2 transform -translate-y-1/2 w-9 h-9 md:w-11 md:h-11 bg-orange-500 bg-opacity-90 border-none rounded-full text-white flex items-center justify-center cursor-pointer z-10 opacity-80 transition-all duration-300 hover:opacity-100 hover:bg-orange-500 hover:scale-110 shadow-lg hidden md:flex"
+                    onclick="scrollContainer('products-grid', 'right')">
+                <i class="fas fa-chevron-right text-sm md:text-lg"></i>
             </button>
             @else
-                <div class="no-favorites-message">
-                    <i class="fas fa-star"></i>
-                    <p>Belum ada produk favorit dengan rating tinggi saat ini.</p>
-                    <p>Produk dengan rating 4.0 ke atas akan ditampilkan di sini.</p>
+                <div class="text-center py-10 bg-white rounded-xl shadow-lg mx-5">
+                    <i class="fas fa-star text-2xl md:text-3xl text-gray-300 mb-4"></i>
+                    <p class="text-base md:text-lg text-gray-500 mb-3">Belum ada produk favorit dengan rating tinggi saat ini.</p>
+                    <p class="text-xs md:text-sm text-gray-500">Produk dengan rating 4.0 ke atas akan ditampilkan di sini.</p>
                 </div>
             @endif
         </div>
     </section>
 
     <!-- Location Section -->
-    <section class="location-section" id="Locate">
-        <div class="location-content">
-            <div class="map">
-                <h2>Lokasi Kantor Kami</h2>
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.9871065035472!2d112.72276627605149!3d-7.466674473607052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e6d71181af21%3A0x4232ab0204ccbfe5!2sSMK%20TELKOM%20Sidoarjo!5e0!3m2!1sid!2sid!4v1740023359217!5m2!1sid!2sid"
-                    width="100%"
-                    height="350"
-                    style="border:0;"
-                    allowfullscreen=""
-                    loading="lazy">
-                </iframe>
-            </div>
-            <div class="address">
-                <h3>SMK Telkom Sidoarjo</h3>
-                <p>Sekardangan</p>
-                <p>RT 00 RW 99</p>
+    <section class="py-10 bg-gray-100 mt-10" id="Locate">
+        <div class="max-w-7xl mx-auto px-5">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+                <div class="w-full">
+                    <h2 class="text-lg md:text-xl lg:text-2xl font-semibold mb-5">Lokasi Kantor Kami</h2>
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.9871065035472!2d112.72276627605149!3d-7.466674473607052!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7e6d71181af21%3A0x4232ab0204ccbfe5!2sSMK%20TELKOM%20Sidoarjo!5e0!3m2!1sid!2sid!4v1740023359217!5m2!1sid!2sid"
+                        width="100%"
+                        height="350"
+                        class="border-0 rounded-xl shadow-lg"
+                        allowfullscreen=""
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <div class="p-6 md:p-8 bg-white rounded-xl shadow-lg">
+                    <h3 class="text-xl md:text-2xl lg:text-3xl text-gray-800 font-bold mb-5">SMK Telkom Sidoarjo</h3>
+                    <p class="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed mb-2">Sekardangan</p>
+                    <p class="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed">RT 00 RW 99</p>
+                </div>
             </div>
         </div>
     </section>
@@ -651,7 +204,7 @@
     <script>
         function scrollContainer(containerId, direction) {
             const container = document.getElementById(containerId);
-            const scrollAmount = container.clientWidth * 0.8; // Responsive scroll amount
+            const scrollAmount = container.clientWidth * 0.8;
             
             if (direction === 'left') {
                 container.scrollBy({

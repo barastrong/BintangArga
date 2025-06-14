@@ -7,515 +7,254 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
-    <style>
-        .product-card {
-            display: flex;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        .product-image {
-            width: 215px;
-            background-color: #f5f5f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .product-details {
-            flex: 1;
-            padding: 20px;
-        }
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-        }
-        .quantity-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s ease;
-        }
-        .quantity-btn:hover {
-            background-color: #f8f8f8;
-            border-color: #bbb;
-        }
-        .quantity-input {
-            width: 60px;
-            height: 32px;
-            text-align: center;
-            border: 1px solid #ddd;
-            border-left: none;
-            border-right: none;
-            font-size: 14px;
-            outline: none;
-            -moz-appearance: textfield; /* Firefox */
-        }
-        .quantity-input:focus {
-            border-color: #fbbf24;
-            box-shadow: 0 0 0 1px #fbbf24;
-        }
-        .quantity-input::-webkit-outer-spin-button,
-        .quantity-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        .total-price {
-            text-align: right;
-            margin-top: 20px;
-        }
-        .remove-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-        .remove-btn:hover {
-            background-color: #f8f8f8;
-            color: #ff4444;
-            border-color: #ff4444;
-        }
-    </style>
 </head>
 <body>
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-8">Checkout</h1>
+<div class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="handleBackButton()" class="text-gray-600 hover:text-orange-500 transition-transform hover:scale-110">
+                <i class="fas fa-arrow-left text-2xl"></i>
+            </button>
+            <h1 class="text-3xl font-bold text-gray-800">Checkout</h1>
+        </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <h2 class="text-lg font-semibold mb-4">Selected Items</h2>
+        <form id="checkout-form" action="{{ route('cart.process') }}" method="POST">
+            @csrf
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                 
-                @foreach($selectedItems as $item)
-                    <div class="product-card mb-4" id="item-{{ $item->id }}">
-                        <div class="product-image">
-                            <img src="{{ Storage::url($item->size->gambar_size) }}" 
-                                alt="{{ $item->product->nama_barang }} - {{ $item->size->size }}"  
-                                 alt="{{ $item->product->nama_barang }}" 
-                                 class="object-contain">
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-white rounded-xl shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 p-6 border-b">Barang Pesanan</h2>
+                        <div class="p-6 space-y-4">
+                            @foreach($selectedItems as $item)
+                                <div class="flex gap-4" id="item-{{ $item->id }}">
+                                    <img src="{{ Storage::url($item->size->gambar_size) }}" alt="{{ $item->product->nama_barang }}" class="w-24 h-24 rounded-lg object-cover">
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold text-gray-800">{{ $item->product->nama_barang }}</h3>
+                                        <p class="text-sm text-gray-500">Ukuran: {{ $item->size->size }}</p>
+                                        <p class="text-sm text-gray-500">Jumlah: {{ $item->quantity }}</p>
+                                        <p class="font-semibold text-gray-700 mt-1">Rp {{ number_format($item->size->harga, 0, ',', '.') }}</p>
+                                    </div>
+                                    <p class="font-bold text-lg text-gray-800">Rp {{ number_format($item->size->harga * $item->quantity, 0, ',', '.') }}</p>
+                                </div>
+                                {{-- Input tersembunyi untuk setiap item --}}
+                                <input type="hidden" name="cart_items[]" value="{{ $item->id }}">
+                                <input type="hidden" name="quantities[{{ $item->id }}]" value="{{ $item->quantity }}">
+                                {{-- Tambahan untuk mengirim status_pembelian --}}
+                                <input type="hidden" class="item-status" data-item-id="{{ $item->id }}" value="{{ $item->status_pembelian }}">
+                            @endforeach
                         </div>
-                        <button type="button" 
-                                class="remove-btn" 
-                                onclick="removeItem({{ $item->id }}, '{{ $item->product->nama_barang }}')">
-                            x
-                        </button>
-                        <div class="product-details">
-                            <h3 class="text-lg font-medium">{{ $item->product->nama_barang }}</h3>
-                            
-                            <div class="text-sm text-gray-500 mt-1">UKURAN</div>
-                            <div>{{ $item->size->size }}</div>
-                            
-                            <div class="text-sm text-gray-500 mt-3">Jumlah</div>
-                            <div class="flex items-center mt-1">
-                                <div class="quantity-controls">
-                                    <button type="button" 
-                                            class="quantity-btn" 
-                                            onclick="updateQuantity({{ $item->id }}, 'decrease')">
-                                        -
-                                    </button>
-                                    <input type="number" 
-                                           id="quantity-{{ $item->id }}" 
-                                           class="quantity-input"
-                                           value="{{ $item->quantity }}"
-                                           min="0"
-                                           max="{{ $item->size->stock }}"
-                                           onchange="updateQuantityManual({{ $item -> id }})"
-                                           onkeyup="updateQuantityManual({{ $item -> id }})"
-                                           onblur="validateQuantity({{ $item->id }})">
-                                    <button type="button" 
-                                            class="quantity-btn" 
-                                            onclick="updateQuantity({{ $item->id }}, 'increase')">
-                                        +
-                                    </button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Detail Pengiriman</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="shipping_address" class="block text-sm font-medium text-gray-700 mb-1">Alamat Pengiriman</label>
+                                <textarea name="shipping_address" id="shipping_address" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" required></textarea>
+                            </div>
+                            <div>
+                                <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1">Nomor Telepon</label>
+                                <input type="tel" name="phone_number" id="phone_number" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" required>
+                            </div>
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Catatan Pembelian (opsional)</label>
+                                <textarea name="description" id="description" rows="2" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-md p-6 sticky top-24 space-y-6">
+                        <h2 class="text-xl font-semibold text-gray-800">Ringkasan Pesanan</h2>
+                        
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Subtotal</span>
+                                <span class="font-medium">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Pajak (10%)</span>
+                                <span class="font-medium">Rp {{ number_format($totalPrice * 0.1, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Biaya Layanan</span>
+                                <span class="font-medium">Rp {{ number_format($totalPrice * 0.03, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center border-t pt-4">
+                            <span class="text-lg font-bold text-gray-900">Total</span>
+                            @php
+                                $finalTotal = $totalPrice + ($totalPrice * 0.1) + ($totalPrice * 0.03);
+                            @endphp
+                            <span class="text-xl font-bold text-orange-600">Rp {{ number_format($finalTotal, 0, ',', '.') }}</span>
+                            <input type="hidden" name="total_with_tax" value="{{ $finalTotal }}">
+                        </div>
+
+                        <div>
+                            <label class="block text-base font-semibold text-gray-700 mb-3">Metode Pembayaran</label>
+                            <div class="space-y-3">
+                                <label for="payment_gopay" class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-orange-500 transition has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500">
+                                    <input type="radio" name="payment_method" value="gopay" id="payment_gopay" class="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500" onchange="showPaymentDetails('gopay')">
+                                    <span class="ml-3 font-medium text-sm text-gray-700">Gopay</span>
+                                </label>
+                                <label for="payment_dana" class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-orange-500 transition has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500">
+                                    <input type="radio" name="payment_method" value="dana" id="payment_dana" class="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500" onchange="showPaymentDetails('dana')">
+                                    <span class="ml-3 font-medium text-sm text-gray-700">Dana</span>
+                                </label>
+                                <label for="payment_bank" class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-orange-500 transition has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500">
+                                    <input type="radio" name="payment_method" value="bank_transfer" id="payment_bank" class="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500" onchange="showPaymentDetails('bank_transfer')">
+                                    <span class="ml-3 font-medium text-sm text-gray-700">Transfer Bank</span>
+                                </label>
+                                <label for="payment_qris" class="flex items-center p-3 border rounded-lg cursor-pointer hover:border-orange-500 transition has-[:checked]:bg-orange-50 has-[:checked]:border-orange-500">
+                                    <input type="radio" name="payment_method" value="qris" id="payment_qris" class="h-4 w-4 text-orange-600 border-gray-300 focus:ring-orange-500" onchange="showPaymentDetails('qris')">
+                                    <span class="ml-3 font-medium text-sm text-gray-700">QRIS</span>
+                                </label>
+                            </div>
+                            @error('payment_method')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div id="payment-details" class="hidden">
+                            <div id="gopay-details" class="payment-detail hidden">
+                                <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                    <h3 class="font-semibold text-green-800 mb-2">Pembayaran dengan Gopay</h3>
+                                    <p class="text-sm text-green-700 mb-2">Silakan transfer ke nomor Gopay berikut:</p>
+                                    <div class="bg-white p-3 rounded border">
+                                        <p class="font-mono text-lg font-bold text-green-800">{{ $item->seller->no_telepon }}</p>
+                                        <p class="text-sm text-gray-600">{{$item->seller->nama_penjual}}</p>
+                                    </div>
+                                    <p class="text-xs text-green-600 mt-2">*Pastikan nominal transfer sesuai dengan total pembayaran</p>
                                 </div>
                             </div>
-                            
-                            <div class="total-price">
-                                <div class="text-sm text-gray-500">Total harga</div>
-                                <p class="text-gray-800 font-medium" id="price-{{ $item->id }}" 
-                                   data-unit-price="{{ $item->size->harga }}">
-                                    Rp {{ number_format($item->size->harga * $item->quantity, 0, ',', '.') }}
-                                </p>
+
+                            <div id="dana-details" class="payment-detail hidden">
+                                <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                    <h3 class="font-semibold text-blue-800 mb-2">Pembayaran dengan Dana</h3>
+                                    <p class="text-sm text-blue-700 mb-2">Silakan transfer ke nomor Dana berikut:</p>
+                                    <div class="bg-white p-3 rounded border">
+                                        <p class="font-mono text-lg font-bold text-blue-800">{{ $item->seller->no_telepon }}</p>
+                                        <p class="text-sm text-gray-600">{{ $item->seller->nama_penjual }}</p>
+                                    </div>
+                                    <p class="text-xs text-blue-600 mt-2">*Pastikan nominal transfer sesuai dengan total pembayaran</p>
+                                </div>
                             </div>
 
-                            <input type="hidden" id="stock-{{ $item->id }}" value="{{ $item->size->stock }}">
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-        
-        <div class="lg:col-span-1">
-            <div class="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                <h2 class="text-lg font-semibold mb-4">Order Summary</h2>
-                
-                <div class="mb-4 pb-4 border-b">
-                    <div class="flex justify-between mb-2">
-                        <span>Subtotal</span>
-                        <span id="subtotal">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
-                    </div>
-                </div>
-
-                <div class="mb-4 pb-4 border-b">
-                    <div class="flex justify-between mb-2">
-                        <span>Tax (10%)</span>
-                        <span id="tax-amount">Rp {{ number_format($totalPrice *0.1 , 0, ',', '.') }}</span>
-                    </div>
-                    <div class="flex justify-between mb-2">
-                        <span>Delivery Tax (3%)</span>
-                        <span id="delivery-tax">Rp {{ number_format($totalPrice * 0.03, 0, ',', '.') }}</span>
-                    </div>
-                    <div class="flex justify-between mb-2 font-semibold">
-                        <span>Total</span>
-                        <span id="total-price">Rp {{ number_format($totalPrice + ($totalPrice * 0.1) + ($totalPrice * 0.03), 0, ',', '.') }}</span>
-                    </div>
-                </div>
-                    
-                <form id="checkout-form" action="{{ route('cart.process') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="total_with_tax" id="input-total-with-tax" value="{{ $totalPrice + ($totalPrice * 0.1) }}">
-
-                    <div id="cart-items-container">
-                        @foreach($selectedItems as $item)
-                            <input type="hidden" name="cart_items[]" value="{{ $item->id }}" id="input-item-{{ $item->id }}">
-                            <input type="hidden" name="quantities[{{ $item->id }}]" value="{{ $item->quantity }}" id="input-quantity-{{ $item->id }}">
-                        @endforeach
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-2">Metode Pembayaran</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="border rounded p-3 cursor-pointer hover:border-yellow-500 payment-option" data-method="gopay">
-                                <input type="radio" name="payment_method" value="gopay" id="payment_gopay" class="hidden">
-                                <label for="payment_gopay" class="cursor-pointer flex flex-col items-center">
-                                    <span class="text-sm font-medium">Gopay</span>
-                                </label>
+                            <!-- Bank Transfer Details -->
+                            <div id="bank_transfer-details" class="payment-detail hidden">
+                                <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                                    <h3 class="font-semibold text-purple-800 mb-2">Transfer Bank</h3>
+                                    <p class="text-sm text-purple-700 mb-2">Silakan transfer ke rekening berikut:</p>
+                                    <div class="bg-white p-3 rounded border space-y-2">
+                                        <div>
+                                            <p class="text-sm text-gray-600">Bank BCA</p>
+                                            <p class="font-mono text-lg font-bold text-purple-800">1234567890</p>
+                                            <p class="text-sm text-gray-600"> {{ $item->seller->nama_penjual }} </p>
+                                        </div>
+                                        <div class="border-t pt-2">
+                                            <p class="text-sm text-gray-600">Bank Mandiri</p>
+                                            <p class="font-mono text-lg font-bold text-purple-800">0987654321</p>
+                                            <p class="text-sm text-gray-600">{{ $item->seller->nama_penjual }}</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-purple-600 mt-2">*Pastikan nominal transfer sesuai dengan total pembayaran</p>
+                                </div>
                             </div>
-                            
-                            <div class="border rounded p-3 cursor-pointer hover:border-yellow-500 payment-option" data-method="qris">
-                                <input type="radio" name="payment_method" value="qris" id="payment_qris" class="hidden">
-                                <label for="payment_qris" class="cursor-pointer flex flex-col items-center">
-                                    <span class="text-sm font-medium">Qris</span>
-                                </label>
-                            </div>
-                            
-                            <div class="border rounded p-3 cursor-pointer hover:border-orange-850 payment-option" data-method="dana">
-                                <input type="radio" name="payment_method" value="dana" id="payment_dana" class="hidden">
-                                <label for="payment_dana" class="cursor-pointer flex flex-col items-center">
-                                    <span class="text-sm font-medium">Dana</span>
-                                </label>
+
+                            <!-- QRIS Details -->
+                            <div id="qris-details" class="payment-detail hidden">
+                                <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                                    <h3 class="font-semibold text-orange-800 mb-2">Pembayaran dengan QRIS</h3>
+                                    <p class="text-sm text-orange-700 mb-2">Scan QR Code berikut untuk pembayaran:</p>
+                                    <div class="bg-white p-4 rounded border text-center">
+                                        <div class="w-32 h-32 bg-gray-200 mx-auto mb-2 rounded flex items-center justify-center">
+                                            <span class="text-xs text-gray-500">QR CODE</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600">Scan dengan aplikasi pembayaran digital</p>
+                                    </div>
+                                    <p class="text-xs text-orange-600 mt-2">*QR Code berlaku untuk semua aplikasi pembayaran digital</p>
+                                </div>
                             </div>
                         </div>
-                        <div id="payment-method-error" class="text-red-500 text-sm mt-1 hidden">Pilih untuk melakukan pembayaran</div>
+                        
+                        <button type="submit" class="w-full bg-orange-500 text-white font-bold py-3 px-6 rounded-lg text-center hover:bg-orange-600 transition-transform hover:scale-105">
+                            Bayar Sekarang
+                        </button>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-700 mb-2">Alamat Pengiriman</label>
-                        <textarea name="shipping_address" rows="3" 
-                                  class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500" 
-                                  required></textarea>
-                    </div>
-                    <div class="mb-6">
-                        <label class="block text-gray-700 mb-2">Nomor Telepone</label>
-                        <input type="text" name="phone_number" 
-                               class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500" 
-                               required>
-                    </div>
-                    <div class="mb-6">
-                        <label for="description" class="block text-gray-700 font-medium mb-2">Catatan Pembelian</label>
-                        <textarea name="description" id="description" rows="2" 
-                                  class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                  required></textarea>
-                    </div>
-                    
-                    <button type="submit" 
-                           class="w-full bg-yellow-500 text-white px-6 py-3 rounded-lg text-center hover:bg-yellow-600 transition">
-                        Complete Order
-                    </button>
-                </form>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
 <script>
-    function showErrorPopup(message) {
-        if (!document.getElementById('error-popup')) {
-            const popup = document.createElement('div');
-            popup.id = 'error-popup';
-            popup.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-4 rounded shadow-lg z-50 transform transition-all duration-300 translate-x-full';
-            popup.style.maxWidth = '350px';
-            document.body.appendChild(popup);
-        }
-        
-        const popup = document.getElementById('error-popup');
-        popup.innerHTML = message;
-        
-        setTimeout(() => {
-            popup.classList.remove('translate-x-full');
-        }, 10);
-        
-        setTimeout(() => {
-            popup.classList.add('translate-x-full');
-        }, 3000);
+function showPaymentDetails(paymentMethod) {
+    // Sembunyikan semua detail pembayaran
+    const paymentDetails = document.getElementById('payment-details');
+    const allDetails = document.querySelectorAll('.payment-detail');
+    
+    allDetails.forEach(detail => {
+        detail.classList.add('hidden');
+    });
+    
+    // Tampilkan detail pembayaran yang dipilih
+    const selectedDetail = document.getElementById(paymentMethod + '-details');
+    if (selectedDetail) {
+        paymentDetails.classList.remove('hidden');
+        selectedDetail.classList.remove('hidden');
     }
+}
 
-    function updateQuantity(itemId, action) {
-        const quantityElement = document.getElementById(`quantity-${itemId}`);
-        const priceElement = document.getElementById(`price-${itemId}`);
-        const quantityInput = document.getElementById(`input-quantity-${itemId}`);
-        const stockElement = document.getElementById(`stock-${itemId}`);
-        
-        let currentQuantity = parseInt(quantityElement.value);
-        const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
-        const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
-        
-        if (action === 'increase') {
-            if (currentQuantity + 1 > stockAvailable) {
-                showErrorPopup(`Stock tidak mencukupi. Tersedia: ${stockAvailable}`);
-                return;
-            }
-            currentQuantity++;
-        } else if (action === 'decrease' && currentQuantity > 1) {
-            currentQuantity--;
-        }
-        
-        quantityElement.value = currentQuantity;
-        
-        quantityInput.value = currentQuantity;
-        
-        const newPrice = unitPrice * currentQuantity;
-        priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
-        
-        updateSubtotal();
-        
-        // Send AJAX request to update quantity in database
-        updateQuantityInDatabase(itemId, currentQuantity);
-    }
+function handleBackButton() {
+    // Kumpulkan semua item ID dan statusnya
+    const itemStatuses = [];
+    document.querySelectorAll('.item-status').forEach(function(element) {
+        itemStatuses.push({
+            id: element.getAttribute('data-item-id'),
+            status: element.value
+        });
+    });
 
-    function updateQuantityManual(itemId) {
-        const quantityElement = document.getElementById(`quantity-${itemId}`);
-        const priceElement = document.getElementById(`price-${itemId}`);
-        const quantityInput = document.getElementById(`input-quantity-${itemId}`);
-        const stockElement = document.getElementById(`stock-${itemId}`);
-        
-        let currentQuantity = parseInt(quantityElement.value);
-        const unitPrice = parseFloat(priceElement.getAttribute('data-unit-price'));
-        const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
-        
-        // Validate quantity
-        if (isNaN(currentQuantity) || currentQuantity < 1) {
-            currentQuantity = 1;
-            quantityElement.value = currentQuantity;
-        } else if (currentQuantity > stockAvailable) {
-            showErrorPopup(`Stock tidak mencukupi. Tersedia: ${stockAvailable}`);
-            currentQuantity = stockAvailable;
-            quantityElement.value = currentQuantity;
-        }
-        
-        // Update hidden input for form submission
-        quantityInput.value = currentQuantity;
-        
-        // Update price display
-        const newPrice = unitPrice * currentQuantity;
-        priceElement.innerText = `Rp ${formatNumber(newPrice)}`;
-        
-        // Update overall subtotal, tax, and total
-        updateSubtotal();
-    }
+    // Filter hanya item dengan status 'beli'
+    const beliItems = itemStatuses.filter(item => item.status === 'beli');
 
-    function validateQuantity(itemId) {
-        const quantityElement = document.getElementById(`quantity-${itemId}`);
-        const stockElement = document.getElementById(`stock-${itemId}`);
-        
-        let currentQuantity = parseInt(quantityElement.value);
-        const stockAvailable = parseInt(stockElement ? stockElement.value : 9999);
-        
-        // Final validation on blur
-        if (isNaN(currentQuantity) || currentQuantity < 1) {
-            currentQuantity = 1;
-            quantityElement.value = currentQuantity;
-        } else if (currentQuantity > stockAvailable) {
-            currentQuantity = stockAvailable;
-            quantityElement.value = currentQuantity;
-        }
-        
-        // Update in database
-        updateQuantityInDatabase(itemId, currentQuantity);
-    }
+    if (beliItems.length > 0) {
+        const itemIds = beliItems.map(item => item.id);
 
-    function updateQuantityInDatabase(itemId, quantity) {
-        // Send AJAX request to update quantity in database
-        fetch(`/cart/update/${itemId}`, {
+        // Kirim permintaan AJAX ke server untuk menghapus item
+        fetch('{{ route("cart.cancel-direct-purchase") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || document.querySelector('input[name="_token"]').value
             },
             body: JSON.stringify({
-                quantity: quantity
+                item_ids: itemIds
             })
-        }).then(response => {
-            if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.error || 'Error updating quantity');
-                });
-            }
-            return response.json();
-        }).then(data => {
+        })
+        .then(response => response.json())
+        .then(data => {
             if (data.success) {
-                console.log('Quantity updated successfully');
-            }
-        }).catch(error => {
-            console.error('Error updating quantity:', error);
-            showErrorPopup(error.message);
-        });
-    }
-
-    // Modify form submission validation to handle stock validation
-    document.getElementById('checkout-form').addEventListener('submit', function(event) {
-        // Check if payment method is selected
-        const paymentSelected = document.querySelector('input[name="payment_method"]:checked');
-        if (!paymentSelected) {
-            event.preventDefault();
-            document.getElementById('payment-method-error').classList.remove('hidden');
-        }
-        
-        // Check stock availability for all items before submission
-        let stockError = false;
-        const cartItems = document.querySelectorAll('[id^="item-"]');
-        
-        cartItems.forEach(item => {
-            const itemId = item.id.split('-')[1];
-            const quantityElement = document.getElementById(`quantity-${itemId}`);
-            const stockElement = document.getElementById(`stock-${itemId}`);
-            
-            if (stockElement) {
-                const quantity = parseInt(quantityElement.value);
-                const stock = parseInt(stockElement.value);
-                
-                if (quantity > stock) {
-                    event.preventDefault();
-                    stockError = true;
-                    const productName = document.querySelector(`#item-${itemId} h3`).innerText;
-                    const sizeName = document.querySelector(`#item-${itemId} div:nth-child(4)`).innerText;
-                    showErrorPopup(`Stock untuk ${productName} - ${sizeName} tidak mencukupi. Tersedia: ${stock}`);
-                }
-            }
-        });
-    });
-    
-    function removeItem(itemId, itemName) {
-        // Remove item from DOM
-        const itemElement = document.getElementById(`item-${itemId}`);
-        const inputElement = document.getElementById(`input-item-${itemId}`);
-        const quantityInput = document.getElementById(`input-quantity-${itemId}`);
-        
-        if (itemElement) itemElement.remove();
-        if (inputElement) inputElement.remove();
-        if (quantityInput) quantityInput.remove();
-        
-        // Update subtotal
-        updateSubtotal();
-        
-        // Check if checkout is empty
-        const cartItems = document.querySelectorAll('[id^="item-"]');
-        if (cartItems.length === 0) {
-            // Redirect to cart page if no items left in checkout
-            window.location.href = "{{ route('cart.index') }}";
-        }
-    }
-    
-    // Function to update subtotal
-    function updateSubtotal() {
-        let subtotal = 0;
-        const priceElements = document.querySelectorAll('[id^="price-"]');
-        
-        priceElements.forEach(element => {
-            const itemId = element.id.split('-')[1];
-            const quantityElement = document.getElementById(`quantity-${itemId}`);
-            const unitPrice = parseFloat(element.getAttribute('data-unit-price'));
-            const quantity = parseInt(quantityElement.value);
-            
-            subtotal += unitPrice * quantity;
-        });
-        
-        subtotal = Math.round(subtotal * 100) / 100;
-        document.getElementById('subtotal').innerText = `Rp ${formatNumber(subtotal)}`;
-
-        const tax = Math.round(subtotal * 0.1 * 100) / 100;
-        const deliveryTax = Math.round(subtotal * 0.03 * 100) / 100;
-        
-        // Update tax display
-        document.getElementById('tax-amount').innerText = `Rp ${formatNumber(tax)}`;
-        document.getElementById('delivery-tax').innerText = `Rp ${formatNumber(deliveryTax)}`;
-        
-        // Calculate total with tax - round to avoid floating point issues
-        const totalWithTax = Math.round((subtotal + tax + deliveryTax) * 100) / 100;
-        
-        // Update total price display
-        document.getElementById('total-price').innerText = `Rp ${formatNumber(totalWithTax)}`;
-        
-        // Also update hidden input for form submission if needed
-        if (document.getElementById('input-total-with-tax')) {
-            document.getElementById('input-total-with-tax').value = totalWithTax;
-        }
-    }
-    
-    // Function to format number as currency
-    function formatNumber(number) {
-        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-    
-    // Add event listeners for payment method selection
-    document.querySelectorAll('.payment-option').forEach(option => {
-        option.addEventListener('click', function() {
-            // Remove active class from all options
-            document.querySelectorAll('.payment-option').forEach(el => {
-                el.classList.remove('border-yellow-500', 'border-orange-850');
-                el.classList.add('border');
-            });
-            
-            // Add active class to selected option
-            const method = this.getAttribute('data-method');
-            if (method === 'nyicil') {
-                this.classList.add('border-orange-850');
+                // Kembali ke halaman sebelumnya
+                window.history.back();
             } else {
-                this.classList.add('border-yellow-500');
+                alert('Terjadi kesalahan: ' + (data.message || 'Gagal menghapus item'));
             }
-            
-            // Select the radio button
-            document.getElementById(`payment_${method}`).checked = true;
-            
-            // Hide error message if shown
-            document.getElementById('payment-method-error').classList.add('hidden');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan jaringan');
         });
-    });
-
-    @if(session('error'))
-        document.addEventListener('DOMContentLoaded', function() {
-            showErrorPopup("{{ session('error') }}");
-        });
-    @endif
+    } else {
+        // Jika tidak ada item status 'beli', kembali langsung
+        window.history.back();
+    }
+}
 </script>
+
 </body>
 </html>
 @endsection

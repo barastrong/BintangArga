@@ -50,10 +50,12 @@ class SellerController extends Controller
 
         // Create the seller profile with the authenticated user's ID
         $validatedData['user_id'] = Auth::id();
-        Seller::create($validatedData);
+        
+        // Note: nomor_seri will be automatically generated in the Seller model's boot method
+        $seller = Seller::create($validatedData);
 
         return redirect()->route('seller.dashboard')
-            ->with('success', 'Pendaftaran penjual berhasil');
+            ->with('success', 'Pendaftaran penjual berhasil. Nomor seri Anda: ' . $seller->nomor_seri);
     }
 
     /**
@@ -94,11 +96,12 @@ class SellerController extends Controller
         // Get the seller profile
         $seller = Auth::user()->seller;
 
-        // Validate the input
+        // Validate the input (nomor_seri is not editable)
         $validatedData = $request->validate([
             'nama_penjual' => 'required|string|max:255',
             'email_penjual' => 'required|email|unique:sellers,email_penjual,' . $seller->id,
             'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'no_telepon' => 'nullable|string|max:15', // Assuming phone number is a string
         ]);
 
         // Handle file upload if provided
@@ -119,6 +122,9 @@ class SellerController extends Controller
             ->with('success', 'Profil penjual berhasil diperbarui');
     }
     
+    /**
+     * Show seller's products
+     */
     public function products()
     {
         // Check if user is a seller
@@ -128,7 +134,11 @@ class SellerController extends Controller
         }
         
         $seller = Auth::user()->seller;
-        $products = Product::where('seller_id', $seller->id)->get();
+        
+        // Load products with category relationship
+        $products = Product::with('category', 'city')
+            ->where('seller_id', $seller->id)
+            ->get();
         
         return view('sellers.products', compact('seller', 'products'));
     }
@@ -145,8 +155,12 @@ class SellerController extends Controller
         }
         
         $seller = Auth::user()->seller;
-        // Get orders for the seller's products
-        $orders = Purchase::where('seller_id', $seller->id)->get();
+        
+        // Get orders for the seller's products with all necessary relationships
+        $orders = Purchase::with(['size', 'product', 'user'])
+            ->where('seller_id', $seller->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
         
         return view('sellers.orders', compact('seller', 'orders'));
     }
@@ -163,13 +177,20 @@ class SellerController extends Controller
         }
         
         $seller = Auth::user()->seller;
+        
+        // Find the specific order by ID and seller
         $order = Purchase::where('id', $orderId)
-                         ->where('seller_id', $seller->id)
-                         ->firstOrFail();
+            ->where('seller_id', $seller->id)
+            ->first();
+
+        if (!$order) {
+            return redirect()->route('seller.orders')
+                ->with('error', 'Pesanan tidak ditemukan');
+        }
         
         // Validate the status
         $request->validate([
-            'status' => 'required|in:process,completed',
+            'status' => 'required|in:process,dikirim',
         ]);
         
         // Update the order status
@@ -179,10 +200,14 @@ class SellerController extends Controller
         return redirect()->route('seller.orders')
             ->with('success', 'Status pesanan berhasil diperbarui');
     }
+
+    /**
+     * Delete seller profile
+     */
     public function destroy($id)
     {
         // Check if user is authorized to delete this seller
-        if (!Auth::user()->isAdmin() && Auth::user()->seller->id != $id) {
+        if (!Auth::user()->role === 'admin' && Auth::user()->seller->id != $id) {
             return redirect()->route('seller.dashboard')
                 ->with('error', 'Anda tidak memiliki izin untuk menghapus profil penjual ini');
         }
@@ -217,5 +242,25 @@ class SellerController extends Controller
         // If admin deleted a profile, redirect to admin dashboard or sellers list
         return redirect()->route('sellers.index')
             ->with('success', 'Profil penjual berhasil dihapus');
+    }
+
+    /**
+     * Generate new serial number for existing seller (if needed)
+     */
+    public function regenerateSerial($id)
+    {
+        // Only admin can regenerate serial numbers
+        if (Auth::user()->role !== 'admin') {
+            return redirect()->back()
+                ->with('error', 'Anda tidak memiliki izin untuk melakukan tindakan ini');
+        }
+
+        $seller = Seller::findOrFail($id);
+        $oldSerial = $seller->nomor_seri;
+        $seller->nomor_seri = Seller::generateSerialNumber();
+        $seller->save();
+
+        return redirect()->back()
+            ->with('success', 'Nomor seri berhasil diperbarui dari ' . $oldSerial . ' menjadi ' . $seller->nomor_seri);
     }
 }

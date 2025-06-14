@@ -10,276 +10,195 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <style>
+    /* Styling untuk tab aktif */
     .tab-active {
-        border-bottom-width: 2px;
-        border-indigo-500: solid;
-        color: #4f46e5;
-    }
-    .time-estimate {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        font-weight: 500;
+        border-color: #f97316; /* Orange-500 */
+        color: #ea580c; /* Orange-600 */
     }
 </style>
 <body>
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">Status Pesanan</h1>
+<div class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Status Pesanan Saya</h1>
 
-    @if(session('success'))
-        <div id="success-message" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
+        <!-- Navigasi Tab yang Disesuaikan -->
+        <div class="border-b border-gray-200">
+            <nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
+                {{-- Nama tab disesuaikan dengan alur yang benar --}}
+                <button onclick="changeTab('pending')" id="pending-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    Menunggu Konfirmasi
+                </button>
+                <button onclick="changeTab('diproses')" id="diproses-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    Diproses
+                </button>
+                <button onclick="changeTab('dikirim')" id="dikirim-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    Dikirim
+                </button>
+                <button onclick="changeTab('selesai')" id="selesai-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    Selesai
+                </button>
+                <button onclick="changeTab('cancelled')" id="cancelled-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm tab-button border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    Dibatalkan
+                </button>
+            </nav>
         </div>
-    @endif
 
-    @if(session('error'))
-        <div id="error-message" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {{ session('error') }}
-        </div>
-    @endif
+        <div class="mt-8">
+            @php
+                $statuses = ['pending', 'diproses', 'dikirim', 'selesai', 'cancelled'];
+                $statusLabels = [
+                    'pending' => [
+                        'label' => 'Menunggu Konfirmasi',
+                        'color' => 'bg-yellow-100 text-yellow-800'
+                    ],
+                    'diproses' => [
+                        'label' => 'Sedang Diproses',
+                        'color' => 'bg-orange-100 text-orange-800'
+                    ],
+                    'dikirim' => [
+                        'label' => 'Sedang Dikirim',
+                        'color' => 'bg-blue-100 text-blue-800'
+                    ],
+                    'selesai' => [
+                        'label' => 'Pesanan Selesai',
+                        'color' => 'bg-green-100 text-green-800'
+                    ],
+                    'cancelled' => [
+                        'label' => 'Pesanan Dibatalkan',
+                        'color' => 'bg-red-100 text-red-800'
+                    ]
+                ];
+                $statusAliases = [
+                    'process' => 'diproses',
+                    'completed' => 'selesai',
+                    'canceled' => 'cancelled'
+                ];
+            @endphp
 
-    <!-- Navigation Tabs -->
-    <div class="flex border-b border-gray-200 mb-6">
-        <button id="pending-tab" 
-                onclick="changeTab('pending')" 
-                class="py-2 px-4 font-medium text-sm focus:outline-none border-b-2 border-transparent tab-active">
-            Dikemas
-        </button>
-        <button id="process-tab" 
-                onclick="changeTab('process')" 
-                class="py-2 px-4 font-medium text-sm focus:outline-none border-b-2 border-transparent">
-            Diproses
-        </button>
-        <button id="completed-tab" 
-                onclick="changeTab('completed')" 
-                class="py-2 px-4 font-medium text-sm focus:outline-none border-b-2 border-transparent">
-            Terkirim
-        </button>
-            <button id="selesai-tab" 
-                onclick="changeTab('selesai')" 
-                class="py-2 px-4 font-medium text-sm focus:outline-none border-b-2 border-transparent">
-            Selesai
-        </button>
-    </div>
+            @foreach ($statuses as $status)
+            <div id="{{ $status }}-content" class="tab-content hidden">
+                @php
+                    $filteredPurchases = $purchases->filter(function ($purchase) use ($status, $statusAliases) {
+                        $currentStatus = $purchase->status;
+                        $normalizedStatus = $statusAliases[$currentStatus] ?? $currentStatus;
+                        return $normalizedStatus === $status;
+                    });
+                @endphp
 
-    <div id="pending-content" class="tab-content">
-        @if(count($purchases->where('status', 'pending')) == 0)
-            <p class="text-gray-600">Anda belum memiliki pesanan yang dikemas.</p>
-        @else
-            <div class="grid gap-4">
-                @foreach($purchases->where('status', 'pending') as $purchase)
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="w-full md:w-1/4 p-4">
-                            <img src="{{ Storage::url($purchase->product->sizes->first()->gambar_size) }}" 
-                            alt="{{ $purchase->product->nama_barang }}"  class="w-full h-40 object-cover">
-                        </div>
-                        <div class="w-full md:w-3/4 p-4">
-                            <h2 class="text-xl font-semibold">{{ $purchase->product->nama_barang }}</h2>
-                            <div class="mt-2 grid grid-cols-2 gap-2">
-                                <div>
-                                    <p class="text-gray-600">UKURAN</p>
-                                    <p>{{ $purchase->size->size }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600">Jumlah</p>
-                                    <p>{{ $purchase->quantity }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <div class="flex items-center space-x-3">
-                                    <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">Dikemas</span>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-gray-600">Total harga</p>
-                                    <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-end">
-                                <a href="{{ route('purchases.show', $purchase) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded mr-2">Detail</a>
-                                <form action="{{ route('purchases.cancel', $purchase) }}" method="POST" class="inline">
-                                    @csrf
-                                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded">Batalkan</button>
-                                </form>
-                            </div>
-                        </div>
+                @if($filteredPurchases->isEmpty())
+                    <div class="text-center py-16 px-6 bg-white rounded-lg shadow-sm">
+                        <i class="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
+                        <p class="text-lg font-medium text-gray-600">
+                            Tidak ada pesanan dengan status "{{ $statusLabels[$status]['label'] }}".
+                        </p>
                     </div>
-                </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
-
-    <div id="process-content" class="tab-content hidden">
-        @if(count($purchases->where('status', 'process')) == 0)
-            <p class="text-gray-600">Anda belum memiliki pesanan yang diproses.</p>
-        @else
-            <div class="grid gap-4">
-                @foreach($purchases->where('status', 'process') as $purchase)
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="w-full md:w-1/4 p-4">
-                            <img src="{{ Storage::url($purchase->product->sizes->first()->gambar_size) }}" 
-                            alt="{{ $purchase->product->nama_barang }}"  class="w-full h-40 object-cover">
-                        </div>
-                        <div class="w-full md:w-3/4 p-4">
-                            <h2 class="text-xl font-semibold">{{ $purchase->product->nama_barang }}</h2>
-                            <div class="mt-2 grid grid-cols-2 gap-2">
-                                <div>
-                                    <p class="text-gray-600">UKURAN</p>
-                                    <p>{{ $purchase->size->size }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600">Jumlah</p>
-                                    <p>{{ $purchase->quantity }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <div class="flex items-center space-x-3">
-                                    <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">Diproses</span>
-                                    <div class="time-estimate">
-                                        <i class="fas fa-shipping-fast mr-1"></i>
-                                        Estimasi kirim: {{ \Carbon\Carbon::now()->addDays(2)->format('d M') }} - {{ \Carbon\Carbon::now()->addDays(3)->format('d M Y') }}
+                @else
+                    <div class="space-y-6">
+                        @foreach($filteredPurchases as $purchase)
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                            <div class="p-6">
+                                <!-- Header Kartu Pesanan -->
+                                <div class="flex flex-col sm:flex-row justify-between items-start gap-4 border-b pb-4 mb-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Nomor Pesanan</p>
+                                        <p class="font-semibold text-gray-800">#{{ $purchase->id }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Tanggal Pesanan</p>
+                                        <p class="font-semibold text-gray-800">{{ $purchase->created_at->format('d F Y') }}</p>
+                                    </div>
+                                    <div class="text-left sm:text-right">
+                                        <p class="text-sm text-gray-500">Total Pembayaran</p>
+                                        <p class="font-bold text-lg text-orange-600">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
                                     </div>
                                 </div>
-                                <div class="text-right">
-                                    <p class="text-gray-600">Total harga</p>
-                                    <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
+                                
+                                <!-- Detail Item -->
+                                <div class="flex gap-4">
+                                    <img src="{{ asset('storage/' . $purchase->size->gambar_size) }}" alt="{{ $purchase->product->nama_barang }}" class="w-24 h-24 rounded-lg object-cover">
+                                    <div class="flex-1">
+                                        <h3 class="font-semibold text-gray-800">{{ $purchase->product->nama_barang }}</h3>
+                                        <p class="text-sm text-gray-500">Ukuran: {{ $purchase->size->size }}</p>
+                                        <p class="text-sm text-gray-500">Jumlah: {{ $purchase->quantity }}</p>
+                                    </div>
+                                    <div class="flex flex-col items-end justify-between">
+                                        @php
+                                            $currentStatus = $purchase->status;
+                                            $normalizedStatus = $statusAliases[$currentStatus] ?? $currentStatus;
+                                            $statusInfo = $statusLabels[$normalizedStatus] ?? ['label' => ucfirst($currentStatus), 'color' => 'bg-gray-100 text-gray-800'];
+                                        @endphp
+                                        <span class="{{ $statusInfo['color'] }} text-xs font-medium px-3 py-1 rounded-full">
+                                            {{ $statusInfo['label'] }}
+                                        </span>
+                                        
+                                        <div class="flex items-center gap-2 mt-4">
+                                            <a href="{{ route('purchases.show', $purchase) }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800">Lihat Detail</a>
+                                            
+                                            {{-- Tombol Batalkan hanya muncul jika status 'pending' --}}
+                                            @if($purchase->status == 'pending')
+                                                <form action="{{ route('purchases.cancel', $purchase) }}" method="POST" onsubmit="return confirm('Anda yakin ingin membatalkan pesanan ini?')">
+                                                    @csrf
+                                                    <button type="submit" class="bg-red-100 text-red-700 font-semibold py-1 px-3 rounded-md text-xs hover:bg-red-200">Batalkan</button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="mt-4 flex justify-end">
-                                <a href="{{ route('purchases.show', $purchase) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded">Detail</a>
-                            </div>
                         </div>
+                        @endforeach
                     </div>
-                </div>
-                @endforeach
+                @endif
             </div>
-        @endif
-    </div>
-
-    <div id="completed-content" class="tab-content hidden">
-    @if(count($purchases->where('status', 'completed')) == 0)
-            <p class="text-gray-600">Anda belum memiliki pesanan yang selesai.</p>
-        @else
-            <div class="grid gap-4">
-                @foreach($purchases->where('status', 'completed') as $purchase)
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="w-full md:w-1/4 p-4">
-                            <img src="{{ Storage::url($purchase->product->sizes->first()->gambar_size) }}" 
-                            alt="{{ $purchase->product->nama_barang }}"  class="w-full h-40 object-cover">
-                        </div>
-                        <div class="w-full md:w-3/4 p-4">
-                            <h2 class="text-xl font-semibold">{{ $purchase->product->nama_barang }}</h2>
-                            <div class="mt-2 grid grid-cols-2 gap-2">
-                                <div>
-                                    <p class="text-gray-600">UKURAN</p>
-                                    <p>{{ $purchase->size->size }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600">Jumlah</p>
-                                    <p>{{ $purchase->quantity }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <div class="flex items-center space-x-3">
-                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Dikirim</span>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-gray-600">Total harga</p>
-                                    <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-end">
-                                <a href="{{ route('purchases.show', $purchase) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded">Detail</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
-
-    <div id="selesai-content" class="tab-content hidden">
-    @if(count($purchases->where('status', 'selesai')) == 0)
-            <p class="text-gray-600">Anda belum memiliki pesanan yang Terkirim.</p>
-        @else
-            <div class="grid gap-4">
-                @foreach($purchases->where('status', 'selesai') as $purchase)
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <div class="flex flex-col md:flex-row">
-                        <div class="w-full md:w-1/4 p-4">
-                            <img src="{{ Storage::url($purchase->product->sizes->first()->gambar_size) }}" 
-                            alt="{{ $purchase->product->nama_barang }}"  class="w-full h-40 object-cover">
-                        </div>
-                        <div class="w-full md:w-3/4 p-4">
-                            <h2 class="text-xl font-semibold">{{ $purchase->product->nama_barang }}</h2>
-                            <div class="mt-2 grid grid-cols-2 gap-2">
-                                <div>
-                                    <p class="text-gray-600">UKURAN</p>
-                                    <p>{{ $purchase->size->size }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600">Jumlah</p>
-                                    <p>{{ $purchase->quantity }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-between items-center">
-                                <div class="flex items-center space-x-3">
-                                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">Selesai</span>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-gray-600">Total harga</p>
-                                    <p class="font-semibold">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex justify-end">
-                                <a href="{{ route('purchases.show', $purchase) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded">Detail</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        @endif
+            @endforeach
+        </div>
     </div>
 </div>
+
 </body>
 <script>
-    // Function to handle tab changing
     function changeTab(tabId) {
-        // Hide all contents
-        const contents = document.querySelectorAll('.tab-content');
-        contents.forEach(content => {
+        // Sembunyikan semua tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.add('hidden');
         });
         
-        // Show selected content
+        // Tampilkan tab content yang dipilih
         document.getElementById(`${tabId}-content`).classList.remove('hidden');
         
-        // Update active tab styling
-        const tabs = document.querySelectorAll('button[id$="-tab"]');
-        tabs.forEach(tab => {
-            tab.classList.remove('tab-active', 'border-indigo-500', 'text-indigo-600');
+        // Reset semua tab button
+        document.querySelectorAll('.tab-button').forEach(tab => {
+            tab.classList.remove('tab-active', 'border-orange-500', 'text-orange-600');
             tab.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
         });
         
+        // Aktifkan tab yang dipilih
         const activeTab = document.getElementById(`${tabId}-tab`);
-        activeTab.classList.add('tab-active', 'border-indigo-500', 'text-indigo-600');
+        activeTab.classList.add('tab-active', 'border-orange-500', 'text-orange-600');
         activeTab.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
     }
-    
-    // Auto-hide success message after 3 seconds
-    setTimeout(function() {
-        const successMessage = document.getElementById('success-message');
-        const errorMessage = document.getElementById('error-message');
-        if (successMessage) successMessage.style.display = 'none';
-        if (errorMessage) errorMessage.style.display = 'none';
-    }, 3000);
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set tab awal
+        const initialTab = window.location.hash.substring(1) || 'pending';
+        changeTab(initialTab);
+
+        // Event listener untuk tab buttons
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.id.replace('-tab', '');
+                window.location.hash = tabId;
+            });
+        });
+
+        // Auto hide success/error messages
+        setTimeout(function() {
+            const successMessage = document.getElementById('success-message');
+            const errorMessage = document.getElementById('error-message');
+            if (successMessage) successMessage.style.display = 'none';
+            if (errorMessage) errorMessage.style.display = 'none';
+        }, 3000);
+    });
 </script>
 </html>
 @endsection

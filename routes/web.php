@@ -31,12 +31,9 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/seller/update', [SellerController::class, 'update'])->name('seller.update');
     Route::get('/seller/products', [SellerController::class, 'products'])->name('seller.products');
     Route::delete('/seller/{id}', [SellerController::class, 'destroy'])->name('seller.destroy');
-
-    // New orders routes
     Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
     Route::put('/seller/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.update-status');
     
-    // Product 
     Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
@@ -48,15 +45,16 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store');
     Route::get('/purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
     Route::post('/purchase/{purchase}/rate', [PurchaseController::class, 'rate'])->name('purchases.rate');
-
-    // Carts Route
+    Route::patch('/purchases/{purchase}/complete', [PurchaseController::class, 'complete'])->name('purchases.complete');
+    Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
+    
     Route::get('/cart', [PurchaseController::class, 'viewCart'])->name('cart.index');
     Route::post('/cart/update/{purchase}', [PurchaseController::class, 'updateCartItem'])->name('cart.update');
     Route::delete('/cart/remove/{purchase}', [PurchaseController::class, 'removeFromCart'])->name('cart.remove');
     Route::match(['get','post'],'/cart/checkout', [PurchaseController::class, 'checkoutFromCart'])->name('cart.checkout');
     Route::post('/cart/process', [PurchaseController::class, 'processCheckout'])->name('cart.process');
     Route::get('/cart/count', [PurchaseController::class, 'getCartCount'])->name('cart.count');
-    Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
+    Route::post('/cart/cancel-direct-purchase', [PurchaseController::class, 'cancelDirectPurchase'])->name('cart.cancel-direct-purchase');
 
     Route::get('/profile-index', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -65,7 +63,6 @@ Route::middleware('auth', 'verified')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    // Admin Routes
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
     Route::get('/admin/products/search', [ProductController::class, 'searchProduct'])->name('admin.products.search');

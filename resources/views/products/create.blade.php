@@ -1,825 +1,321 @@
 @extends('layouts.app')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-</head>
-<style>
-    /* Main Layout & Typography */
-:root {
-  --primary-color: #ff7a30;
-  --primary-dark: #e65a00;
-  --secondary-color: #3b5998;
-  --light-gray: #f5f7fa;
-  --border-color: #e4e9f0;
-  --success: #38b653;
-  --danger: #e53e3e;
-  --text-dark: #333333;
-  --text-muted: #6c757d;
-  --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 10px rgba(0,0,0,0.08);
-  --border-radius: 8px;
-}
+<div class="bg-gray-50">
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <div class="lg:col-span-1">
+                @include('sellers.partials.sidebar')
+            </div>
 
-body {
-  font-family: 'Poppins', sans-serif;
-  color: var(--text-dark);
-  background-color: #f8f9fc;
-  line-height: 1.6;
-}
+            <div class="lg:col-span-3">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-800">Tambah Produk Baru</h1>
+                    <p class="text-gray-500 mt-1">Lengkapi semua informasi di bawah ini untuk produk barumu.</p>
+                </div>
 
-.main-container {
-  max-width: 1200px;
-  margin: 30px auto;
-  padding: 0 15px;
-}
-
-/* Form Card Styling */
-.form-card {
-  background-color: #fff;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-md);
-  margin-bottom: 30px;
-  overflow: hidden;
-}
-
-.form-card-header {
-  background-color: #fff;
-  padding: 25px 30px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.page-title {
-  font-size: 43px;
-  font-weight: 600;
-  color: var(--primary-color);
-  margin-bottom: 8px;
-}
-
-.text-muted {
-  color: var(--text-muted);
-}
-
-.card-body {
-  padding: 30px;
-}
-
-/* Section Dividers */
-.section-divider {
-  display: flex;
-  align-items: center;
-  margin: 35px 0 20px;
-  position: relative;
-}
-
-.section-divider::before {
-  content: "";
-  flex-grow: 1;
-  height: 1px;
-  background-color: var(--border-color);
-  margin-right: 15px;
-}
-
-.section-divider::after {
-  content: "";
-  flex-grow: 1;
-  height: 1px;
-  background-color: var(--border-color);
-  margin-left: 15px;
-}
-
-.section-icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--light-gray);
-  border-radius: 50%;
-  color: var(--primary-color);
-}
-
-/* Form Elements */
-.form-label {
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: var(--text-dark);
-  display: block;
-}
-
-.tag-label {
-  font-size: 0.7rem;
-  background-color: rgba(255, 122, 48, 0.1);
-  color: var(--primary-color);
-  padding: 2px 8px;
-  border-radius: 20px;
-  margin-left: 5px;
-  font-weight: 500;
-}
-
-.form-control, .form-select {
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 12px;
-  width: 100%;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.form-control:focus, .form-select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(255, 122, 48, 0.15);
-  outline: none;
-}
-
-.input-group {
-  display: flex;
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-}
-
-.input-group-text {
-  display: flex;
-  align-items: center;
-  padding: 0 15px;
-  background-color: var(--light-gray);
-  border: 1px solid var(--border-color);
-  border-right: none;
-  color: var(--text-muted);
-}
-
-.input-group .form-control {
-  box-shadow: none;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-/* Loading States */
-.loading-spinner {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #f3f3f3;
-  border-top: 2px solid var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-right: 8px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Image Upload */
-.dropzone-container {
-  border: 2px dashed var(--border-color);
-  border-radius: var(--border-radius);
-  padding: 25px 20px;
-  background-color: var(--light-gray);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.dropzone-container:hover {
-  border-color: var(--primary-color);
-  background-color: rgba(255, 122, 48, 0.05);
-}
-
-.upload-icon {
-  color: var(--primary-color);
-}
-
-.preview-image-container {
-  display: flex;
-  justify-content: center;
-}
-
-.img-thumbnail {
-  max-height: 150px;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-}
-
-/* Size Cards */
-.size-card {
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
-}
-
-.size-card.active {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(255, 122, 48, 0.1);
-}
-
-.card-header {
-  background-color: var(--light-gray);
-  border-bottom: 1px solid var(--border-color);
-  padding: 15px 20px;
-}
-
-.size-details {
-  display: none;
-  padding: 20px;
-}
-
-.size-details.active {
-  display: block;
-  animation: fadeIn 0.3s;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Form Switch */
-.form-check-input {
-  cursor: pointer;
-  width: 45px;
-  height: 22px;
-  appearance: none;
-  position: relative;
-  border-radius: 20px;
-  background-color: #ddd;
-  transition: all 0.3s;
-}
-
-.form-check-input:checked {
-  background-color: var(--success);
-}
-
-.form-check-input::before {
-  content: "";
-  position: absolute;
-  height: 18px;
-  width: 18px;
-  left: 2px;
-  bottom: 1px;
-  border-radius: 50%;
-  background-color: white;
-  transition: all 0.3s;
-}
-
-.form-check-input:checked::before {
-  transform: translateX(23px);
-}
-
-.form-check-label {
-  cursor: pointer;
-}
-
-/* Buttons */
-.btn {
-  border-radius: var(--border-radius);
-  font-weight: 500;
-  transition: all 0.3s;
-  padding: 10px 20px;
-  font-size: 0.9rem;
-  border: none;
-}
-
-.btn-orange {
-  background-color: var(--primary-color);
-  color: white;
-}
-
-.btn-orange:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 122, 48, 0.25);
-}
-
-.btn-light {
-  background-color: var(--light-gray);
-  color: var(--text-dark);
-}
-
-.btn-light:hover {
-  background-color: #e9ecef;
-}
-
-/* Alert Styling */
-.alert {
-  padding: 15px;
-  border-radius: var(--border-radius);
-  margin-bottom: 20px;
-}
-
-.alert-danger {
-  background-color: #fff5f5;
-  border-left: 5px solid var(--danger);
-}
-
-/* Validation Feedback */
-.invalid-feedback {
-  display: none;
-  color: var(--danger);
-  font-size: 0.8rem;
-  margin-top: 5px;
-}
-
-.is-invalid {
-  border-color: var(--danger) !important;
-}
-
-.is-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.15) !important;
-}
-
-/* Badges */
-.badge {
-  padding: 5px 10px;
-  font-weight: 500;
-  font-size: 0.75rem;
-  border-radius: 15px;
-}
-
-.bg-success {
-  background-color: var(--success) !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .card-body {
-    padding: 20px 15px;
-  }
-  
-  .section-divider h5 {
-    font-size: 1rem;
-  }
-  
-  .btn {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-}
-</style>
-<body>
-<div class="main-container">
-    <div class="form-card">
-        <div class="form-card-header">
-            <h2 class="page-title mb-1">Tambah Produk Baru</h2>
-            <p class="text-muted mb-0">Lengkapi informasi produk Anda di bawah ini</p>
-        </div>
-        <div class="card-body p-md-5 p-4">
-            @if ($errors->any())
-                <div class="alert alert-danger border-0 rounded-lg shadow-sm mb-4">
-                    <div class="d-flex align-items-center">
-                        <i class="fas fa-exclamation-circle me-3 text-danger fa-lg"></i>
-                        <ul class="mb-0">
+                @if ($errors->any())
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md" role="alert">
+                        <p class="font-bold">Terjadi Kesalahan</p>
+                        <ul class="mt-2 list-disc list-inside text-sm">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
-                </div>
-            @endif
+                @endif
 
-            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data" id="productForm">
-                @csrf
-                <input type="hidden" name="seller_id" value="{{ $seller->id }}">
-                
-                <!-- Product Information Section -->
-                <div class="section-divider">
-                    <div class="section-icon">
-                        <i class="fas fa-info-circle"></i>
-                    </div>
-                    <h5 class="fw-bold mb-0 ms-3 me-3">Informasi Produk</h5>
-                </div>
-                
-                <div class="row g-4 mt-2">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="category_id" class="form-label">Kategori <span class="tag-label">Wajib</span></label>
-                            <select name="category_id" id="category_id" class="form-select" required>
-                                <option value="">Pilih Kategori</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->nama }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data" id="productForm" class="space-y-8">
+                    @csrf
+                    <input type="hidden" name="seller_id" value="{{ $seller->id }}">
 
-                        <div class="form-group">
-                            <label for="nama_barang" class="form-label">Nama Barang <span class="tag-label">Wajib</span></label>
-                            <input type="text" name="nama_barang" id="nama_barang" class="form-control" placeholder="Masukkan nama produk" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="description" class="form-label">Deskripsi <span class="tag-label">Wajib</span></label>
-                            <textarea name="description" id="description" class="form-control" rows="4" placeholder="Jelaskan detail produk Anda" required></textarea>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="province_id" class="form-label">Provinsi <span class="tag-label">Wajib</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                </span>
-                                <select name="province_id" id="province_id" class="form-select" required>
-                                    <option value="">Pilih Provinsi</option>
-                                    @foreach($provinces as $province)
-                                        <option value="{{ $province->id }}">{{ $province->name }}</option>
-                                    @endforeach
-                                </select>
+                    <!-- Card Informasi Produk & Lokasi -->
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-4">Informasi & Lokasi Produk</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {{-- Kolom Kiri --}}
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="nama_barang" class="block text-sm font-medium text-gray-700">Nama Barang</label>
+                                    <input type="text" name="nama_barang" id="nama_barang" value="{{ old('nama_barang') }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                                </div>
+                                <div>
+                                    <label for="category_id" class="block text-sm font-medium text-gray-700">Kategori</label>
+                                    <select id="category_id" name="category_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                                        <option value="">Pilih Kategori</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->nama }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                                    <textarea id="description" name="description" rows="5" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500">{{ old('description') }}</textarea>
+                                </div>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="city_id" class="form-label">Kota/Kabupaten <span class="tag-label">Wajib</span></label>
-                            <div class="input-group">
-                                <span class="input-group-text">
-                                    <i class="fas fa-building"></i>
-                                </span>
-                                <select name="city_id" id="city_id" class="form-select" required disabled>
-                                    <option value="">Pilih provinsi terlebih dahulu</option>
-                                </select>
-                            </div>
-                            <div class="invalid-feedback" id="city_error" style="display: none;">
-                                Gagal memuat data kota. Silakan coba lagi.
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="alamat_lengkap" class="form-label">Alamat Lengkap <span class="tag-label">Wajib</span></label>
-                            <textarea name="alamat_lengkap" id="alamat_lengkap" class="form-control" rows="3" placeholder="Alamat lengkap toko Anda" required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="gambar" class="form-label">Gambar Produk <span class="tag-label">Wajib</span></label>
-                            <div class="dropzone-container text-center">
-                                <input type="file" name="gambar" id="gambar" class="form-control d-none" accept="image/*" hidden required>
-                                <label for="gambar" class="d-block cursor-pointer mb-2">
-                                    <div class="upload-icon mb-3">
-                                        <i class="fas fa-cloud-upload-alt fa-3x"></i>
-                                    </div>
-                                    <p class="mb-1 fw-medium">Klik untuk upload gambar</p>
-                                    <small class="text-muted">JPG, PNG maks. 5MB</small>
-                                </label>
-                                <div class="mt-3 preview-image-container">
-                                    <img id="preview" class="img-thumbnail shadow-sm rounded" style="display: none; max-width: 200px;">
+                            {{-- Kolom Kanan --}}
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="province_id" class="block text-sm font-medium text-gray-700">Provinsi</label>
+                                    <select id="province_id" name="province_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                                        <option value="">Pilih Provinsi</option>
+                                        @foreach($provinces as $province)
+                                            <option value="{{ $province->id }}" {{ old('province_id') == $province->id ? 'selected' : '' }}>
+                                                {{ $province->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="city_id" class="block text-sm font-medium text-gray-700">Kota/Kabupaten</label>
+                                    <select id="city_id" name="city_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500" disabled>
+                                        <option value="">Pilih Provinsi Dahulu</option>
+                                    </select>
+                                    <div class="text-red-500 text-xs mt-1 hidden" id="city_error">Gagal memuat data kota.</div>
+                                </div>
+                                <div>
+                                    <label for="alamat_lengkap" class="block text-sm font-medium text-gray-700">Alamat Lengkap</label>
+                                    <textarea id="alamat_lengkap" name="alamat_lengkap" rows="3" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500">{{ old('alamat_lengkap') }}</textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Size and Price Section -->
-                <div class="section-divider mt-5">
-                    <div class="section-icon">
-                        <i class="fas fa-tag"></i>
-                    </div>
-                    <h5 class="fw-bold mb-0 ms-3 me-3">Ukuran dan Harga</h5>
-                </div>
-                
-                <div class="row g-4 mt-2">
-                    @foreach(['S', 'M', 'L', 'XL'] as $size)
-                    <div class="col-md-6 mb-3">
-                        <div class="size-card h-100" id="card_{{ $size }}">
-                            <div class="card-header py-3 d-flex align-items-center justify-content-between">
-                                <div class="d-flex align-items-center">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" class="form-check-input" name="size_active[{{ $size }}]" 
-                                               id="toggle_{{ $size }}" onchange="toggleSize('{{ $size }}')">
-                                        <label class="form-check-label fw-medium ms-2" for="toggle_{{ $size }}">
-                                            Ukuran {{ $size }}
+                    <!-- Card Gambar Produk -->
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-4">Gambar Utama Produk</h2>
+                        <div id="dropzone-container" class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-orange-400 transition-colors">
+                            <div class="space-y-1 text-center">
+                                <div id="preview-wrapper" class="hidden">
+                                    <img id="preview" src="#" alt="Preview Gambar" class="mx-auto h-32 w-auto rounded-md">
+                                    <p id="filename-display" class="text-sm text-gray-500 mt-2"></p>
+                                </div>
+                                <div id="placeholder-wrapper">
+                                    <i class="fas fa-cloud-upload-alt mx-auto h-12 w-12 text-gray-400"></i>
+                                    <div class="flex text-sm text-gray-600">
+                                        <label for="gambar" class="relative font-medium text-orange-600 hover:text-orange-500">
+                                            <span>Unggah file</span>
+                                            <input id="gambar" name="gambar" type="file" required class="sr-only">
                                         </label>
+                                        <p class="pl-1">atau seret dan lepas</p>
                                     </div>
-                                </div>
-                                <span class="badge bg-light text-dark me-2" id="status_{{ $size }}">Tidak Aktif</span>
-                            </div>
-                            <div class="card-body size-details p-4" id="size_details_{{ $size }}">
-                                <div class="row g-3">
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label for="harga_{{ $size }}" class="form-label">Harga</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">Rp</span>
-                                                <input type="number" name="sizes[{{ $size }}][harga]" 
-                                                       id="harga_{{ $size }}" class="form-control" 
-                                                       data-size="{{ $size }}" min="0" placeholder="0">
-                                            </div>
-                                            <div class="invalid-feedback" id="harga_feedback_{{ $size }}">
-                                                Harga wajib diisi
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-group">
-                                            <label for="stock_{{ $size }}" class="form-label">Stok</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">
-                                                    <i class="fas fa-boxes"></i>
-                                                </span>
-                                                <input type="number" name="sizes[{{ $size }}][stock]" 
-                                                       id="stock_{{ $size }}" class="form-control" 
-                                                       data-size="{{ $size }}" min="0" placeholder="0">
-                                            </div>
-                                            <div class="invalid-feedback" id="stock_feedback_{{ $size }}">
-                                                Stok wajib diisi
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group mt-3">
-                                    <label for="gambar_{{ $size }}" class="form-label">Gambar Ukuran {{ $size }}</label>
-                                    <div class="dropzone-container p-3 text-center">
-                                        <input type="file" name="sizes[{{ $size }}][gambar]" 
-                                              id="gambar_{{ $size }}" class="form-control d-none size-input" 
-                                              data-size="{{ $size }}" accept="image/*" hidden >
-                                        <label for="gambar_{{ $size }}" class="d-block cursor-pointer mb-0">
-                                            <i class="fas fa-image upload-icon me-1"></i>
-                                            <small>Klik untuk upload gambar</small>
-                                        </label>
-                                        <div class="mt-2 preview-image-container">
-                                            <img id="preview_{{ $size }}" class="img-thumbnail shadow-sm rounded" 
-                                                 style="display: none; max-width: 150px;">
-                                        </div>
-                                    </div>
+                                    <p class="text-xs text-gray-500">PNG, JPG, GIF hingga 2MB</p>
                                 </div>
                             </div>
                         </div>
+                        @error('gambar') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                     </div>
-                    @endforeach
-                </div>
 
-                <div class="text-center mt-5 pt-3 border-top">
-                    <a href="{{ route('products.index') }}">
-                    <button type="button" class="btn btn-light fw-medium me-2 px-4 py-2">
-                        <i class="fas fa-arrow-left me-2"></i>Kembali
-                    </button>
-                    </a>
-                    <button type="submit" class="btn btn-orange px-4 py-2 shadow-sm">
-                        <i class="fas fa-save me-2"></i>Simpan Produk
-                    </button>
-                </div>
-            </form>
+                    <!-- Card Ukuran & Harga -->
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-4">Ukuran, Harga, dan Stok</h2>
+                        <div class="space-y-4">
+                            @php $availableSizes = ['S', 'M', 'L', 'XL']; @endphp
+                            @foreach($availableSizes as $sizeName)
+                                <div class="border rounded-lg" id="card_{{ $sizeName }}">
+                                    <div class="flex items-center justify-between p-4 cursor-pointer" onclick="document.getElementById('toggle_{{ $sizeName }}').click()">
+                                        <label class="flex items-center gap-3 text-base font-semibold text-gray-800">
+                                            <input type="checkbox" name="size_active[{{ $sizeName }}]" id="toggle_{{ $sizeName }}" onchange="toggleSize('{{ $sizeName }}')" class="h-5 w-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                            Ukuran {{ $sizeName }}
+                                        </label>
+                                        <span id="status_{{ $sizeName }}" class="text-xs font-medium px-2.5 py-1 rounded-full bg-gray-200 text-gray-800">Tidak Aktif</span>
+                                    </div>
+                                    <div id="size_details_{{ $sizeName }}" class="p-4 border-t border-gray-200" style="display: none;">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="harga_{{ $sizeName }}" class="block text-sm font-medium text-gray-700">Harga (Rp)</label>
+                                                <input type="number" name="sizes[{{ $sizeName }}][harga]" id="harga_{{ $sizeName }}" value="{{ old('sizes.'.$sizeName.'.harga') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="50000">
+                                                <div class="text-red-500 text-xs mt-1 hidden" id="harga_feedback_{{ $sizeName }}">Harga wajib diisi.</div>
+                                            </div>
+                                            <div>
+                                                <label for="stock_{{ $sizeName }}" class="block text-sm font-medium text-gray-700">Stok</label>
+                                                <input type="number" name="sizes[{{ $sizeName }}][stock]" id="stock_{{ $sizeName }}" value="{{ old('sizes.'.$sizeName.'.stock') }}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="10">
+                                                <div class="text-red-500 text-xs mt-1 hidden" id="stock_feedback_{{ $sizeName }}">Stok wajib diisi.</div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-4">
+                                            <label class="block text-sm font-medium text-gray-700">Gambar Ukuran (Wajib)</label>
+                                            <input type="file" name="sizes[{{ $sizeName }}][gambar]" id="gambar_{{ $sizeName }}" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi -->
+                    <div class="flex justify-end gap-4 pt-4 border-t">
+                        <a href="{{ route('seller.products') }}" class="bg-white border border-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-md hover:bg-gray-50 transition-colors">
+                            Batal
+                        </a>
+                        <button type="submit" class="bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-600 transition-colors">
+                            Simpan Produk
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-</body>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Set up CSRF token for AJAX requests
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    
-    // Province-City functionality
-    const provinceSelect = document.getElementById('province_id');
-    const citySelect = document.getElementById('city_id');
-    const cityError = document.getElementById('city_error');
-    
-    provinceSelect.addEventListener('change', function() {
-        const provinceId = this.value;
+    // Salin dan tempel SELURUH JavaScript dari file lamamu ke sini.
+    // Kode ini dirancang untuk bekerja dengan ID dan kelas yang sudah disamakan.
+    document.addEventListener('DOMContentLoaded', function() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         
-        // Reset city dropdown and hide any previous errors
-        citySelect.innerHTML = '';
-        citySelect.disabled = true;
-        citySelect.classList.remove('is-invalid');
-        cityError.style.display = 'none';
+        // Province-City functionality
+        const provinceSelect = document.getElementById('province_id');
+        const citySelect = document.getElementById('city_id');
+        const cityError = document.getElementById('city_error');
         
-        if (provinceId) {
-            // Show loading state
-            citySelect.innerHTML = '<option value=""><span class="loading-spinner"></span>Memuat kota...</option>';
-            
-            // Construct the API URL
-            const apiUrl = `/api/cities/${provinceId}`;
-            
-            // Fetch cities for selected province
-            fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Clear loading state
-                citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
-                
-                // Check if data is array and has items
-                if (Array.isArray(data) && data.length > 0) {
-                    data.forEach(city => {
-                        const option = document.createElement('option');
-                        option.value = city.id;
-                        option.textContent = city.name;
-                        citySelect.appendChild(option);
-                    });
-                    
-                    citySelect.disabled = false;
-                } else {
-                    // Handle case where no cities are found
-                    citySelect.innerHTML = '<option value="">Tidak ada kota ditemukan</option>';
-                    console.warn('No cities found for province:', provinceId);
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                
-                // Show error state
-                citySelect.innerHTML = '<option value="">Error memuat kota</option>';
-                citySelect.classList.add('is-invalid');
-                cityError.textContent = 'Gagal memuat data kota. Silakan coba lagi atau refresh halaman.';
-                cityError.style.display = 'block';
-                
-                // Show user-friendly alert
-                showAlert('Gagal memuat data kota. Silakan coba lagi.', 'warning');
-            });
-        } else {
-            // Reset to default state
-            citySelect.innerHTML = '<option value="">Pilih provinsi terlebih dahulu</option>';
+        provinceSelect.addEventListener('change', function() {
+            const provinceId = this.value;
+            citySelect.innerHTML = '<option value="">Memuat...</option>';
             citySelect.disabled = true;
-        }
-    });
-    
-    // Preview gambar produk
-    document.getElementById('gambar').addEventListener('change', function(e) {
-        previewImage(this, 'preview');
-        
-        const uploadLabel = this.previousElementSibling;
-        if (this.files && this.files[0]) {
-            uploadLabel.innerHTML = '<i class="fas fa-check-circle text-success fa-2x mb-3"></i><p class="mb-0">Image uploaded</p>';
-        }
-    });
-
-    // Form validation
-    document.getElementById('productForm').addEventListener('submit', function(e) {
-        const activeSizes = document.querySelectorAll('input[name^="size_active"]:checked');
-        let isValid = true;
-        
-        if (activeSizes.length === 0) {
-            e.preventDefault();
-            showAlert('Mohon pilih minimal satu ukuran', 'danger');
-            return;
-        }
-        
-        activeSizes.forEach(sizeCheckbox => {
-            const size = sizeCheckbox.id.replace('toggle_', '');
-            const hargaInput = document.getElementById(`harga_${size}`);
-            const stockInput = document.getElementById(`stock_${size}`);
+            cityError.style.display = 'none';
             
-            if (!hargaInput.value || hargaInput.value <= 0) {
-                isValid = false;
-                hargaInput.classList.add('is-invalid');
-                document.getElementById(`harga_feedback_${size}`).style.display = 'block';
+            if (provinceId) {
+                fetch(`/api/cities/${provinceId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    citySelect.innerHTML = '<option value="">Pilih Kota/Kabupaten</option>';
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.id;
+                            option.textContent = city.name;
+                            citySelect.appendChild(option);
+                        });
+                        citySelect.disabled = false;
+                    } else {
+                        citySelect.innerHTML = '<option value="">Tidak ada kota ditemukan</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    citySelect.innerHTML = '<option value="">Error memuat kota</option>';
+                    cityError.textContent = 'Gagal memuat data kota. Coba lagi.';
+                    cityError.style.display = 'block';
+                });
             } else {
-                hargaInput.classList.remove('is-invalid');
-                document.getElementById(`harga_feedback_${size}`).style.display = 'none';
-            }
-            
-            if (!stockInput.value || stockInput.value < 0) {
-                isValid = false;
-                stockInput.classList.add('is-invalid');
-                document.getElementById(`stock_feedback_${size}`).style.display = 'block';
-            } else {
-                stockInput.classList.remove('is-invalid');
-                document.getElementById(`stock_feedback_${size}`).style.display = 'none';
+                citySelect.innerHTML = '<option value="">Pilih provinsi terlebih dahulu</option>';
             }
         });
+        
+        // Main product image upload
+        const dropzone = document.getElementById('dropzone-container');
+        const mainFileInput = document.getElementById('gambar');
+        const mainPreview = document.getElementById('preview');
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const placeholderWrapper = document.getElementById('placeholder-wrapper');
+        const filenameDisplay = document.getElementById('filename-display');
+        
+        dropzone.addEventListener('click', () => mainFileInput.click());
+        mainFileInput.addEventListener('change', (e) => previewImage(e.target, 'preview'));
 
-        if (!isValid) {
-            e.preventDefault();
-            showAlert('Mohon lengkapi semua data untuk ukuran yang dipilih', 'danger');
-        }
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => dropzone.classList.add('border-orange-400', 'bg-orange-50'), false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => dropzone.classList.remove('border-orange-400', 'bg-orange-50'), false);
+        });
+        dropzone.addEventListener('drop', (e) => {
+            mainFileInput.files = e.dataTransfer.files;
+            mainFileInput.dispatchEvent(new Event('change'));
+        }, false);
+
+        // Form validation on submit
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            const activeSizes = document.querySelectorAll('input[name^="size_active"]:checked');
+            let isValid = true;
+            
+            if (activeSizes.length === 0) {
+                e.preventDefault();
+                alert('Mohon pilih dan aktifkan minimal satu ukuran.');
+                return;
+            }
+            
+            activeSizes.forEach(checkbox => {
+                const size = checkbox.id.replace('toggle_', '');
+                const hargaInput = document.getElementById(`harga_${size}`);
+                const stockInput = document.getElementById(`stock_${size}`);
+                
+                if (!hargaInput.value || hargaInput.value <= 0) {
+                    isValid = false;
+                    hargaInput.classList.add('border-red-500');
+                    document.getElementById(`harga_feedback_${size}`).classList.remove('hidden');
+                } else {
+                    hargaInput.classList.remove('border-red-500');
+                    document.getElementById(`harga_feedback_${size}`).classList.add('hidden');
+                }
+                
+                if (!stockInput.value || stockInput.value < 0) {
+                    isValid = false;
+                    stockInput.classList.add('border-red-500');
+                    document.getElementById(`stock_feedback_${size}`).classList.remove('hidden');
+                } else {
+                    stockInput.classList.remove('border-red-500');
+                    document.getElementById(`stock_feedback_${size}`).classList.add('hidden');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                alert('Mohon lengkapi semua data harga dan stok untuk ukuran yang dipilih.');
+            }
+        });
     });
-});
 
-function showAlert(message) {
-    // Create custom alert
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-4 shadow';
-    alertDiv.style.zIndex = '9999';
-    alertDiv.style.borderLeft = '5px solid #E53E3E';
-    alertDiv.style.borderRadius = '8px';
-    alertDiv.innerHTML = `
-        <div class="d-flex align-items-center">
-            <i class="fas fa-exclamation-circle me-3 text-danger fa-lg"></i>
-            <div>${message}</div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    document.body.appendChild(alertDiv);
-    
-    // Auto dismiss after 3 seconds
-    setTimeout(() => {
-        alertDiv.classList.remove('show');
-        setTimeout(() => alertDiv.remove(), 300);
-    }, 3000);
-}
-
-function toggleSize(size) {
-    const details = document.getElementById(`size_details_${size}`);
-    const toggle = document.getElementById(`toggle_${size}`);
-    const card = document.getElementById(`card_${size}`);
-    const statusBadge = document.getElementById(`status_${size}`);
-    
-    if (toggle.checked) {
-        details.classList.add('active');
-        card.classList.add('active');
-        statusBadge.textContent = 'Aktif';
-        statusBadge.className = 'badge bg-success text-white me-2';
+    function toggleSize(size) {
+        const details = document.getElementById(`size_details_${size}`);
+        const toggle = document.getElementById(`toggle_${size}`);
+        const card = document.getElementById(`card_${size}`);
+        const statusBadge = document.getElementById(`status_${size}`);
         
-        // Reset any validation errors
-        const inputs = card.querySelectorAll('input');
-        inputs.forEach(input => {
-            input.classList.remove('is-invalid');
-        });
-        // Hide feedback messages
-        const feedbacks = card.querySelectorAll('.invalid-feedback');
-        feedbacks.forEach(feedback => {
-            feedback.style.display = 'none';
-        });
-    } else {
-        details.classList.remove('active');
-        card.classList.remove('active');
-        statusBadge.textContent = 'Tidak Aktif';
-        statusBadge.className = 'badge bg-light text-dark me-2';
-        
-        // Clear inputs
-        const hargaInput = document.getElementById(`harga_${size}`);
-        const stockInput = document.getElementById(`stock_${size}`);
-        const imageInput = document.getElementById(`gambar_${size}`);
-        
-        if (hargaInput) hargaInput.value = '';
-        if (stockInput) stockInput.value = '';
-        if (imageInput) imageInput.value = '';
-        
-        const preview = document.getElementById(`preview_${size}`);
-        if (preview) {
-            preview.style.display = 'none';
-            preview.src = '';
+        if (toggle.checked) {
+            details.style.display = 'block';
+            card.classList.add('bg-orange-50', 'border-orange-200');
+            statusBadge.textContent = 'Aktif';
+            statusBadge.classList.remove('bg-gray-200', 'text-gray-800');
+            statusBadge.classList.add('bg-green-100', 'text-green-800');
+        } else {
+            details.style.display = 'none';
+            card.classList.remove('bg-orange-50', 'border-orange-200');
+            statusBadge.textContent = 'Tidak Aktif';
+            statusBadge.classList.remove('bg-green-100', 'text-green-800');
+            statusBadge.classList.add('bg-gray-200', 'text-gray-800');
         }
     }
-}
 
-function previewImage(input, previewId) {
-    const preview = document.getElementById(previewId);
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            preview.style.display = 'block';
-            preview.src = e.target.result;
+    function previewImage(input, previewId) {
+        const preview = document.getElementById(previewId);
+        const previewWrapper = document.getElementById('preview-wrapper');
+        const placeholderWrapper = document.getElementById('placeholder-wrapper');
+        const filenameDisplay = document.getElementById('filename-display');
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewWrapper.classList.remove('hidden');
+                placeholderWrapper.classList.add('hidden');
+                filenameDisplay.textContent = input.files[0].name;
+            }
+            reader.readAsDataURL(input.files[0]);
         }
-        reader.readAsDataURL(input.files[0]);
     }
-}
-
-// Add preview for size images
-['S', 'M', 'L', 'XL'].forEach(size => {
-    const input = document.getElementById(`gambar_${size}`);
-    if (input) {
-        input.addEventListener('change', function(e) {
-            previewImage(this, `preview_${size}`);
-            
-            const uploadLabel = this.previousElementSibling;
-            if (this.files && this.files[0]) {
-                uploadLabel.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Image uploaded';
-            }
-        });
-    }
-    
-    // Add form input validation handlers
-    const hargaInput = document.getElementById(`harga_${size}`);
-    const stockInput = document.getElementById(`stock_${size}`);
-    
-    if (hargaInput) {
-        hargaInput.addEventListener('input', function() {
-            if (this.value) {
-                this.classList.remove('is-invalid');
-                document.getElementById(`harga_feedback_${size}`).style.display = 'none';
-            }
-        });
-    }
-    
-    if (stockInput) {
-        stockInput.addEventListener('input', function() {
-            if (this.value) {
-                this.classList.remove('is-invalid');
-                document.getElementById(`stock_feedback_${size}`).style.display = 'none';
-            }
-        });
-    }
-});
 </script>
-</html>
 @endsection

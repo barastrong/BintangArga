@@ -8,249 +8,216 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-    <title>Document</title>
+    <title>Checkout Pemesanan</title>
 </head>
 <body>
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-4">
-        <a href="{{ route('products.index') }}" class="text-secondary text-decoration-none d-flex align-items-center">
-            <i class="fas fa-chevron-left me-2"></i>
-            Kembali ke explore
-        </a>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="relative">
-            @if($product->sizes->isNotEmpty())
-                <img id="mainImage" src="{{ Storage::url($product->sizes->first()->gambar_size) }}" 
-                     alt="{{ $product->nama_barang }}" 
-                     class="w-full rounded-lg shadow-lg object-cover max-h-96">
-                
-                <!-- Thumbnail Images -->
-                <div class="grid grid-cols-4 gap-2 mt-4">
-                    @foreach($product->sizes as $size)
-                        <img src="{{ Storage::url($size->gambar_size) }}" 
-                             alt="{{ $product->nama_barang }} - {{ $size->size }}"
-                             onclick="updateMainImage('{{ Storage::url($size->gambar_size) }}')"
-                             class="w-full h-20 object-cover rounded-lg cursor-pointer shadow hover:opacity-75 transition">
-                    @endforeach
-                </div>
-            @else
-                <div class="bg-gray-200 w-full h-96 flex items-center justify-center rounded-lg">
-                    <p class="text-gray-500">No image available</p>
-                </div>
-            @endif
+<div class="py-12 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Tombol Kembali -->
+        <div class="mb-6">
+            <a href="{{ url()->previous() }}" class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+                <span>Kembali</span>
+            </a>
         </div>
 
-        <!-- Product Details -->
-        <div>
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold mb-2">{{ $product->nama_barang }}</h1>
-                    <div class="flex items-center gap-2">
-                        <img src="{{ asset('storage/' . $product->seller->foto_profil) }}" alt="Profil Penjual" class="w-20 h-20 rounded-full object-cover">
-                    <div>
-                        <span class="text-gray-500 fs-6">Penjual</span>
-                        <p class="font-semibold fs-5">{{ $product->seller->nama_penjual }}</p>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2">
+                <!-- Kolom Gambar -->
+                <div class="p-4 sm:p-6">
+                    <div class="aspect-w-1 aspect-h-1">
+                        <img id="mainImage" src="{{ $product->sizes->first() ? Storage::url($product->sizes->first()->gambar_size) : 'https://via.placeholder.com/600' }}" 
+                             alt="{{ $product->nama_barang }}" 
+                             class="w-full h-full object-cover rounded-lg shadow-md">
                     </div>
-                </div>
-            </div>
-
-            <!-- Rating -->
-            <div class="flex items-center mb-4">
-                <div class="flex text-yellow-400">
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= round($averageRating))
-                        <i class="fas fa-star text-warning"></i> <!-- Bintang penuh -->
-                        @else
-                            <i class="far fa-star text-warning"></i> <!-- Bintang outline -->
-                        @endif
-                    @endfor
-                </div>
-                <span class="ml-2 text-gray-700">{{ number_format($averageRating, 1) }} ({{ $product->purchases->count() }} reviews)</span>
-            </div>
-
-            <!-- Description -->
-            <div class="mb-6 bg-gray-50 p-4 rounded-lg">
-                <h2 class="font-semibold text-lg mb-2">Description</h2>
-                <p class="text-gray-700">{{ $product->description }}</p>
-            </div>
-
-            <!-- Size Chart -->
-            <div class="mb-6">
-                <h2 class="font-semibold text-lg mb-4">SIZE CHART</h2>
-                
-                @foreach($product->sizes as $size)
-                <div class="flex items-center justify-between mb-4 border-b pb-4">
-                    <div class="flex items-center">
-                        <img src="{{ Storage::url($size->gambar_size) }}" 
-                             alt="{{ $size->size }}" 
-                             class="w-16 h-16 object-cover rounded-lg shadow">
-                        <div class="ml-4">
-                            <h3 class="font-bold">{{ $size->size }}</h3>
-                            <p class="text-gray-700 font-semibold">Rp {{ number_format($size->harga, 0, ',', '.') }}</p>
-                            <p class="text-sm {{ $size->stock > 0 ? 'text-green-600' : 'text-red-600' }}">
-                                {{ $size->stock > 0 ? 'Stock: ' . $size->stock : 'Out of Stock' }}
-                            </p>
-                        </div>
+                    @if($product->sizes->count() > 1)
+                    <div class="grid grid-cols-5 gap-3 mt-4">
+                        @foreach($product->sizes as $size)
+                            <div class="aspect-w-1 aspect-h-1">
+                                <img src="{{ Storage::url($size->gambar_size) }}" 
+                                     alt="{{ $product->nama_barang }} - {{ $size->size }}"
+                                     onclick="updateMainImage('{{ Storage::url($size->gambar_size) }}')"
+                                     class="w-full h-full object-cover rounded-md cursor-pointer border-2 border-transparent hover:border-orange-500 transition">
+                            </div>
+                        @endforeach
                     </div>
-                    
-                    <!-- Add to Cart Button - FIXED -->
-                    @if($size->stock > 0)
-                    <button onclick="openPurchaseModal('{{ $size->id }}', '{{ $size->size }}', {{ $size->harga }}, {{ $size->stock }}, '{{ $product->id }}')" 
-                           class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg inline-block transition shadow">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            Beli
-                    </button>
-                    @else
-                        <button disabled class="bg-gray-300 text-gray-500 px-4 py-2 rounded-lg cursor-not-allowed">
-                            Out of Stock
-                        </button>
                     @endif
                 </div>
-                @endforeach
+
+                <!-- Kolom Detail & Aksi -->
+                <div class="p-6 sm:p-8 flex flex-col">
+                    <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">{{ $product->nama_barang }}</h1>
+                    
+                    <!-- Info Rating & Terjual -->
+                    <div class="flex items-center flex-wrap gap-x-4 gap-y-2 mt-3 text-sm">
+                        <div class="flex items-center text-gray-600">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="font-semibold">{{ number_format($averageRating, 1) }}</span>
+                            <span class="text-gray-400 ml-1">({{ $product->ratings->count() }} ulasan)</span>
+                        </div>
+                        <span class="text-gray-300 hidden sm:block">|</span>
+                        <div class="text-gray-600 font-medium">
+                            <span>{{ $product->purchases->where('status_pembelian', '!=', 'keranjang')->count() }}</span>
+                            <span class="text-gray-500">terjual</span>
+                        </div>
+                    </div>
+
+                    <!-- Info Penjual -->
+                    <div class="mt-6 pt-6 border-t">
+                        <p class="text-sm text-gray-500 mb-2">Dijual oleh:</p>
+                        <a class="flex items-center gap-4 group">
+                            <img src="{{ asset('storage/' . $product->seller->foto_profil) }}" alt="Profil Penjual" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-orange-500 transition">
+                            <div>
+                                <p class="font-semibold text-gray-800 group-hover:text-orange-600 transition">{{ $product->seller->nama_penjual }}</p>
+                                <span class="text-xs text-white bg-orange-500 px-2 py-0.5 rounded-full">Toko Terpercaya</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <!-- Deskripsi -->
+                    <div class="mt-6">
+                        <h2 class="font-semibold text-lg mb-2 text-gray-800">Deskripsi Produk</h2>
+                        <p class="text-gray-600 text-base leading-relaxed whitespace-pre-wrap">{{ $product->description }}</p>
+                    </div>
+
+                    <!-- Size Chart (Bagian Aksi) -->
+                    <div class="mt-auto pt-8">
+                        <h2 class="font-semibold text-lg mb-4 text-gray-800">Pilih Ukuran & Beli</h2>
+                        <div class="space-y-3">
+                            @forelse($product->sizes as $size)
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border hover:border-orange-400 transition">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ Storage::url($size->gambar_size) }}" alt="{{ $size->size }}" class="w-12 h-12 object-cover rounded-md hidden sm:block">
+                                    <div>
+                                        <h3 class="font-bold text-gray-800">{{ $size->size }}</h3>
+                                        <p class="text-orange-600 font-semibold">Rp {{ number_format($size->harga, 0, ',', '.') }}</p>
+                                        <p class="text-xs {{ $size->stock > 5 ? 'text-green-600' : ($size->stock > 0 ? 'text-yellow-600' : 'text-red-600') }}">
+                                            Stok: {{ $size->stock > 0 ? $size->stock : 'Habis' }}
+                                        </p>
+                                    </div>
+                                </div>
+                                @if($size->stock > 0)
+                                    <button onclick="openPurchaseModal('{{ $size->id }}', '{{ $size->size }}', {{ $size->harga }}, {{ $size->stock }}, '{{ $product->id }}')" 
+                                           class="bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-600 transition-colors shadow-sm flex items-center gap-2">
+                                        <i class="fas fa-shopping-cart text-sm"></i>
+                                        <span>Beli</span>
+                                    </button>
+                                @else
+                                    <button disabled class="bg-gray-200 text-gray-500 font-semibold py-2 px-4 rounded-md cursor-not-allowed">Stok Habis</button>
+                                @endif
+                            </div>
+                            @empty
+                            <div class="p-4 bg-red-50 text-red-700 rounded-lg text-center">
+                                <p>Saat ini tidak ada ukuran yang tersedia untuk produk ini.</p>
+                            </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="mt-12">
-        <h2 class="text-2xl font-bold mb-6">Customer Reviews</h2>
-        
-        @if($product->ratings->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                @foreach($product->ratings->take(4) as $rating)
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <div class="flex justify-between items-start mb-2">
-                            <div>
-                                <p class="font-semibold">{{ $rating->user->name ?? 'Anonymous' }}</p>
-                                <div class="flex text-yellow-400 mt-1">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $rating->rating)
-                                        <i class="fas fa-star text-warning"></i> <!-- Bintang penuh -->
-                                        @else
-                                            <i class="far fa-star text-warning"></i> <!-- Bintang outline -->
-                                        @endif
+        <!-- Customer Reviews Section -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Ulasan Pelanggan</h2>
+            @if($product->ratings->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    @foreach($product->ratings->take(4) as $rating)
+                        <div class="bg-white p-5 rounded-xl shadow-sm">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex items-center gap-3">
+                                    <img class="h-10 w-10 rounded-full object-cover" src="{{ $rating->user->profile_image ? asset('storage/' . $rating->user->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($rating->user->name).'&color=FFFFFF&background=F97316' }}" alt="{{ $rating->user->name }}">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">{{ $rating->user->name ?? 'Anonymous' }}</p>
+                                        <p class="text-xs text-gray-400">{{ $rating->created_at->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex text-yellow-400">
+                                    @for($i = 1; $i <= $rating->rating; $i++)
+                                        <i class="fas fa-star"></i>
+                                    @endfor
+                                    @for($i = $rating->rating + 1; $i <= 5; $i++)
+                                        <i class="far fa-star"></i>
                                     @endfor
                                 </div>
                             </div>
-                            <span class="text-sm text-gray-500">{{ $rating->created_at->diffForHumans() }}</span>
+                            <p class="text-gray-600 mt-3 pl-13">{{ $rating->review ?: 'Tidak ada ulasan tertulis.' }}</p>
                         </div>
-                        
-                        @if($rating->review)
-                            <p class="text-gray-700 mt-2">{{ $rating->review }}</p>
-                        @else
-                            <p class="text-gray-500 italic mt-2">No written review</p>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-        @else
-            <div class="bg-gray-50 p-6 rounded-lg text-center">
-                <p class="text-gray-600">No reviews yet. Be the first to leave a review!</p>
-            </div>
-        @endif
+                    @endforeach
+                </div>
+            @else
+                <div class="bg-white p-8 rounded-lg shadow-sm text-center">
+                    <p class="text-gray-600">Jadilah yang pertama memberikan ulasan untuk produk ini!</p>
+                </div>
+            @endif
+        </div>
     </div>
+</div>
 
-    <!-- Purchase Modal - FIXED -->
-    <div id="purchaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-        <div class="flex items-center justify-center min-h-screen px-4 py-6">
-            <div class="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-                <!-- Modal Header -->
-                <div class="border-b px-6 py-4 sticky top-0 bg-white">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <h3 class="text-xl font-semibold text-gray-900">Detail Pembelian</h3>
-                        </div>
-                        <button onclick="closePurchaseModal()" class="text-gray-400 hover:text-gray-500">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+<!-- Purchase Modal (Struktur tidak diubah, hanya memastikan konsistensi) -->
+<div id="purchaseModal" class="fixed inset-0 bg-black bg-opacity-60 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] flex flex-col" @click.away="closePurchaseModal()">
+        <!-- Header -->
+        <div class="border-b px-6 py-4 flex justify-between items-center flex-shrink-0">
+            <h3 class="text-xl font-semibold text-gray-900">Detail Pembelian</h3>
+            <button onclick="closePurchaseModal()" class="text-gray-400 hover:text-gray-600 transition">×</button>
+        </div>
+        <!-- Body -->
+        <div class="overflow-y-auto">
+            <form id="purchaseForm" method="POST" action="{{ route('purchases.store') }}" class="p-6">
+                @csrf
+                <input type="hidden" name="product_id" id="productId">
+                <input type="hidden" name="size_id" id="sizeId">
+                <input type="hidden" name="status_pembelian" value="beli">
+                
+                {{-- Konten form di sini sudah cukup bagus, tidak perlu banyak diubah --}}
+                <div class="mb-4">
+                    <h4 class="font-semibold text-lg text-gray-800 mb-2">{{ $product->nama_barang }}</h4>
+                    <p class="text-gray-600">Ukuran: <span id="selectedSize" class="font-medium"></span></p>
+                    <p class="text-gray-600">Harga Satuan: Rp <span id="selectedPrice" class="font-medium"></span></p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah</label>
+                    <div class="flex items-center">
+                        <button type="button" onclick="updateQuantity(-1)" class="px-3 py-1 border rounded-l-md hover:bg-gray-100">-</button>
+                        <input type="number" id="quantity" name="quantity" value="1" min="1" class="w-16 text-center border-t border-b focus:outline-none" readonly>
+                        <button type="button" onclick="updateQuantity(1)" class="px-3 py-1 border rounded-r-md hover:bg-gray-100">+</button>
+                        <span class="text-sm text-gray-500 ml-4">Stok tersedia: <span id="availableStock">0</span></span>
                     </div>
                 </div>
 
-                <!-- Modal Body -->
-                <form id="purchaseForm" method="POST" action="{{ route('purchases.store') }}" class="px-6 py-4">
-                    @csrf
-                    <input type="hidden" name="product_id" id="productId">
-                    <input type="hidden" name="size_id" id="sizeId">
-                       <input type="hidden" name="status_pembelian" value="beli">
-                    
-                    <!-- Product Details -->
-                    <div class="mb-6">
-                        <h4 class="font-semibold mb-2">{{ $product->nama_barang }}</h4>
-                        <p class="text-gray-600">Size: <span id="selectedSize"></span></p>
-                        <p class="text-gray-600">Harga: Rp <span id="selectedPrice"></span></p>
-                    </div>
+                <input type="hidden" name="shipping_address" id="shipping_address" value="Will be filled at checkout">
+                <input type="hidden" name="phone_number" id="phone_number" value="Will be filled at checkout">
+                <input type="hidden" name="description" id="description" value="Direct purchase - details at checkout">
+                <!-- <div class="mb-4">
+                    <label for="shipping_address" class="block text-sm font-medium text-gray-700 mb-2">Alamat Pengiriman</label>
+                    <textarea name="shipping_address" id="shipping_address" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" required></textarea>
+                </div>
 
-                    <!-- Quantity Selection -->
-                    <div class="mb-6">
-                        <label class="block text-gray-700 font-medium mb-2">Jumlah</label>
-                        <div class="flex items-center space-x-4">
-                            <div class="flex items-center border rounded">
-                                <button type="button" onclick="updateQuantity(-1)" class="px-3 py-1 border-r hover:bg-gray-100 ">-</button>
-                                <input type="number" id="quantity" name="quantity" value="1" min="1" 
-                                       class="w-16 text-center px-2 py-1 focus:outline-none" readonly>
-                                <button type="button" onclick="updateQuantity(1)" class="px-3 py-1 border-l hover:bg-gray-100">+</button>
-                            </div>
-                            <span class="text-gray-500">Stock: <span id="availableStock">0</span></span>
-                        </div>
-                    </div>
+                <div class="mb-4">
+                    <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon</label>
+                    <input type="tel" name="phone_number" id="phone_number" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" required>
+                </div>
 
-                    <!-- Shipping Information -->
-                    <div class="mb-6">
-                        <label for="shipping_address" class="block text-gray-700 font-medium mb-2">Alamat Pengiriman</label>
-                        <textarea name="shipping_address" id="shipping_address" rows="3" 
-                                  class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                  required></textarea>
-                    </div>
+                <div class="mb-4">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Catatan Pembelian (opsional)</label>
+                    <textarea name="description" id="description" rows="2" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"></textarea>
+                </div> -->
 
-                    <div class="mb-6">
-                        <label for="phone_number" class="block text-gray-700 font-medium mb-2">Nomor Telepon</label>
-                        <input type="tel" name="phone_number" id="phone_number" 
-                               class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                               required>
+                <div class="bg-orange-50 p-4 rounded-lg my-4">
+                    <div class="flex justify-between font-bold text-lg">
+                        <span class="text-gray-800">Total Pembayaran:</span>
+                        <span class="text-orange-600">Rp <span id="subtotal">0</span></span>
                     </div>
+                </div>
 
-                    <div class="mb-6">
-                        <label for="description" class="block text-gray-700 font-medium mb-2">Catatan Pembelian</label>
-                        <textarea name="description" id="description" rows="2" 
-                                  class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                  required></textarea>
-                    </div>
-
-                    <!-- Total Price -->
-                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                        <div class="flex justify-between font-semibold">
-                            <span>Total Pembayaran:</span>
-                            <span>Rp <span id="subtotal">0</span></span>
-                        </div>
-                    </div>
-
-                    <!-- Submit Button - FIXED -->
-                    <div class="flex space-x-4">
-                        <button type="button" onclick="addToCart()" 
-                            class="flex-1 bg-white border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-50 px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            Keranjang
-                        </button>
-                        
-                        <button type="submit" 
-                            class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition shadow flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            Beli Sekarang
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div class="flex space-x-4">
+                    <button type="button" onclick="addToCart()" class="w-full text-center bg-orange-100 text-orange-600 font-semibold py-3 rounded-lg hover:bg-orange-200 transition">Tambah ke Keranjang</button>
+                    <button type="submit" class="w-full text-center bg-orange-500 text-white font-semibold py-3 rounded-lg hover:bg-orange-600 transition">Beli Sekarang</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
