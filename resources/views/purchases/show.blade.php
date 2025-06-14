@@ -1,200 +1,164 @@
 @extends('layouts.app')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-6">Detail Pesanan</h1>
+<div class="bg-gray-50 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    @if(session('success'))
-        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {{ session('success') }}
+        <div class="mb-6">
+            <a href="{{ route('purchases.index') }}" class="inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors">
+                <i class="fas fa-arrow-left"></i>
+                <span>Kembali ke Riwayat Pesanan</span>
+            </a>
         </div>
-    @endif
 
-    @if(session('error'))
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {{ session('error') }}
+        @if(session('success'))
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-md" role="alert">
+                <p>{{ session('success') }}</p>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md" role="alert">
+                <p>{{ session('error') }}</p>
+            </div>
+        @endif
+
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <!-- Header -->
+            <div class="p-6 border-b">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Detail Pesanan #{{ $purchase->id }}</h2>
+                        <p class="text-sm text-gray-500">Dipesan pada {{ $purchase->created_at->format('d F Y, H:i') }}</p>
+                    </div>
+                    @php
+                        $statusInfo = [
+                            'pending' => ['label' => 'Menunggu Konfirmasi', 'class' => 'bg-yellow-100 text-yellow-800'],
+                            'diproses' => ['label' => 'Diproses', 'class' => 'bg-blue-100 text-blue-800'],
+                            'process' => ['label' => 'Diproses', 'class' => 'bg-blue-100 text-blue-800'],
+                            'dikirim' => ['label' => 'Dikirim', 'class' => 'bg-indigo-100 text-indigo-800'],
+                            'completed' => ['label' => 'Selesai', 'class' => 'bg-green-100 text-green-800'],
+                            'selesai' => ['label' => 'Selesai', 'class' => 'bg-green-100 text-green-800'],
+                            'cancelled' => ['label' => 'Dibatalkan', 'class' => 'bg-red-100 text-red-800'],
+                        ];
+                        $currentStatus = $statusInfo[$purchase->status] ?? ['label' => ucfirst($purchase->status), 'class' => 'bg-gray-100 text-gray-800'];
+                    @endphp
+                    <span class="text-xs font-medium px-3 py-1 rounded-full {{ $currentStatus['class'] }}">{{ $currentStatus['label'] }}</span>
+                </div>
+            </div>
+
+            <!-- Detail Item -->
+            <div class="p-6">
+                <div class="flex gap-4">
+                    <img src="{{ asset('storage/' . $purchase->size->gambar_size) }}" alt="{{ $purchase->product->nama_barang }}" class="w-24 h-24 rounded-lg object-cover">
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-gray-800">{{ $purchase->product->nama_barang }}</h3>
+                        <p class="text-sm text-gray-500">Ukuran: {{ $purchase->size->size }}</p>
+                        <p class="text-sm text-gray-500">Jumlah: {{ $purchase->quantity }}</p>
+                    </div>
+                    <p class="font-bold text-lg text-gray-800">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</p>
+                </div>
+            </div>
+
+            <!-- Detail Pengiriman -->
+            <div class="p-6 border-t">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Informasi Pengiriman</h3>
+                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6 text-sm">
+                    <div>
+                        <dt class="text-gray-500">Penerima</dt>
+                        <dd class="mt-1 text-gray-900 font-medium">{{ Auth::user()->name }}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500">Nomor Telepon</dt>
+                        <dd class="mt-1 text-gray-900 font-medium">{{ $purchase->phone_number }}</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                        <dt class="text-gray-500">Alamat Pengiriman</dt>
+                        <dd class="mt-1 text-gray-900 font-medium">{{ $purchase->shipping_address }}</dd>
+                    </div>
+                    @if($purchase->description)
+                    <div class="sm:col-span-2">
+                        <dt class="text-gray-500">Catatan Pembelian</dt>
+                        <dd class="mt-1 text-gray-900 font-medium">{{ $purchase->description }}</dd>
+                    </div>
+                    @endif
+                </dl>
+            </div>
         </div>
-    @endif
 
-    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Informasi Pesanan #{{ $purchase->id }}
+        <!-- Form Rating (jika status 'completed'/'selesai' dan belum dirating) -->
+        @if(($purchase->status === 'completed' || $purchase->status === 'selesai') && !$purchase->has_been_rated)
+        <div id="rating-form" class="mt-8 bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+                Bagaimana pendapatmu tentang produk ini?
             </h3>
-        </div>
-        <div class="border-t border-gray-200">
-            <dl>
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Produk</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $purchase->product->nama_barang }}</dd>
-                </div>
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Ukuran</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $purchase->size->size }}</dd>
-                </div>
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Jumlah</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $purchase->quantity }}</dd>
-                </div>
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Total Harga</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</dd>
-                </div>
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Status</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            {{ $purchase->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                            {{ $purchase->status === 'process' ? 'bg-orange-100 text-orange-800' : '' }}
-                            {{ $purchase->status === 'completed' ? 'bg-green-100 text-green-800' : '' }}
-                            {{ $purchase->status === 'selesai' ? 'bg-green-100 text-green-800' : '' }}
-                            {{ $purchase->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}">
-                            {{ ucfirst($purchase->status) }}
-                        </span>
-                    </dd>
-                </div>
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Alamat Pengiriman</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $purchase->shipping_address }}</dd>
-                </div>
-                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">Nomor Telepon</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $purchase->phone_number }}</dd>
-                </div>
-            </dl>
-        </div>
-    </div>
-
-    @if($purchase->status === 'completed')
-    <div class="mt-8 bg-white shadow overflow-hidden sm:rounded-lg">
-        <div class="px-4 py-5 sm:px-6">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                Beri Rating & Ulasan
-            </h3>
-        </div>
-        <div class="border-t border-gray-200 px-4 py-5">
-            @if(isset($purchase->rating))
+            <form action="{{ route('purchases.rate', $purchase) }}" method="POST">
+                @csrf
                 <div class="mb-4">
-                    <p class="text-sm font-medium text-gray-700 mb-2">Rating Anda:</p>
-                    <div class="flex items-center">
-                        @for($i = 1; $i <= 5; $i++)
-                            <svg class="w-5 h-5 {{ $i <= $purchase->rating ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                            </svg>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rating Anda</label>
+                    <div class="flex items-center space-x-1 rating-stars">
+                        @for ($i = 1; $i <= 5; $i++)
+                        <label>
+                            <input type="radio" name="rating" value="{{ $i }}" class="sr-only" required>
+                            <i class="fas fa-star text-2xl text-gray-300 cursor-pointer hover:text-yellow-400 transition-colors"></i>
+                        </label>
                         @endfor
                     </div>
                 </div>
-                @if(isset($purchase->review))
-                <div>
-                    <p class="text-sm font-medium text-gray-700 mb-2">Ulasan Anda:</p>
-                    <p class="text-sm text-gray-900 italic">{{ $purchase->review }}</p>
+                <div class="mb-4">
+                    <label for="review" class="block text-sm font-medium text-gray-700 mb-2">Ulasan (Opsional)</label>
+                    <textarea id="review" name="review" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500" placeholder="Bagikan pengalaman Anda dengan produk ini..."></textarea>
                 </div>
-                @endif
-                <div class="mt-4">
-                    <p class="text-sm text-gray-500">Anda telah memberikan rating dan ulasan untuk pesanan ini. Terima kasih atas feedback Anda!</p>
-                </div>
-            @else
-                <form action="{{ route('purchases.rate', $purchase) }}" method="POST">
-                    @csrf
-                    <div class="mb-4">
-                        <label for="rating" class="block text-sm font-medium text-gray-700 mb-2">Pilih Rating:</label>
-                        <div class="flex items-center space-x-1">
-                            <input type="radio" id="star1" name="rating" value="1" class="hidden peer" required>
-                            <label for="star1" class="cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked:text-yellow-400">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                            </label>
-                            
-                            <input type="radio" id="star2" name="rating" value="2" class="hidden peer">
-                            <label for="star2" class="cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked:text-yellow-400">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                            </label>
-                            
-                            <input type="radio" id="star3" name="rating" value="3" class="hidden peer">
-                            <label for="star3" class="cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked:text-yellow-400">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                            </label>
-                            
-                            <input type="radio" id="star4" name="rating" value="4" class="hidden peer">
-                            <label for="star4" class="cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked:text-yellow-400">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                            </label>
-                            
-                            <input type="radio" id="star5" name="rating" value="5" class="hidden peer">
-                            <label for="star5" class="cursor-pointer text-gray-300 hover:text-yellow-400 peer-checked:text-yellow-400">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                </svg>
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label for="review" class="block text-sm font-medium text-gray-700 mb-2">Ulasan Anda (Opsional):</label>
-                        <textarea id="review" name="review" rows="4" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="Bagikan pengalaman Anda dengan produk ini..."></textarea>
-                    </div>
-                    
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Kirim Rating & Ulasan
-                    </button>
-                </form>
-                @endif
-            </div>
-        </div>
-    @endif
-
-    <div class="mt-6 flex justify-between">
-        <a href="{{ route('purchases.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-            Kembali ke Daftar Pesanan
-        </a>
-        
-        @if($purchase->status === 'pending')
-            <form action="{{ route('purchases.cancel', $purchase) }}" method="POST">
-                @csrf
-                <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                    Batalkan Pesanan
+                
+                <button type="submit" class="w-full sm:w-auto bg-orange-500 text-white font-bold py-2 px-4 rounded-md hover:bg-orange-600 transition">
+                    Kirim Ulasan
                 </button>
             </form>
+        </div>
         @endif
+
     </div>
 </div>
-</body>
+
 <script>
-    // Get all star labels
-    const starLabels = document.querySelectorAll('input[name="rating"] + label');
-    const stars = document.querySelectorAll('input[name="rating"]');
-
-    // Add event listeners to star inputs
-    stars.forEach((star, index) => {
-        star.addEventListener('change', function() {
-            // Reset all stars
-            starLabels.forEach(label => {
-                label.querySelector('svg').classList.remove('text-yellow-400');
-                label.querySelector('svg').classList.add('text-gray-300');
-            });
-
-            // Color stars up to the selected one
-            for (let i = 0; i <= index; i++) {
-                starLabels[i].querySelector('svg').classList.remove('text-gray-300');
-                starLabels[i].querySelector('svg').classList.add('text-yellow-400');
+    // Script untuk interaksi bintang rating
+    const ratingContainer = document.querySelector('.rating-stars');
+    if (ratingContainer) {
+        const stars = ratingContainer.querySelectorAll('label i');
+        ratingContainer.addEventListener('mouseover', (e) => {
+            if (e.target.tagName === 'I') {
+                const hoverIndex = Array.from(stars).indexOf(e.target);
+                stars.forEach((star, index) => {
+                    star.classList.toggle('text-yellow-300', index <= hoverIndex);
+                    star.classList.toggle('text-gray-300', index > hoverIndex);
+                });
             }
         });
-    });
+
+        ratingContainer.addEventListener('mouseout', () => {
+            const checkedStar = ratingContainer.querySelector('input[name="rating"]:checked');
+            if (checkedStar) {
+                const checkedIndex = parseInt(checkedStar.value) - 1;
+                stars.forEach((star, index) => {
+                    star.classList.toggle('text-yellow-400', index <= checkedIndex);
+                    star.classList.toggle('text-gray-300', index > checkedIndex);
+                });
+            } else {
+                stars.forEach(star => {
+                    star.classList.remove('text-yellow-300', 'text-yellow-400');
+                    star.classList.add('text-gray-300');
+                });
+            }
+        });
+
+        ratingContainer.addEventListener('click', (e) => {
+            if (e.target.tagName === 'I') {
+                const clickedIndex = Array.from(stars).indexOf(e.target);
+                stars.forEach((star, index) => {
+                    star.classList.toggle('text-yellow-400', index <= clickedIndex);
+                    star.classList.toggle('text-gray-300', index > clickedIndex);
+                });
+            }
+        });
+    }
 </script>
-</html>
 @endsection
