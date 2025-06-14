@@ -12,7 +12,6 @@
 </header>
 <br>
 <br>
-<br>
 <div class="bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <section class="py-16 sm:py-24">
