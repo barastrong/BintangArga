@@ -188,12 +188,10 @@ class SellerController extends Controller
                 ->with('error', 'Pesanan tidak ditemukan');
         }
         
-        // Validate the status
         $request->validate([
             'status' => 'required|in:process,dikirim',
         ]);
         
-        // Update the order status
         $order->status = $request->status;
         $order->save();
         

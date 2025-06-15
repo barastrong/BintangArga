@@ -143,29 +143,32 @@ class DeliveryController extends Controller
      */
     public function updateOrderStatus(Request $request, $id)
     {
-        if (!Auth::user()->delivery) {
-            return redirect()->route('delivery.register');
-        }
-
+        // Validasi input
         $request->validate([
             'status_pengiriman' => 'required|in:picked_up,shipping,delivered'
         ]);
 
+        // Cari pesanan berdasarkan delivery_id
         $order = Purchase::where('delivery_id', Auth::user()->delivery->id)
-            ->findOrFail($id);
+            ->where('id', $id)
+            ->first();
 
-        $order->update([
-            'status_pengiriman' => $request->status
-        ]);
+        if (!$order) {
+            return redirect()->back()->with('error', 'Pesanan tidak ditemukan');
+        }
 
-        $statusText = [
-            'picked_up' => 'Pesanan telah diambil',
-            'shipping' => 'Pesanan dalam pengiriman',
-            'delivered' => 'Pesanan telah diterima'
+        // Update status
+        $order->status_pengiriman = $request->status_pengiriman;
+        $order->save();
+
+        // Pesan sukses
+        $messages = [
+            'picked_up' => 'Pesanan berhasil diambil',
+            'shipping' => 'Pengiriman dimulai',
+            'delivered' => 'Pesanan selesai dikirim'
         ];
 
-        return redirect()->back()
-            ->with('success', $statusText[$request->status]);
+        return redirect()->back()->with('success', $messages[$request->status_pengiriman]);
     }
 
     /**

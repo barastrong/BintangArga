@@ -16,12 +16,12 @@
                         </div>
                         <div class="flex items-center space-x-4">
                             <!-- Stats Summary -->
-                            <div class="bg-green-50 rounded-lg px-4 py-2">
+                            <div class="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg px-4 py-2">
                                 <div class="flex items-center">
-                                    <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                    <i class="fas fa-check-circle text-orange-600 mr-2"></i>
                                     <div>
-                                        <p class="text-sm text-green-600 font-medium">Total Selesai</p>
-                                        <p class="text-lg font-bold text-green-700">{{ $completedOrders->total() }}</p>
+                                        <p class="text-sm text-orange-600 font-medium">Total Selesai</p>
+                                        <p class="text-lg font-bold text-orange-700">{{ $completedOrders->total() }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -30,37 +30,16 @@
                 </div>
 
                 <!-- Filter Section -->
-                <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                <!-- <div class="bg-white rounded-xl shadow-md p-6 mb-6">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-filter text-gray-400 mr-2"></i>
-                                <span class="text-sm font-medium text-gray-700">Filter:</span>
-                            </div>
-                            <select class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">Semua Bulan</option>
-                                <option value="1">Januari</option>
-                                <option value="2">Februari</option>
-                                <option value="3">Maret</option>
-                                <option value="4">April</option>
-                                <option value="5">Mei</option>
-                                <option value="6">Juni</option>
-                                <option value="7">Juli</option>
-                                <option value="8">Agustus</option>
-                                <option value="9">September</option>
-                                <option value="10">Oktober</option>
-                                <option value="11">November</option>
-                                <option value="12">Desember</option>
-                            </select>
-                        </div>
                         <div class="flex items-center space-x-2">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            <button class="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white px-4 py-2 rounded-lg text-sm transition-all duration-200">
                                 <i class="fas fa-download mr-2"></i>
                                 Export
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- History List -->
                 <div class="bg-white rounded-xl shadow-md overflow-hidden">
@@ -98,8 +77,8 @@
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10">
-                                                    <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                        <i class="fas fa-box text-blue-600"></i>
+                                                    <div class="h-10 w-10 rounded-full bg-gradient-to-r from-orange-100 to-orange-200 flex items-center justify-center">
+                                                        <i class="fas fa-box text-orange-600"></i>
                                                     </div>
                                                 </div>
                                                 <div class="ml-4">
@@ -114,9 +93,9 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center">
-                                                @if($order->product->foto_produk)
-                                                    <img src="{{ asset('storage/' . $order->product->foto_produk) }}" 
-                                                         alt="{{ $order->product->nama_produk }}" 
+                                                @if($order->product->gambar)
+                                                    <img src="{{ asset('storage/' . $order->product->gambar) }}" 
+                                                         alt="{{ $order->product->nama_barang }}" 
                                                          class="h-10 w-10 rounded-lg object-cover mr-3">
                                                 @else
                                                     <div class="h-10 w-10 rounded-lg bg-gray-200 flex items-center justify-center mr-3">
@@ -125,7 +104,7 @@
                                                 @endif
                                                 <div>
                                                     <div class="text-sm font-medium text-gray-900">
-                                                        {{ $order->product->nama_produk }}
+                                                        {{ $order->product->nama_barang }}
                                                     </div>
                                                     <div class="text-sm text-gray-500">
                                                         Qty: {{ $order->quantity }}
@@ -159,15 +138,15 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm font-medium text-gray-900">
-                                                Rp {{ number_format($order->total_harga, 0, ',', '.') }}
+                                                Rp {{ number_format($order->total_price, 0, ',', '.') }}
                                             </div>
                                             <div class="text-sm text-gray-500">
                                                 + Ongkir: Rp {{ number_format($order->ongkir, 0, ',', '.') }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('delivery.order.detail', $order->id) }}" 
-                                               class="text-blue-600 hover:text-blue-900 mr-3">
+                                            <a href="{{ route('delivery.order-detail', $order->id) }}" 
+                                               class="text-orange-600 hover:text-orange-900 mr-3">
                                                 <i class="fas fa-eye mr-1"></i>
                                                 Detail
                                             </a>
@@ -217,7 +196,7 @@
                             </p>
                             <div class="mt-6">
                                 <a href="{{ route('delivery.orders') }}" 
-                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700">
                                     <i class="fas fa-list mr-2"></i>
                                     Lihat Pesanan Aktif
                                 </a>
@@ -228,17 +207,17 @@
 
                 <!-- Summary Cards -->
                 @if($completedOrders->count() > 0)
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white rounded-xl shadow-md p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <div class="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                                <div class="h-12 w-12 bg-gradient-to-r from-orange-100 to-orange-200 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-orange-600 text-xl"></i>
                                 </div>
                             </div>
                             <div class="ml-4">
                                 <h3 class="text-sm font-medium text-gray-900">Total Pengiriman Selesai</h3>
-                                <p class="text-2xl font-bold text-green-600">{{ $completedOrders->total() }}</p>
+                                <p class="text-2xl font-bold text-orange-600">{{ $completedOrders->total() }}</p>
                             </div>
                         </div>
                     </div>
@@ -246,29 +225,15 @@
                     <div class="bg-white rounded-xl shadow-md p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <div class="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-calendar text-blue-600 text-xl"></i>
+                                <div class="h-12 w-12 bg-gradient-to-r from-orange-100 to-orange-200 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-calendar text-orange-600 text-xl"></i>
                                 </div>
                             </div>
                             <div class="ml-4">
                                 <h3 class="text-sm font-medium text-gray-900">Bulan Ini</h3>
-                                <p class="text-2xl font-bold text-blue-600">
+                                <p class="text-2xl font-bold text-orange-600">
                                     {{ $completedOrders->where('updated_at', '>=', now()->startOfMonth())->count() }}
                                 </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <div class="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-star text-yellow-600 text-xl"></i>
-                                </div>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-sm font-medium text-gray-900">Rating Rata-rata</h3>
-                                <p class="text-2xl font-bold text-yellow-600">4.8</p>
                             </div>
                         </div>
                     </div>

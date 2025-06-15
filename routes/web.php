@@ -42,7 +42,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [DeliveryController::class, 'dashboard'])->name('dashboard');
         Route::get('/orders', [DeliveryController::class, 'orders'])->name('orders');
         Route::get('/orders/{id}', [DeliveryController::class, 'orderDetail'])->name('order-detail');
-        Route::patch('/orders/{id}/status', [DeliveryController::class, 'updateOrderStatus'])->name('update-status');
+        Route::patch('/orders/{id}/update-status', [DeliveryController::class, 'updateOrderStatus'])->name('update-status');
         Route::get('/profile', [DeliveryController::class, 'profile'])->name('profile');
         Route::get('/profile/edit', [DeliveryController::class, 'editProfile'])->name('edit-profile');
         Route::patch('/profile', [DeliveryController::class, 'updateProfile'])->name('update-profile');
