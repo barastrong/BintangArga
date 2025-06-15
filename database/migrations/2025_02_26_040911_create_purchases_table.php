@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('quantity');
             $table->decimal('total_price', 12, 2);
             $table->string('status')->default('pending', 'processing', 'completed', 'canceled');
+            $table->string('status_pengiriman')->default('picked_up', 'shipped', 'delivered', 'canceled');
             $table->string('payment_method');
             $table->string('payment_status')->default('unpaid','paid');
             $table->string('shipping_address');
