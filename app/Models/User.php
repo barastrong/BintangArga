@@ -65,4 +65,8 @@ class User extends Authenticatable
     {
         return $this->seller()->exists();
     }
+    public function delivery()
+    {
+        return $this->hasOne(Delivery::class);
+    }
 }

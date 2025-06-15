@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SocialAuthController;
 
@@ -24,6 +25,7 @@ Route::get('/category/{categoryId}', [ProductController::class, 'category'])->na
 Route::get('/api/cities/{province}', [LocationController::class, 'getCities'])->name('api.cities');
 
 Route::middleware(['auth'])->group(function () {
+
     Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
     Route::post('/seller/register', [SellerController::class, 'store'])->name('seller.store');
     Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
@@ -33,6 +35,19 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/seller/{id}', [SellerController::class, 'destroy'])->name('seller.destroy');
     Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
     Route::put('/seller/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.update-status');
+
+    Route::prefix('delivery')->name('delivery.')->group(function(){
+        Route::get('/register', [DeliveryController::class, 'register'])->name('register');
+        Route::post('/register', [DeliveryController::class, 'storeRegister'])->name('register.store');
+        Route::get('/dashboard', [DeliveryController::class, 'dashboard'])->name('dashboard');
+        Route::get('/orders', [DeliveryController::class, 'orders'])->name('orders');
+        Route::get('/orders/{id}', [DeliveryController::class, 'orderDetail'])->name('order-detail');
+        Route::patch('/orders/{id}/status', [DeliveryController::class, 'updateOrderStatus'])->name('update-status');
+        Route::get('/profile', [DeliveryController::class, 'profile'])->name('profile');
+        Route::get('/profile/edit', [DeliveryController::class, 'editProfile'])->name('edit-profile');
+        Route::patch('/profile', [DeliveryController::class, 'updateProfile'])->name('update-profile');
+        Route::get('/history', [DeliveryController::class, 'history'])->name('history');
+    });
     
     Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');

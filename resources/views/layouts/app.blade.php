@@ -18,7 +18,6 @@
     <body class="font-sans antialiased bg-gray-50">
         <div class="flex flex-col min-h-screen">
             <!-- Navigation -->
-            {{-- Menambahkan x-data untuk state burger menu --}}
             <nav x-data="{ open: false }" class="bg-white shadow-sm sticky top-0 z-50">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
@@ -59,6 +58,13 @@
                                         </span>
                                     </a>
                                     <a href="{{ route('seller.dashboard') }}" class="text-gray-600 hover:text-gray-900"><i class="fas fa-store text-xl"></i></a>
+
+                                    @if(Auth::user()->role === 'user' || Auth::user()->role === 'admin')
+                                        <a href="{{ route('delivery.dashboard') }}" class="text-gray-600 hover:text-gray-900" title="Delivery Dashboard">
+                                            <i class="fas fa-truck text-xl"></i>
+                                        </a>
+                                    @endif
+
                                     @if (Auth::user()->role === 'admin')
                                         <a href="{{ route('admin.index') }}" class="text-gray-600 hover:text-gray-900"><i class="fas fa-user-shield text-xl"></i></a>
                                     @endif

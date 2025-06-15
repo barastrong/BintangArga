@@ -6,6 +6,7 @@ use App\Models\Purchase;
 use App\Models\Product;
 use App\Models\Size;
 use App\Models\Rating;
+use App\Models\Delivery; // Tambahkan ini
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class PurchaseController extends Controller
     public function index()
     {
         $purchases = Auth::user()->purchases()
-        ->with(['product', 'size'])
+        ->with(['product', 'size', 'delivery']) // Tambahkan delivery
         ->orderBy('created_at', 'desc')
         ->get();
             
@@ -178,6 +179,8 @@ class PurchaseController extends Controller
         if (Auth::id() !== $purchase->user_id) {
             abort(403, 'Unauthorized action.');
         }
+        $purchase->load('delivery');
+        
         return view('purchases.show', compact('purchase'));
     }
 
@@ -238,7 +241,8 @@ class PurchaseController extends Controller
 
             // Update status to completed
             $purchase->update([
-                'status' => 'completed'
+                'status' => 'completed',
+                'delivered_at' => now()
             ]);
 
             DB::commit();
@@ -487,6 +491,12 @@ class PurchaseController extends Controller
                 
                 $seller_id = $item->product->seller_id;
                 
+                // Assign random delivery (Tambahan ini)
+                $randomDelivery = Delivery::getRandomDelivery();
+                if (!$randomDelivery) {
+                    throw new \Exception("Tidak ada delivery yang tersedia saat ini");
+                }
+                
                 // Reduce stock when processing checkout
                 $item->size->update([
                     'stock' => $item->size->stock - $newQuantity
@@ -508,7 +518,9 @@ class PurchaseController extends Controller
                     'total_price' => $totalWithTax, // Now includes tax
                     'payment_method' => $request->payment_method,
                     'payment_status' => 'paid',
-                    'seller_id' => $seller_id
+                    'seller_id' => $seller_id,
+                    'delivery_id' => $randomDelivery->id, // Assign random delivery
+                    'assigned_to_delivery_at' => now()
                 ]);
                 
                 // Store the first item for redirection
@@ -521,7 +533,7 @@ class PurchaseController extends Controller
             
             if ($firstProcessedItem) {
                 return redirect()->route('purchases.show', $firstProcessedItem)
-                    ->with('success', 'Pesanan berhasil diproses');
+                    ->with('success', 'Pesanan berhasil diproses dan telah ditetapkan delivery: ' . $firstProcessedItem->delivery->nama);
             } else {
                 return redirect()->route('purchases.index')
                     ->with('success', 'Pesanan berhasil diproses');

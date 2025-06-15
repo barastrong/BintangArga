@@ -13,6 +13,7 @@ class Purchase extends Model
         'user_id',
         'product_id',
         'size_id',
+        'delivery_id',
         'quantity',
         'total_price',
         'status',
@@ -28,6 +29,11 @@ class Purchase extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function delivery()
+    {
+        return $this->belongsTo(Delivery::class);
     }
     
     public function seller()

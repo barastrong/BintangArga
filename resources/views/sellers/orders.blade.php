@@ -229,7 +229,7 @@
                                                     Transfer Bank
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                                     <i class="fas fa-clock mr-1"></i>
                                                     Pending
                                                 </span>
