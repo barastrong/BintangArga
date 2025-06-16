@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard')</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         [x-cloak] { display: none !important; }
@@ -256,6 +256,22 @@
                                 <i class="fas fa-shopping-cart"></i>
                             </span>
                             <span class="font-medium">Purchases</span>
+                        </a>
+                        
+                        <a href="{{ route('admin.sellers') }}" 
+                           class="nav-link {{ request()->routeIs('admin.sellers') ? 'active bg-orange-50 text-orange-900 border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200">
+                            <span class="nav-icon mr-4 {{ request()->routeIs('admin.sellers') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                                <i class="fas fa-store"></i>
+                            </span>
+                            <span class="font-medium">Seller</span>
+                        </a>
+
+                        <a href="{{ route('admin.deliveries') }}" 
+                           class="nav-link {{ request()->routeIs('admin.deliveries') ? 'active bg-orange-50 text-orange-900 border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200">
+                            <span class="nav-icon mr-4 {{ request()->routeIs('admin.deliveries') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600' }}">
+                                <i class="fas fa-truck"></i>
+                            </span>
+                            <span class="font-medium">Delivery Panel</span>
                         </a>
                     </nav>
                 </div>

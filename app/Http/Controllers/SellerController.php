@@ -34,6 +34,7 @@ class SellerController extends Controller
             'nama_penjual' => 'required|string|max:255',
             'email_penjual' => 'required|email|unique:sellers,email_penjual',
             'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'no_telepon' => 'nullable|string|max:15',
         ]);
 
         // Check if user already has a seller profile
@@ -238,7 +239,7 @@ class SellerController extends Controller
         }
         
         // If admin deleted a profile, redirect to admin dashboard or sellers list
-        return redirect()->route('sellers.index')
+        return redirect()->route('sellers.dashboard')
             ->with('success', 'Profil penjual berhasil dihapus');
     }
 

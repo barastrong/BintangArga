@@ -90,9 +90,6 @@
                             <img src="{{ asset('storage/' . $purchase->size->gambar_size) }}" 
                                  alt="{{ $purchase->product->nama_barang }}" 
                                  class="w-32 h-32 lg:w-40 lg:h-40 rounded-xl object-cover shadow-lg border border-gray-200">
-                            <!-- <div class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
-                                {{ $purchase->quantity }}x
-                            </div> -->
                         </div>
                     </div>
                     
@@ -178,6 +175,17 @@
                                 <p class="text-sm text-gray-500">Nomor Seri Kurir</p>
                                 <p class="font-mono text-sm bg-gray-100 px-3 py-1 rounded-lg font-semibold text-gray-800">
                                     {{ $purchase->delivery->delivery_serial }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-route text-white"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">Status Pengiriman</p>
+                                <p class="font-semibold text-gray-800 capitalize">
+                                {{ $purchase->status_pengiriman ?? 'Belum ada info' }}
                                 </p>
                             </div>
                         </div>

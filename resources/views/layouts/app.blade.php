@@ -57,7 +57,7 @@
                                             {{ Auth::check() ? Auth::user()->purchases()->where('status', 'keranjang')->count(): '0' }}
                                         </span>
                                     </a>
-                                    <a href="{{ route('seller.dashboard') }}" class="text-gray-600 hover:text-gray-900"><i class="fas fa-store text-xl"></i></a>
+                                    <a href="{{ route('seller.dashboard') }}" class="text-gray-600 hover:text-gray-900"> <i class="fas fa-store text-xl"></i> </a>
 
                                     @if(Auth::user()->role === 'user' || Auth::user()->role === 'admin')
                                         <a href="{{ route('delivery.dashboard') }}" class="text-gray-600 hover:text-gray-900" title="Delivery Dashboard">

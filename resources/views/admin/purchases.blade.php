@@ -33,10 +33,14 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Shipping Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchase Type</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
@@ -46,9 +50,14 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $purchase->id }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">{{ $purchase->user->name ?? 'Unknown' }}</div>
+                                        <div class="text-sm text-gray-500">{{ $purchase->phone_number ?? 'No Phone' }}</div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900">{{ $purchase->product->nama_barang ?? 'Unknown' }}</div>
+                                        <div class="text-sm text-gray-500">{{ $purchase->seller->nama_penjual ?? 'No Seller' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $purchase->size->size ?? 'No Size' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $purchase->quantity }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp {{ number_format($purchase->total_price, 0, ',', '.') }}</td>
@@ -56,7 +65,7 @@
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             @if($purchase->status == 'pending') bg-yellow-100 text-yellow-800 
                                             @elseif($purchase->status == 'process') bg-blue-100 text-blue-800 
-                                            @elseif($purchase->status == 'keranjang') bg-orange-100 text-orange-800 
+                                            @elseif($purchase->status == 'dikirim') bg-indigo-100 text-indigo-800 
                                             @elseif($purchase->status == 'completed') bg-green-100 text-green-800 
                                             @elseif($purchase->status == 'selesai') bg-green-100 text-green-800 
                                             @elseif($purchase->status == 'cancelled') bg-red-100 text-red-800 
@@ -66,11 +75,34 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            @if($purchase->status_pengiriman == 'pending') bg-yellow-100 text-yellow-800 
+                                            @elseif($purchase->status_pengiriman == 'picked_up') bg-blue-100 text-blue-800 
+                                            @elseif($purchase->status_pengiriman == 'shipping') bg-indigo-100 text-indigo-800 
+                                            @elseif($purchase->status_pengiriman == 'delivered') bg-green-100 text-green-800 
+                                            @else bg-gray-100 text-gray-800 @endif">
+                                            {{ ucfirst(str_replace('_', ' ', $purchase->status_pengiriman ?? 'pending')) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                            {{ ucfirst(str_replace('_', ' ', $purchase->payment_method ?? 'Unknown')) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                             @if($purchase->payment_status == 'unpaid') bg-yellow-100 text-yellow-800 
                                             @elseif($purchase->payment_status == 'paid') bg-green-100 text-green-800 
                                             @elseif($purchase->payment_status == 'failed') bg-red-100 text-red-800 
                                             @else bg-gray-100 text-gray-800 @endif">
                                             {{ ucfirst($purchase->payment_status) }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            @if($purchase->status_pembelian == 'keranjang') bg-orange-100 text-orange-800 
+                                            @elseif($purchase->status_pembelian == 'beli') bg-green-100 text-green-800 
+                                            @else bg-gray-100 text-gray-800 @endif">
+                                            {{ ucfirst($purchase->status_pembelian ?? 'beli') }}
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -86,7 +118,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="px-6 py-4 text-center text-gray-500">No purchases found</td>
+                                    <td colspan="12" class="px-6 py-4 text-center text-gray-500">No purchases found</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -204,28 +236,45 @@
                     // Determine status class
                     let statusClass = '';
                     if (purchase.status === 'pending') statusClass = 'bg-yellow-100 text-yellow-800';
-                    else if (purchase.status === 'processing') statusClass = 'bg-blue-100 text-blue-800';
-                    else if (purchase.status === 'shipped') statusClass = 'bg-indigo-100 text-indigo-800';
-                    else if (purchase.status === 'delivered') statusClass = 'bg-green-100 text-green-800';
+                    else if (purchase.status === 'process') statusClass = 'bg-blue-100 text-blue-800';
+                    else if (purchase.status === 'dikirim') statusClass = 'bg-indigo-100 text-indigo-800';
+                    else if (purchase.status === 'completed') statusClass = 'bg-green-100 text-green-800';
                     else if (purchase.status === 'cancelled') statusClass = 'bg-red-100 text-red-800';
                     else statusClass = 'bg-gray-100 text-gray-800';
 
+                    // Determine shipping status class
+                    let shippingStatusClass = '';
+                    if (purchase.status_pengiriman === 'pending') shippingStatusClass = 'bg-yellow-100 text-yellow-800';
+                    else if (purchase.status_pengiriman === 'picked_up') shippingStatusClass = 'bg-blue-100 text-blue-800';
+                    else if (purchase.status_pengiriman === 'shipping') shippingStatusClass = 'bg-indigo-100 text-indigo-800';
+                    else if (purchase.status_pengiriman === 'delivered') shippingStatusClass = 'bg-green-100 text-green-800';
+                    else shippingStatusClass = 'bg-gray-100 text-gray-800';
+
                     // Determine payment status class
                     let paymentStatusClass = '';
-                    if (purchase.payment_status === 'pending') paymentStatusClass = 'bg-yellow-100 text-yellow-800';
+                    if (purchase.payment_status === 'unpaid') paymentStatusClass = 'bg-yellow-100 text-yellow-800';
                     else if (purchase.payment_status === 'paid') paymentStatusClass = 'bg-green-100 text-green-800';
                     else if (purchase.payment_status === 'failed') paymentStatusClass = 'bg-red-100 text-red-800';
                     else paymentStatusClass = 'bg-gray-100 text-gray-800';
+
+                    // Determine purchase type class
+                    let purchaseTypeClass = '';
+                    if (purchase.status_pembelian === 'keranjang') purchaseTypeClass = 'bg-orange-100 text-orange-800';
+                    else if (purchase.status_pembelian === 'beli') purchaseTypeClass = 'bg-green-100 text-green-800';
+                    else purchaseTypeClass = 'bg-gray-100 text-gray-800';
                     
                     tableContent += `
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${purchase.id}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">${purchase.user_name}</div>
+                                <div class="text-sm text-gray-500">${purchase.phone_number || 'No Phone'}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">${purchase.product_name}</div>
+                                <div class="text-sm text-gray-500">${purchase.seller_name || 'No Seller'}</div>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${purchase.size_name || 'No Size'}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${purchase.quantity}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Rp ${new Intl.NumberFormat('id-ID').format(purchase.total_price)}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -234,14 +283,28 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${shippingStatusClass}">
+                                    ${(purchase.status_pengiriman || 'pending').replace('_', ' ').charAt(0).toUpperCase() + (purchase.status_pengiriman || 'pending').replace('_', ' ').slice(1)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                    ${(purchase.payment_method || 'Unknown').replace('_', ' ').charAt(0).toUpperCase() + (purchase.payment_method || 'Unknown').replace('_', ' ').slice(1)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${paymentStatusClass}">
                                     ${purchase.payment_status.charAt(0).toUpperCase() + purchase.payment_status.slice(1)}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${purchaseTypeClass}">
+                                    ${(purchase.status_pembelian || 'beli').charAt(0).toUpperCase() + (purchase.status_pembelian || 'beli').slice(1)}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
                                     <a href="/admin/purchases/${purchase.id}" class="text-blue-600 hover:text-orange-900">View</a>
-                                    <a href="/admin/purchases/${purchase.id}/edit" class="text-green-600 hover:text-green-900">Edit</a>
                                     <form action="/admin/purchases/${purchase.id}" method="POST" onsubmit="return confirm('Are you sure you want to delete this purchase?');" class="inline">
                                         @csrf
                                         @method('DELETE')

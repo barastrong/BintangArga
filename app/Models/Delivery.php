@@ -43,9 +43,13 @@ class Delivery extends Model
         return $serial;
     }
 
-    // Get random delivery
     public static function getRandomDelivery()
     {
         return self::inRandomOrder()->first();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

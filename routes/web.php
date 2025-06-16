@@ -56,20 +56,26 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware('auth', 'verified')->group(function () {
-    Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');
-    Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store');
-    Route::get('/purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-    Route::post('/purchase/{purchase}/rate', [PurchaseController::class, 'rate'])->name('purchases.rate');
-    Route::patch('/purchases/{purchase}/complete', [PurchaseController::class, 'complete'])->name('purchases.complete');
-    Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
-    
-    Route::get('/cart', [PurchaseController::class, 'viewCart'])->name('cart.index');
-    Route::post('/cart/update/{purchase}', [PurchaseController::class, 'updateCartItem'])->name('cart.update');
-    Route::delete('/cart/remove/{purchase}', [PurchaseController::class, 'removeFromCart'])->name('cart.remove');
-    Route::match(['get','post'],'/cart/checkout', [PurchaseController::class, 'checkoutFromCart'])->name('cart.checkout');
-    Route::post('/cart/process', [PurchaseController::class, 'processCheckout'])->name('cart.process');
-    Route::get('/cart/count', [PurchaseController::class, 'getCartCount'])->name('cart.count');
-    Route::post('/cart/cancel-direct-purchase', [PurchaseController::class, 'cancelDirectPurchase'])->name('cart.cancel-direct-purchase');
+    Route::prefix('purchase')->name('purchases.')->group(function() {
+        Route::get('/purchase', [PurchaseController::class, 'index'])->name('index');
+        Route::post('/store', [PurchaseController::class, 'store'])->name('store');
+        Route::get('/{purchase}', [PurchaseController::class, 'show'])->name('show');
+        Route::post('/{purchase}/rate', [PurchaseController::class, 'rate'])->name('rate');
+        Route::patch('/{purchase}/complete', [PurchaseController::class, 'complete'])->name('complete');
+        Route::post('/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('cancel');
+    });
+    Route::prefix('cart')->name('cart.')->group(function() {
+        Route::get('/', [PurchaseController::class, 'viewCart'])->name('index');
+        Route::post('/update/{purchase}', [PurchaseController::class, 'updateCartItem'])->name('update');
+        Route::delete('/remove/{purchase}', [PurchaseController::class, 'removeFromCart'])->name('remove');
+        Route::match(['get','post'],'/checkout', [PurchaseController::class, 'checkoutFromCart'])->name('checkout');
+        Route::post('/process', [PurchaseController::class, 'processCheckout'])->name('process');
+        Route::get('/count', [PurchaseController::class, 'getCartCount'])->name('count');
+        Route::post('/cancel-direct-purchase', [PurchaseController::class, 'cancelDirectPurchase'])->name('cancel-direct-purchase');    
+    });
+
+    Route::prefix('cart')->name('cart.')->group(function() {    
+    });
 
     Route::get('/profile-index', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -78,18 +84,28 @@ Route::middleware('auth', 'verified')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
-    Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
-    Route::get('/admin/products/search', [ProductController::class, 'searchProduct'])->name('admin.products.search');
-    Route::get('/admin/users/search', [AdminController::class, 'searchUsers'])->name('admin.users.search');
-    Route::get('/admin/users/{id}', [AdminController::class, 'viewUser'])->name('admin.users.view');
-    Route::get('/admin/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
-    Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
-    Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete'); 
-    Route::get('/admin/purchases', [AdminController::class, 'purchases'])->name('admin.purchases');
-    Route::get('/admin/purchases/{id}', [AdminController::class, 'viewPurchase'])->name('admin.purchases.view');
-    Route::delete('/admin/purchases/{id}', [AdminController::class, 'deletePurchase'])->name('admin.purchases.delete');
-    Route::get('/admin/purchases/search', [AdminController::class, 'searchPurchases'])->name('admin.purchases.search');
+    Route::prefix('admin')->name('admin.')->group(function() {
+        Route::get('/', [AdminController::class, 'index'])->name('index');
+        Route::get('/products', [AdminController::class, 'products'])->name('products');
+        Route::get('/products/search', [ProductController::class, 'searchProduct'])->name('products.search');
+        Route::get('/users/search', [AdminController::class, 'searchUsers'])->name('users.search');
+        Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('users.view');
+        Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('users.edit');
+        Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('users.update');
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('users.delete'); 
+        Route::get('/purchases', [AdminController::class, 'purchases'])->name('purchases');
+        Route::get('/purchases/{id}', [AdminController::class, 'viewPurchase'])->name('purchases.view');
+        Route::delete('/purchases/{id}', [AdminController::class, 'deletePurchase'])->name('purchases.delete');
+        Route::get('/purchases/search', [AdminController::class, 'searchPurchases'])->name('purchases.search');
+        Route::get('/sellers', [AdminController::class, 'sellers'])->name('sellers');
+        Route::get('/sellers/{id}', [AdminController::class, 'viewSeller'])->name('sellers.view');
+        Route::get('/sellers/search', [AdminController::class, 'searchSellers'])->name('sellers.search');
+        Route::delete('/sellers/{id}', [AdminController::class, 'deleteSeller'])->name('sellers.delete');
+        Route::get('/deliveries', [AdminController::class, 'deliveries'])->name('deliveries');
+        Route::get('/deliveries/{id}', [AdminController::class, 'viewDelivery'])->name('deliveries.view');
+        Route::get('/deliveries/search', [AdminController::class, 'searchDeliveries'])->name('deliveries.search');
+        Route::delete('/deliveries/{id}', [AdminController::class, 'deleteDelivery'])->name('deliveries.delete');
+    });
 });
 
 require __DIR__.'/auth.php';
