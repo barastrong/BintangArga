@@ -26,15 +26,17 @@ Route::get('/api/cities/{province}', [LocationController::class, 'getCities'])->
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
-    Route::post('/seller/register', [SellerController::class, 'store'])->name('seller.store');
-    Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
-    Route::get('/seller/edit', [SellerController::class, 'edit'])->name('seller.edit');
-    Route::put('/seller/update', [SellerController::class, 'update'])->name('seller.update');
-    Route::get('/seller/products', [SellerController::class, 'products'])->name('seller.products');
-    Route::delete('/seller/{id}', [SellerController::class, 'destroy'])->name('seller.destroy');
-    Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
-    Route::put('/seller/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.update-status');
+    Route::prefix('seller')->name('seller.')->group(function() {
+        Route::get('/register', [SellerController::class, 'create'])->name('register');
+        Route::post('/register', [SellerController::class, 'store'])->name('store');
+        Route::get('/dashboard', [SellerController::class, 'dashboard'])->name('dashboard');
+        Route::get('/edit', [SellerController::class, 'edit'])->name('edit');
+        Route::put('/update', [SellerController::class, 'update'])->name('update');
+        Route::get('/products', [SellerController::class, 'products'])->name('products');
+        Route::delete('/{id}', [SellerController::class, 'destroy'])->name('destroy');
+        Route::get('/orders', [SellerController::class, 'orders'])->name('orders');
+        Route::put('/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('orders.update-status');
+    });
 
     Route::prefix('delivery')->name('delivery.')->group(function(){
         Route::get('/register', [DeliveryController::class, 'register'])->name('register');
@@ -48,6 +50,7 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/profile', [DeliveryController::class, 'updateProfile'])->name('update-profile');
         Route::get('/history', [DeliveryController::class, 'history'])->name('history');
     });
+    
     
     Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
     Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
@@ -74,13 +77,12 @@ Route::middleware('auth', 'verified')->group(function () {
         Route::post('/cancel-direct-purchase', [PurchaseController::class, 'cancelDirectPurchase'])->name('cancel-direct-purchase');    
     });
 
-    Route::prefix('cart')->name('cart.')->group(function() {    
+    Route::prefix('profile')->name('profile.')->group(function() {    
+        Route::get('-index', [ProfileController::class, 'index'])->name('index');
+        Route::get('-edit', [ProfileController::class, 'edit'])->name('edit');
+        Route::patch('-update', [ProfileController::class, 'update'])->name('update');
+        Route::delete('-destroy', [ProfileController::class, 'destroy'])->name('destroy');
     });
-
-    Route::get('/profile-index', [ProfileController::class, 'index'])->name('profile.index');
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {

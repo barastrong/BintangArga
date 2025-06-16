@@ -2,8 +2,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\UserResource;
-use App\Http\Resources\UserCollection;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -17,7 +15,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return new UserCollection($users);
+        return response()->json($users);
     }
 
     /**
@@ -39,7 +37,7 @@ class UserController extends Controller
             'role' => $validated['role'],
         ]);
 
-        return new UserResource($user);
+        return response()->json($user, 201);
     }
 
     /**
@@ -47,16 +45,14 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return new UserResource($user);
+        return response()->json($user);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        $user = User::findOrFail($id);
-        
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'email' => [
@@ -76,21 +72,19 @@ class UserController extends Controller
         }
 
         $user->update($validated);
-        $user->refresh();
 
-        return new UserResource($user);
+        return response()->json($user);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::findOrFail($id);
         $user->delete();
+        
         return response()->json([
-            'message' => 'User deleted successfully',
-            'user' => new UserResource($user)
+            'message' => 'User deleted successfully'
         ]);
     }
 }

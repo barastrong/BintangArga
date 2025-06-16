@@ -17,14 +17,17 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Product API routes
-Route::get('/products', [ProductApiController::class, 'index']);
-Route::post('/products/store', [ProductApiController::class, 'store']);
-Route::get('/products/show/{id}', [ProductApiController::class, 'show']);
-Route::delete('/products/delete/{id}', [ProductApiController::class, 'destroy']);
+Route::prefix('products')->group(function(){
+    Route::get('/', [ProductApiController::class, 'index']);
+    Route::post('/store', [ProductApiController::class, 'store']);
+    Route::get('/show/{id}', [ProductApiController::class, 'show']);
+    Route::delete('/delete/{id}', [ProductApiController::class, 'destroy']);
+});
 
-Route::get('/users', [UserController::class, 'index']);
-Route::post('/users/store', [UserController::class, 'store']);
-Route::get('/users/show/{id}', [UserController::class, 'show']);
-Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
-Route::put('/users/update/{id}', [UserController::class, 'update']);
+Route::prefix('users')->group(function(){
+    Route::get('/', [UserController::class, 'index']);
+    Route::post('/store', [UserController::class, 'store']);
+    Route::get('/show/{user}', [UserController::class, 'show']);
+    Route::delete('/delete/{user}', [UserController::class, 'destroy']);
+    Route::put('/update/{user}', [UserController::class, 'update']);
+});
