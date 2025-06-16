@@ -15,7 +15,7 @@
                     <p class="text-lg text-gray-600">Kelola semua pesanan yang perlu dikirim</p>
                 </div>
                 <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-                    <button onclick="refreshOrders()" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
+                    <button onclick="refreshOrders()" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5">
                         <i class="fas fa-sync-alt mr-2"></i>
                         <span class="font-medium">Refresh</span>
                     </button>
@@ -37,7 +37,7 @@
                     <div class="border-b border-gray-200">
                         <nav class="-mb-px flex flex-wrap gap-2 lg:gap-8">
                             <a href="{{ route('delivery.orders') }}" 
-                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'all' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
+                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'all' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
                                 <div class="flex items-center space-x-2">
                                     <i class="fas fa-list"></i>
                                     <span>Semua</span>
@@ -45,32 +45,32 @@
                                 </div>
                             </a>
                             <a href="{{ route('delivery.orders', ['status_pengiriman' => 'picked_up']) }}" 
-                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'picked_up' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
+                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'picked_up' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
                                 <div class="flex items-center space-x-2">
-                                    <i class="fas fa-hand-holding-box"></i>
+                                    <i class="fas fa-box-open"></i>
                                     <span>Diambil</span>
-                                    <span class="bg-blue-100 text-blue-900 py-1 px-3 rounded-full text-xs font-semibold">
-                                        {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status', 'picked_up')->count() }}
+                                    <span class="bg-orange-100 text-orange-900 py-1 px-3 rounded-full text-xs font-semibold">
+                                        {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status_pengiriman', 'picked_up')->count() }}
                                     </span>
                                 </div>
                             </a>
                             <a href="{{ route('delivery.orders', ['status_pengiriman' => 'shipping']) }}" 
-                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'shipping' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
+                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'shipping' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
                                 <div class="flex items-center space-x-2">
                                     <i class="fas fa-truck"></i>
                                     <span>Dalam Pengiriman</span>
                                     <span class="bg-yellow-100 text-yellow-900 py-1 px-3 rounded-full text-xs font-semibold">
-                                        {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status', 'shipping')->count() }}
+                                        {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status_pengiriman', 'shipping')->count() }}
                                     </span>
                                 </div>
                             </a>
                             <a href="{{ route('delivery.orders', ['status_pengiriman' => 'delivered']) }}" 
-                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'delivered' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
+                               class="group py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition-all duration-200 {{ $status == 'delivered' ? 'border-orange-500 text-orange-600 bg-orange-50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50' }}">
                                 <div class="flex items-center space-x-2">
                                     <i class="fas fa-check-circle"></i>
                                     <span>Selesai</span>
                                     <span class="bg-green-100 text-green-900 py-1 px-3 rounded-full text-xs font-semibold">
-                                        {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status', 'delivered')->count() }}
+                                        {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status_pengiriman', 'delivered')->count() }}
                                     </span>
                                 </div>
                             </a>
@@ -90,18 +90,18 @@
                                             <!-- Product Header -->
                                             <div class="flex items-center space-x-4 mb-6">
                                                 <div class="w-20 h-20 bg-gradient-to-r from-gray-100 to-gray-200 rounded-xl flex items-center justify-center shadow-md overflow-hidden">
-                                                    @if($order->product->foto_produk)
-                                                        <img src="{{ asset('storage/' . $order->product->foto_produk) }}" 
-                                                             alt="{{ $order->product->nama_produk }}"
+                                                    @if($order->product->gambar)
+                                                        <img src="{{ asset('storage/' . $order->product->gambar) }}" 
+                                                             alt="{{ $order->product->nama_barang }}"
                                                              class="w-full h-full object-cover">
                                                     @else
                                                         <i class="fas fa-box text-gray-400 text-2xl"></i>
                                                     @endif
                                                 </div>
                                                 <div class="flex-1">
-                                                    <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $order->product->nama_produk }}</h3>
+                                                    <h3 class="text-xl font-bold text-gray-900 mb-1">{{ $order->product->nama_barang }}</h3>
                                                     <p class="text-sm text-gray-600 flex items-center mb-1">
-                                                        <i class="fas fa-store mr-2 text-blue-500"></i>
+                                                        <i class="fas fa-store mr-2 text-orange-500"></i>
                                                         {{ $order->seller->nama_penjual ?? 'N/A' }}
                                                     </p>
                                                     <p class="text-xs text-gray-500 flex items-center">
@@ -113,9 +113,9 @@
 
                                             <!-- Customer & Shipping Info -->
                                             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-                                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-200">
+                                                <div class="bg-gradient-to-r from-orange-50 to-orange-100 p-5 rounded-xl border border-orange-200">
                                                     <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
-                                                        <i class="fas fa-user-circle mr-2 text-blue-600"></i>
+                                                        <i class="fas fa-user-circle mr-2 text-orange-600"></i>
                                                         Informasi Pelanggan
                                                     </h4>
                                                     <div class="space-y-2">
@@ -160,8 +160,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center space-x-2">
-                                                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                            <i class="fas fa-clock text-blue-600 text-xs"></i>
+                                                        <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                                                            <i class="fas fa-clock text-orange-600 text-xs"></i>
                                                         </div>
                                                         <div>
                                                             <p class="text-gray-500 text-xs">Tanggal</p>
@@ -189,16 +189,16 @@
                                                     <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold shadow-md
                                                         @if($order->status_pengiriman == 'delivered') bg-gradient-to-r from-green-500 to-green-600 text-white
                                                         @elseif($order->status_pengiriman == 'shipping') bg-gradient-to-r from-yellow-500 to-yellow-600 text-white
-                                                        @elseif($order->status_pengiriman == 'picked_up') bg-gradient-to-r from-blue-500 to-blue-600 text-white
+                                                        @elseif($order->status_pengiriman == 'picked_up') bg-gradient-to-r from-orange-500 to-orange-600 text-white
                                                         @else bg-gradient-to-r from-gray-500 to-gray-600 text-white @endif">
                                                         @if($order->status_pengiriman == 'delivered') 
                                                             <i class="fas fa-check-circle mr-2"></i>Selesai
                                                         @elseif($order->status_pengiriman == 'shipping') 
                                                             <i class="fas fa-truck mr-2"></i>Dalam Pengiriman
                                                         @elseif($order->status_pengiriman == 'picked_up') 
-                                                            <i class="fas fa-hand-holding-box mr-2"></i>Diambil
+                                                            <i class="fas fa-box-open"></i>Diambil
                                                         @else 
-                                                            <i class="fas fa-clock mr-2"></i>{{ ucfirst($order->status) }}
+                                                            <i class="fas fa-clock mr-2"></i>{{ ucfirst($order->status_pengiriman) }}
                                                         @endif
                                                     </span>
                                                 </div>
@@ -206,25 +206,49 @@
                                                 <!-- Action Buttons -->
                                                 <div class="space-y-3">
                                                     <a href="{{ route('delivery.order-detail', $order->id) }}" 
-                                                       class="flex items-center justify-center w-full bg-white hover:bg-gray-50 text-gray-800 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 border border-gray-200 hover:border-gray-300 shadow-sm">
+                                                    class="flex items-center justify-center w-full bg-white hover:bg-gray-50 text-gray-800 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 border border-gray-200 hover:border-gray-300 shadow-sm">
                                                         <i class="fas fa-eye mr-2"></i>Lihat Detail
                                                     </a>
 
                                                     @if($order->status_pengiriman == 'picked_up')
-                                                        <button onclick="updateStatus({{ $order->id }}, 'shipping')" 
-                                                                class="flex items-center justify-center w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                                                            <i class="fas fa-truck mr-2"></i>Mulai Kirim
-                                                        </button>
+                                                        <form action="{{ route('delivery.update-status', $order->id) }}" method="POST" class="w-full">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="status_pengiriman" value="shipping">
+                                                            <button type="submit" 
+                                                                    onclick="return confirm('Apakah Anda yakin akan memulai pengiriman pesanan ini?')"
+                                                                    class="flex items-center justify-center w-full bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                                                <i class="fas fa-truck mr-2"></i>Mulai Kirim
+                                                            </button>
+                                                        </form>
                                                     @elseif($order->status_pengiriman == 'shipping')
-                                                        <button onclick="updateStatus({{ $order->id }}, 'delivered')" 
-                                                                class="flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                                                            <i class="fas fa-check mr-2"></i>Tandai Selesai
-                                                        </button>
+                                                        <form action="{{ route('delivery.update-status', $order->id) }}" method="POST" class="w-full">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="status_pengiriman" value="delivered">
+                                                            <button type="submit" 
+                                                                    onclick="return confirm('Apakah Anda yakin pesanan sudah diterima pelanggan?')"
+                                                                    class="flex items-center justify-center w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                                                <i class="fas fa-check mr-2"></i>Tandai Selesai
+                                                            </button>
+                                                        </form>
+                                                    @elseif($order->status_pengiriman != 'delivered')
+                                                        <!-- Jika status bukan picked_up, shipping, atau delivered, tampilkan tombol pickup -->
+                                                        <form action="{{ route('delivery.update-status', $order->id) }}" method="POST" class="w-full">
+                                                            @csrf
+                                                            @method('PATCH')
+                                                            <input type="hidden" name="status_pengiriman" value="picked_up">
+                                                            <button type="submit" 
+                                                                    onclick="return confirm('Apakah Anda yakin akan mengambil pesanan ini?')"
+                                                                    class="flex items-center justify-center w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                                                <i class="fas fa-hand-holding-box mr-2"></i>Ambil Pesanan
+                                                            </button>
+                                                        </form>
                                                     @endif
 
                                                     <!-- Quick Actions -->
                                                     <div class="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200">
-                                                        <button class="flex items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-700 py-2 px-3 rounded-lg text-xs font-medium transition-colors">
+                                                        <button class="flex items-center justify-center bg-orange-100 hover:bg-orange-200 text-orange-700 py-2 px-3 rounded-lg text-xs font-medium transition-colors">
                                                             <i class="fas fa-phone mr-1"></i>Call
                                                         </button>
                                                         <button class="flex items-center justify-center bg-purple-100 hover:bg-purple-200 text-purple-700 py-2 px-3 rounded-lg text-xs font-medium transition-colors">
@@ -259,7 +283,7 @@
                             @endif
                         </p>
                         <div class="mt-6">
-                            <a href="{{ route('delivery.dashboard') }}" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors">
+                            <a href="{{ route('delivery.dashboard') }}" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl font-medium transition-colors">
                                 <i class="fas fa-arrow-left mr-2"></i>
                                 Kembali ke Dashboard
                             </a>
@@ -276,12 +300,12 @@
                 <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                     <h3 class="text-lg font-bold text-gray-900 mb-4">Statistik Pesanan</h3>
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                        <div class="flex items-center justify-between p-3 bg-orange-50 rounded-xl">
                             <div class="flex items-center">
-                                <div class="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                                <div class="w-3 h-3 bg-orange-500 rounded-full mr-3"></div>
                                 <span class="text-sm font-medium text-gray-700">Total Hari Ini</span>
                             </div>
-                            <span class="text-lg font-bold text-blue-700">{{ $orders->total() }}</span>
+                            <span class="text-lg font-bold text-orange-700">{{ $orders->total() }}</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-green-50 rounded-xl">
                             <div class="flex items-center">
@@ -289,7 +313,7 @@
                                 <span class="text-sm font-medium text-gray-700">Selesai</span>
                             </div>
                             <span class="text-lg font-bold text-green-700">
-                                {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status', 'delivered')->whereDate('created_at', today())->count() }}
+                                {{ \App\Models\Purchase::where('delivery_id', Auth::user()->delivery->id)->where('status_pengiriman', 'delivered')->whereDate('created_at', today())->count() }}
                             </span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-xl">
@@ -306,91 +330,26 @@
     </div>
 </div>
 
-<!-- Modal Konfirmasi Update Status -->
-<div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-        <div class="p-6">
-            <div class="flex items-center justify-center mb-4">
-                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-question-circle text-blue-600 text-2xl"></i>
-                </div>
-            </div>
-            <div class="text-center">
-                <h3 class="text-xl font-bold text-gray-900 mb-2" id="modalTitle">Konfirmasi Perubahan Status</h3>
-                <p class="text-gray-600" id="modalMessage">Apakah Anda yakin ingin mengubah status pesanan ini?</p>
-            </div>
-        </div>
-        <div class="bg-gray-50 px-6 py-4 rounded-b-2xl flex flex-col sm:flex-row gap-3">
-            <button type="button" onclick="closeModal()" 
-                    class="flex-1 px-4 py-3 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-xl font-medium transition-colors">
-                Batal
-            </button>
-            <button type="button" onclick="confirmUpdate()" 
-                    class="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors shadow-lg">
-                Ya, Ubah Status
-            </button>
+<!-- Success/Error Messages -->
+@if(session('success'))
+    <div id="success-message" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>{{ session('success') }}</span>
         </div>
     </div>
-</div>
+@endif
+
+@if(session('error'))
+    <div id="error-message" class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span>{{ session('error') }}</span>
+        </div>
+    </div>
+@endif
 
 <script>
-let currentOrderId = null;
-let currentStatus = null;
-
-function updateStatus(orderId, status) {
-    currentOrderId = orderId;
-    currentStatus = status;
-    
-    const statusText = {
-        'shipping': 'Mulai Pengiriman',
-        'delivered': 'Selesaikan Pengiriman'
-    };
-    
-    document.getElementById('modalTitle').textContent = statusText[status];
-    document.getElementById('modalMessage').textContent = `Apakah Anda yakin ingin ${statusText[status].toLowerCase()}?`;
-    document.getElementById('confirmModal').classList.remove('hidden');
-    document.getElementById('confirmModal').classList.add('flex');
-}
-
-function confirmUpdate() {
-    if (currentOrderId && currentStatus) {
-        // Submit form untuk update status
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/delivery/orders/${currentOrderId}/status`;
-        
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = 'PATCH';
-        
-        const statusInput = document.createElement('input');
-        statusInput.type = 'hidden';
-        statusInput.name = 'status';
-        statusInput.value = currentStatus;
-        
-        form.appendChild(csrfToken);
-        form.appendChild(methodInput);
-        form.appendChild(statusInput);
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
-    closeModal();
-}
-
-function closeModal() {
-    document.getElementById('confirmModal').classList.add('hidden');
-    document.getElementById('confirmModal').classList.remove('flex');
-    currentOrderId = null;
-    currentStatus = null;
-}
-
 function refreshOrders() {
     // Add loading state
     const refreshBtn = document.querySelector('[onclick="refreshOrders()"]');
@@ -402,6 +361,32 @@ function refreshOrders() {
         window.location.reload();
     }, 1000);
 }
+
+// Show success/error messages
+document.addEventListener('DOMContentLoaded', function() {
+    const successMessage = document.getElementById('success-message');
+    const errorMessage = document.getElementById('error-message');
+    
+    if (successMessage) {
+        setTimeout(() => {
+            successMessage.style.transform = 'translateX(0)';
+        }, 100);
+        
+        setTimeout(() => {
+            successMessage.style.transform = 'translateX(100%)';
+        }, 5000);
+    }
+    
+    if (errorMessage) {
+        setTimeout(() => {
+            errorMessage.style.transform = 'translateX(0)';
+        }, 100);
+        
+        setTimeout(() => {
+            errorMessage.style.transform = 'translateX(100%)';
+        }, 5000);
+    }
+});
 
 // Auto refresh every 60 seconds
 setInterval(() => {
@@ -440,6 +425,31 @@ document.addEventListener('DOMContentLoaded', function() {
         card.style.transform = 'translateY(20px)';
         card.style.transition = 'all 0.6s ease-out';
         observer.observe(card);
+    });
+});
+
+// Form confirmation and loading states
+document.querySelectorAll('form[action*="update-status"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const button = this.querySelector('button[type="submit"]');
+        const originalText = button.innerHTML;
+        
+        // Show loading state
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
+        button.disabled = true;
+        
+        // If user cancels confirmation, restore button
+        setTimeout(() => {
+            if (!this.submitted) {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }, 100);
+        
+        // Mark as submitted when form actually submits
+        this.addEventListener('submit', () => {
+            this.submitted = true;
+        });
     });
 });
 </script>

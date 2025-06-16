@@ -19,13 +19,14 @@ return new class extends Migration
             $table->foreignId('size_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('total_price', 12, 2);
-            $table->string('status')->default('pending', 'processing', 'completed', 'canceled');
-            $table->string('status_pengiriman')->default('picked_up', 'shipped', 'delivered', 'canceled');
+            $table->string('status')->default('pending'); // hanya satu nilai default
+            $table->enum('status_pengiriman', ['pending', 'picked_up', 'shipping', 'delivered'])
+                  ->default('pending');
             $table->string('payment_method');
-            $table->string('payment_status')->default('unpaid','paid');
+            $table->string('payment_status')->default('unpaid'); // satu default
             $table->string('shipping_address');
             $table->string('phone_number');
-            $table->string('description');
+            $table->string('description')->nullable(); // sebaiknya bisa nullable
             $table->enum('status_pembelian', ['beli', 'keranjang'])->default('beli');
             $table->timestamps();
         });

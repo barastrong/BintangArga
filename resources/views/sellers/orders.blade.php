@@ -97,24 +97,24 @@
                     
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
                         <div class="flex items-center">
-                            <div class="p-2 bg-green-100 rounded-lg">
-                                <i class="fas fa-check-circle text-green-600"></i>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm font-medium text-gray-600">Selesai</p>
-                                <p class="text-2xl font-bold text-gray-900">{{ $orders->whereIn('status', ['completed', 'selesai'])->count() }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-                        <div class="flex items-center">
                             <div class="p-2 bg-orange-200 rounded-lg">
                                 <i class="fas fa-truck text-orange-700"></i>
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm font-medium text-gray-600">Dikirim</p>
                                 <p class="text-2xl font-bold text-gray-900">{{ $orders->where('status', 'dikirim')->count() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                        <div class="flex items-center">
+                            <div class="p-2 bg-green-100 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-600">Selesai</p>
+                                <p class="text-2xl font-bold text-gray-900">{{ $orders->whereIn('status', ['completed', 'selesai'])->count() }}</p>
                             </div>
                         </div>
                     </div>
