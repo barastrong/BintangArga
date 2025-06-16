@@ -1,6 +1,5 @@
 <?php
 
-// database/seeders/DeliverySeeder.php
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -74,6 +73,7 @@ class DeliverySeeder extends Seeder
         ];
 
         foreach ($deliveries as $delivery) {
+            $delivery['user_id'] = 5; // pastikan user_id 4 ada di tabel users
             Delivery::create($delivery);
         }
     }

@@ -1,298 +1,146 @@
 @extends('layouts.app')
 
 @section('content')
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi Penjual</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-</head>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #f7f9fa;
-    }
-
-    .registration-container {
-        width: 100%;
-        max-width: 500px;
-        background-color: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        padding: 40px;
-        position: relative;
-        overflow: hidden;
-        margin-left: 37%
-    }
-
-    .registration-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .registration-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: #FF6B35;
-        margin-bottom: 10px;
-    }
-
-    .registration-subtitle {
-        color: #6b7280;
-        font-size: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-        color: #333;
-    }
-
-    .input-wrapper {
-        position: relative;
-    }
-
-    .input-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #FF6B35;
-        opacity: 0.7;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 12px 12px 12px 40px;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 10px;
-        font-size: 15px;
-        transition: all 0.3s ease;
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: #FF6B35;
-        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
-    }
-
-    .drag-drop-area {
-        border: 2px dashed #FF6B35;
-        border-radius: 12px;
-        padding: 40px 20px;
-        text-align: center;
-        background-color: #fff9f5;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .drag-drop-area.dragover {
-        background-color: #fff3e0;
-        border-color: #FF9800;
-    }
-
-    .upload-icon {
-        color: #FF6B35;
-        font-size: 48px;
-        margin-bottom: 15px;
-    }
-
-    .submit-btn {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #FF6B35, #FF9800);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.4s ease;
-    }
-
-    .submit-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
-    }
-
-    .file-preview {
-        margin-top: 15px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .file-preview img {
-        max-width: 200px;
-        max-height: 200px;
-        border-radius: 12px;
-        object-fit: cover;
-    }
-
-    .error-message {
-        color: #FF6B35;
-        font-size: 13px;
-        margin-top: 5px;
-    }
-</style>
-
-<body>
-    <div class="registration-container">
-        <div class="registration-header">
-            <h2 class="registration-title">Registrasi Penjual</h2>
-            <p class="registration-subtitle">Lengkapi informasi untuk mendaftar sebagai penjual</p>
+<div class="bg-gray-50 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Daftar Sebagai Penjual
+            </h2>
+            {{-- [REVISI] Ukuran teks diperbesar --}}
+            <p class="mt-2 text-center text-base text-gray-600">
+                Lengkapi informasi di bawah untuk membuka tokomu.
+            </p>
         </div>
 
-        <form method="POST" action="{{ route('seller.store') }}" enctype="multipart/form-data">
-            @csrf
+        <div class="bg-white rounded-xl shadow-lg p-8 space-y-6">
+            <form method="POST" action="{{ route('seller.store') }}" enctype="multipart/form-data">
+                @csrf
 
-            <div class="form-group">
-                <label for="nama_penjual" class="form-label">Nama Penjual</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-user input-icon"></i>
-                    <input 
-                        id="nama_penjual" 
-                        type="text" 
-                        class="form-input @error('nama_penjual') is-invalid @enderror" 
-                        name="nama_penjual" 
-                        value="{{ old('nama_penjual') }}" 
-                        required 
-                        placeholder="Masukkan nama penjual"
-                    >
-                </div>
-                @error('nama_penjual')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="email_penjual" class="form-label">Email Penjual</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-envelope input-icon"></i>
-                    <input 
-                        id="email_penjual" 
-                        type="email" 
-                        class="form-input @error('email_penjual') is-invalid @enderror" 
-                        name="email_penjual" 
-                        value="{{ old('email_penjual') }}" 
-                        required 
-                        placeholder="email@example.com"
-                    >
-                </div>
-                @error('email_penjual')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="foto_profil" class="form-label">Foto Profil</label>
-                <div id="drag-drop-area" class="drag-drop-area">
-                    <input 
-                        type="file" 
-                        id="foto_profil" 
-                        name="foto_profil" 
-                        accept=".jpg,.jpeg,.png,.gif" 
-                        style="display:none;"
-                    >
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
+                <!-- Nama Penjual -->
+                <div>
+                    {{-- [REVISI] Ukuran teks label diperbesar --}}
+                    <label for="nama_penjual" class="block text-base font-medium text-gray-700">Nama Toko / Penjual</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        {{-- [REVISI] Padding dan ukuran teks input diperbesar --}}
+                        <input type="text" name="nama_penjual" id="nama_penjual" value="{{ old('nama_penjual') }}" required 
+                               class="w-full pl-12 px-4 py-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                               placeholder="Contoh: Bintang Store">
                     </div>
-                    <p>Seret & lepas file di sini atau klik untuk memilih</p>
-                    <small>Format: JPG, PNG, atau GIF (Maks: 2MB)</small>
+                    @error('nama_penjual') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                 </div>
-                <div id="file-preview" class="file-preview"></div>
-                @error('foto_profil')
-                    <span class="error-message">{{ $message }}</span>
-                @enderror
-            </div>
 
-            <div class="form-group">
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-user-plus me-2"></i> Daftar Sebagai Penjual
-                </button>
-            </div>
-        </form>
+                <!-- Email Penjual -->
+                <div>
+                    <label for="email_penjual" class="block text-base font-medium text-gray-700">Email Kontak Toko</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="email" name="email_penjual" id="email_penjual" value="{{ old('email_penjual') }}" required 
+                               class="w-full pl-12 px-4 py-3 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                               placeholder="email@toko.com">
+                    </div>
+                    @error('email_penjual') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Upload Foto Profil -->
+                <div>
+                    <label class="block text-base font-medium text-gray-700">Foto Profil / Logo Toko (Opsional)</label>
+                    <div id="drag-drop-area" class="mt-2 flex justify-center px-6 py-10 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-orange-400 transition-colors">
+                        <div class="space-y-1 text-center">
+                            <div id="file-preview" class="hidden mb-4">
+                                {{-- Preview akan dimasukkan oleh JS --}}
+                            </div>
+                            <div id="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt mx-auto h-12 w-12 text-gray-400"></i>
+                                {{-- [REVISI] Ukuran teks diperbesar --}}
+                                <div class="flex text-base text-gray-600">
+                                    <label for="foto_profil" class="relative font-medium text-orange-600 hover:text-orange-500">
+                                        <span>Unggah file</span>
+                                        <input id="foto_profil" name="foto_profil" type="file" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">atau seret dan lepas</p>
+                                </div>
+                                <p class="text-sm text-gray-500">PNG, JPG, GIF hingga 2MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    @error('foto_profil') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    {{-- [REVISI] Ukuran tombol dan teks diperbesar --}}
+                    <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                        Daftar Sekarang
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dragDropArea = document.getElementById('drag-drop-area');
-            const fileInput = document.getElementById('foto_profil');
-            const filePreview = document.getElementById('file-preview');
+{{-- Script tidak perlu diubah --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dragDropArea = document.getElementById('drag-drop-area');
+        const fileInput = document.getElementById('foto_profil');
+        const filePreview = document.getElementById('file-preview');
+        const uploadPlaceholder = document.getElementById('upload-placeholder');
 
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
-
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, highlight, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, unhighlight, false);
-            });
-
-            dragDropArea.addEventListener('click', () => fileInput.click());
-            dragDropArea.addEventListener('drop', handleDrop, false);
-            fileInput.addEventListener('change', handleFiles, false);
-
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            function highlight() {
-                dragDropArea.classList.add('dragover');
-            }
-
-            function unhighlight() {
-                dragDropArea.classList.remove('dragover');
-            }
-
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            }
-
-            function handleFiles(files) {
-                files = files.target ? files.target.files : files;
-                
-                if (files.length > 0) {
-                    const file = files[0];
-                    
-                    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                    if (!validTypes.includes(file.type)) {
-                        alert('Hanya file JPG, PNG, atau GIF yang diperbolehkan');
-                        return;
-                    }
-
-                    if (file.size > 2 * 1024 * 1024) {
-                        alert('Ukuran file maksimal 2MB');
-                        return;
-                    }
-
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        filePreview.innerHTML = `<img src="${e.target.result}" alt="File Preview">`;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            }
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragDropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
         });
-    </script>
-</body>
-</html>
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dragDropArea.addEventListener(eventName, () => dragDropArea.classList.add('bg-orange-50'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dragDropArea.addEventListener(eventName, () => dragDropArea.classList.remove('bg-orange-50'), false);
+        });
+
+        dragDropArea.addEventListener('click', () => fileInput.click());
+        dragDropArea.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', (e) => handleFiles(e.target.files), false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function handleDrop(e) {
+            handleFiles(e.dataTransfer.files);
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Hanya file JPG, PNG, atau GIF yang diperbolehkan');
+                    return;
+                }
+
+                if (file.size > 2 * 1024 * 1024) { // 2MB
+                    alert('Ukuran file maksimal 2MB');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    filePreview.innerHTML = `<img src="${e.target.result}" alt="File Preview" class="mx-auto h-24 w-24 rounded-full object-cover">`;
+                    filePreview.classList.remove('hidden');
+                    uploadPlaceholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    });
+</script>
 @endsection

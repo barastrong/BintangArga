@@ -10,22 +10,34 @@ use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SocialAuthController;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// --- Public Routes ---
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
-
 Route::get('auth/github', [SocialAuthController::class, 'redirectToGithub'])->name('auth.github');
 Route::get('auth/github/callback', [SocialAuthController::class, 'handleGithubCallback']);
 
 Route::get('/', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 Route::get('/shop', [ProductController::class, 'shop'])->name('shop');
-Route::get('/product/create', [ProductController::class, 'create'])->name('products.create');
-Route::post('/product/store', [ProductController::class, 'store'])->name('products.store');
 Route::get('/category/{categoryId}', [ProductController::class, 'category'])->name('products.category');
 Route::get('/api/cities/{province}', [LocationController::class, 'getCities'])->name('api.cities');
 
+// --- Authenticated User Routes ---
 Route::middleware(['auth'])->group(function () {
+    // Product Management (for sellers)
+    Route::get('/product/create', [ProductController::class, 'create'])->name('products.create');
+    Route::post('/product/store', [ProductController::class, 'store'])->name('products.store');
+    Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
+    // Seller Routes
     Route::get('/seller/register', [SellerController::class, 'create'])->name('seller.register');
     Route::post('/seller/register', [SellerController::class, 'store'])->name('seller.store');
     Route::get('/seller/dashboard', [SellerController::class, 'dashboard'])->name('seller.dashboard');
@@ -36,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/seller/orders', [SellerController::class, 'orders'])->name('seller.orders');
     Route::put('/seller/orders/{order}/update-status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.update-status');
 
+    // Delivery Routes
     Route::prefix('delivery')->name('delivery.')->group(function(){
         Route::get('/register', [DeliveryController::class, 'register'])->name('register');
         Route::post('/register', [DeliveryController::class, 'storeRegister'])->name('register.store');
@@ -48,35 +61,41 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/profile', [DeliveryController::class, 'updateProfile'])->name('update-profile');
         Route::get('/history', [DeliveryController::class, 'history'])->name('history');
     });
-    
-    Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
-    Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-    
 });
 
-Route::middleware('auth', 'verified')->group(function () {
-    Route::get('/purchase', [PurchaseController::class, 'index'])->name('purchases.index');
+// --- Authenticated & Verified User Routes ---
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Purchase & Order History
+    Route::get('/purchases', [PurchaseController::class, 'index'])->name('purchases.index');
     Route::post('/purchase', [PurchaseController::class, 'store'])->name('purchases.store');
-    Route::get('/purchase/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
-    Route::post('/purchase/{purchase}/rate', [PurchaseController::class, 'rate'])->name('purchases.rate');
+    Route::get('/purchases/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
+    Route::post('/purchases/{purchase}/rate', [PurchaseController::class, 'rate'])->name('purchases.rate');
     Route::patch('/purchases/{purchase}/complete', [PurchaseController::class, 'complete'])->name('purchases.complete');
     Route::post('/purchases/{purchase}/cancel', [PurchaseController::class, 'cancel'])->name('purchases.cancel');
     
+    // Cart & Checkout Flow
     Route::get('/cart', [PurchaseController::class, 'viewCart'])->name('cart.index');
     Route::post('/cart/update/{purchase}', [PurchaseController::class, 'updateCartItem'])->name('cart.update');
     Route::delete('/cart/remove/{purchase}', [PurchaseController::class, 'removeFromCart'])->name('cart.remove');
-    Route::match(['get','post'],'/cart/checkout', [PurchaseController::class, 'checkoutFromCart'])->name('cart.checkout');
-    Route::post('/cart/process', [PurchaseController::class, 'processCheckout'])->name('cart.process');
     Route::get('/cart/count', [PurchaseController::class, 'getCartCount'])->name('cart.count');
     Route::post('/cart/cancel-direct-purchase', [PurchaseController::class, 'cancelDirectPurchase'])->name('cart.cancel-direct-purchase');
 
+    // =================================================================
+    // PERBAIKAN DI SINI: Route checkout dibuat lebih eksplisit
+    // =================================================================
+    // Route untuk MENAMPILKAN halaman checkout (bisa dari cart (POST) atau direct purchase (GET))
+    Route::match(['get', 'post'], '/cart/checkout', [PurchaseController::class, 'checkoutFromCart'])->name('cart.checkout');
+    // Route untuk MEMPROSES pembayaran dari halaman checkout
+    Route::post('/cart/process', [PurchaseController::class, 'processCheckout'])->name('cart.process');
+
+    // Profile Management
     Route::get('/profile-index', [ProfileController::class, 'index'])->name('profile.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// --- Admin Routes ---
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
