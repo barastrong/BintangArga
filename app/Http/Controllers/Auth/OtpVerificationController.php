@@ -19,7 +19,7 @@ class OtpVerificationController extends Controller
         }
 
         if (auth()->user()->email_verified) {
-            return redirect()->route('dashboard')
+            return redirect()->route('products.index')
                 ->with('info', 'Email Anda sudah terverifikasi.');
         }
 

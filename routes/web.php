@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\SocialAuthController;
+use App\Http\Controllers\Admin\AdminApprovalController;
 
 Route::get('auth/google', [SocialAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
@@ -107,6 +108,31 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/deliveries/{id}', [AdminController::class, 'viewDelivery'])->name('deliveries.view');
         Route::get('/deliveries/search', [AdminController::class, 'searchDeliveries'])->name('deliveries.search');
         Route::delete('/deliveries/{id}', [AdminController::class, 'deleteDelivery'])->name('deliveries.delete');
+            // Delivery Approval Routes
+    Route::get('/approvals/deliveries', [AdminApprovalController::class, 'deliveryApprovals'])
+        ->name('approvals.deliveries');
+    
+    Route::get('/approvals/deliveries/search', [AdminApprovalController::class, 'searchDeliveries'])
+        ->name('approvals.deliveries.search');
+    
+    Route::post('/approvals/delivery/{id}/approve', [AdminApprovalController::class, 'approveDelivery'])
+        ->name('approvals.delivery.approve');
+    
+    Route::post('/approvals/delivery/{id}/reject', [AdminAprovalController::class, 'rejectDelivery'])
+        ->name('approvals.delivery.reject');
+
+    // Seller Approval Routes
+    Route::get('/approvals/sellers', [AdminApprovalController::class, 'sellerApprovals'])
+        ->name('approvals.sellers');
+    
+    Route::get('/approvals/sellers/search', [AdminApprovalController::class, 'searchSellers'])
+        ->name('approvals.sellers.search');
+    
+    Route::post('/approvals/seller/{id}/approve', [AdminApprovalController::class, 'approveSeller'])
+        ->name('approvals.seller.approve');
+    
+    Route::post('/approvals/seller/{id}/reject', [AdminApprovalController::class, 'rejectSeller'])
+        ->name('approvals.seller.reject');
     });
 });
 

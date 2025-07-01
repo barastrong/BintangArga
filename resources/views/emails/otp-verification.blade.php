@@ -37,11 +37,11 @@
 </head>
 <body>
     <div class="container">
-        <h2>Verifikasi Email ByRead</h2>
+        <h2>Verifikasi Email FitFashion </h2>
         
         <p>Halo!</p>
         
-        <p>Terima kasih telah mendaftar di ByRead. Untuk melanjutkan, silakan masukkan kode OTP berikut:</p>
+        <p>Terima kasih telah mendaftar di FitFashion . Untuk melanjutkan, silakan masukkan kode OTP berikut:</p>
         
         <div class="otp-code">
             {{ $otp }}
@@ -50,10 +50,10 @@
         <p>Kode OTP ini akan kadaluarsa dalam 5 menit.</p>
         
         <div class="warning">
-            <p>Jika Anda tidak merasa mendaftar di ByRead, silakan abaikan email ini.</p>
+            <p>Jika Anda tidak merasa mendaftar di FitFashion , silakan abaikan email ini.</p>
         </div>
         
-        <p>Salam,<br>Tim ByRead</p>
+        <p>Salam,<br>Tim FitFashion </p>
     </div>
 </body>
 </html> 

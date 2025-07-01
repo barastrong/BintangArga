@@ -25,7 +25,7 @@ class OtpVerification extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Verifikasi Email ByRead',
+            subject: 'Verifikasi Email FitFashion ',
         );
     }
 

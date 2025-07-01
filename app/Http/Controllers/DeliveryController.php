@@ -10,27 +10,28 @@ use Illuminate\Support\Facades\Storage;
 
 class DeliveryController extends Controller
 {
-    /**
-     * Dashboard untuk delivery
-     */
     public function dashboard()
     {
-        // Cek apakah user sudah punya akun delivery
-        if (!Auth::user()->delivery) {
+        $user = Auth::user();
+
+        if (!$user->delivery) {
             return redirect()->route('delivery.register')
-                ->with('warning', 'Silakan daftar sebagai delivery terlebih dahulu');
+                ->with('info', 'Silakan daftar sebagai delivery terlebih dahulu.');
         }
 
-        $delivery = Auth::user()->delivery;
+        if ($user->delivery->is_proved == 0) {
+            return redirect()->route('delivery.register')
+                ->with('warning', 'Akun Anda sedang menunggu verifikasi dari admin.');
+        }
+
+        $delivery = $user->delivery;
         
-        // Statistik delivery
         $totalDeliveries = Purchase::where('delivery_id', $delivery->id)->count();
         $completedDeliveries = Purchase::where('delivery_id', $delivery->id)
             ->where('status_pengiriman', 'delivered')->count();
         $pendingDeliveries = Purchase::where('delivery_id', $delivery->id)
             ->where('status_pengiriman', 'shipping')->count();
         
-        // Pesanan terbaru
         $recentOrders = Purchase::with(['user', 'product'])
             ->where('delivery_id', $delivery->id)
             ->orderBy('created_at', 'desc')
@@ -46,28 +47,30 @@ class DeliveryController extends Controller
         ));
     }
 
-    /**
-     * Halaman register delivery
-     */
     public function register()
     {
-        // Jika sudah punya akun delivery, redirect ke dashboard
-        if (Auth::user()->delivery) {
-            return redirect()->route('delivery.dashboard');
+        $user = Auth::user();
+        
+        if ($user->delivery && $user->delivery->is_proved == 1) {
+            return redirect()->route('delivery.dashboard')
+                ->with('info', 'Anda sudah terdaftar dan terverifikasi sebagai delivery');
         }
 
         return view('delivery.register');
     }
 
-    /**
-     * Proses register delivery
-     */
     public function storeRegister(Request $request)
     {
-        // Jika sudah punya akun delivery
-        if (Auth::user()->delivery) {
-            return redirect()->route('delivery.dashboard')
-                ->with('info', 'Anda sudah terdaftar sebagai delivery');
+        $user = Auth::user();
+        
+        if ($user->delivery) {
+            if ($user->delivery->is_proved == 1) {
+                return redirect()->route('delivery.dashboard')
+                    ->with('info', 'Anda sudah terdaftar dan terverifikasi sebagai delivery');
+            } else {
+                return redirect()->back()
+                    ->with('warning', 'Akun delivery Anda sedang menunggu verifikasi admin');
+            }
         }
 
         $request->validate([
@@ -81,10 +84,10 @@ class DeliveryController extends Controller
             'nama' => $request->nama,
             'no_telepon' => $request->no_telepon,
             'email' => $request->email,
+            'is_proved' => 0,
             'user_id' => Auth::id()
         ];
 
-        // Upload foto profile jika ada
         if ($request->hasFile('foto_profile')) {
             $file = $request->file('foto_profile');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -94,20 +97,25 @@ class DeliveryController extends Controller
 
         Delivery::create($data);
 
-        return redirect()->route('delivery.dashboard')
-            ->with('success', 'Selamat! Anda berhasil terdaftar sebagai delivery');
+        return redirect()->back()
+            ->with('success', 'Pendaftaran berhasil! Tunggu verifikasi akun Anda oleh admin.');
     }
 
-    /**
-     * Daftar pesanan untuk delivery
-     */
     public function orders(Request $request)
     {
-        if (!Auth::user()->delivery) {
-            return redirect()->route('delivery.register');
+        $user = Auth::user();
+
+        if (!$user->delivery) {
+            return redirect()->route('delivery.register')
+                ->with('info', 'Silakan daftar sebagai delivery terlebih dahulu.');
         }
 
-        $delivery = Auth::user()->delivery;
+        if ($user->delivery->is_proved == 0) {
+            return redirect()->route('delivery.register')
+                ->with('warning', 'Akun Anda sedang menunggu verifikasi dari admin.');
+        }
+
+        $delivery = $user->delivery;
         $status = $request->get('status_pengiriman', 'all');
 
         $query = Purchase::with(['user', 'product', 'seller'])
@@ -122,13 +130,18 @@ class DeliveryController extends Controller
         return view('delivery.orders', compact('orders', 'status'));
     }
 
-    /**
-     * Detail pesanan
-     */
     public function orderDetail($id)
     {
-        if (!Auth::user()->delivery) {
-            return redirect()->route('delivery.register');
+        $user = Auth::user();
+
+        if (!$user->delivery) {
+            return redirect()->route('delivery.register')
+                ->with('info', 'Silakan daftar sebagai delivery terlebih dahulu.');
+        }
+
+        if ($user->delivery->is_proved == 0) {
+            return redirect()->route('delivery.register')
+                ->with('warning', 'Akun Anda sedang menunggu verifikasi dari admin.');
         }
 
         $order = Purchase::with(['user', 'product', 'seller'])
@@ -138,17 +151,12 @@ class DeliveryController extends Controller
         return view('delivery.order-detail', compact('order'));
     }
 
-    /**
-     * Update status pesanan
-     */
     public function updateOrderStatus(Request $request, $id)
     {
-        // Validasi input
         $request->validate([
             'status_pengiriman' => 'required|in:picked_up,shipping,delivered'
         ]);
 
-        // Cari pesanan berdasarkan delivery_id
         $order = Purchase::where('delivery_id', Auth::user()->delivery->id)
             ->where('id', $id)
             ->first();
@@ -157,11 +165,9 @@ class DeliveryController extends Controller
             return redirect()->back()->with('error', 'Pesanan tidak ditemukan');
         }
 
-        // Update status
         $order->status_pengiriman = $request->status_pengiriman;
         $order->save();
 
-        // Pesan sukses
         $messages = [
             'picked_up' => 'Pesanan berhasil diambil',
             'shipping' => 'Pengiriman dimulai',
@@ -171,42 +177,57 @@ class DeliveryController extends Controller
         return redirect()->back()->with('success', $messages[$request->status_pengiriman]);
     }
 
-    /**
-     * Profil delivery
-     */
     public function profile()
     {
-        if (!Auth::user()->delivery) {
-            return redirect()->route('delivery.register');
+        $user = Auth::user();
+
+        if (!$user->delivery) {
+            return redirect()->route('delivery.register')
+                ->with('info', 'Silakan daftar sebagai delivery terlebih dahulu.');
         }
 
-        $delivery = Auth::user()->delivery;
+        if ($user->delivery->is_proved == 0) {
+            return redirect()->route('delivery.register')
+                ->with('warning', 'Akun Anda sedang menunggu verifikasi dari admin.');
+        }
+
+        $delivery = $user->delivery;
         return view('delivery.profile', compact('delivery'));
     }
 
-    /**
-     * Edit profil delivery
-     */
     public function editProfile()
     {
-        if (!Auth::user()->delivery) {
-            return redirect()->route('delivery.register');
+        $user = Auth::user();
+
+        if (!$user->delivery) {
+            return redirect()->route('delivery.register')
+                ->with('info', 'Silakan daftar sebagai delivery terlebih dahulu.');
         }
 
-        $delivery = Auth::user()->delivery;
+        if ($user->delivery->is_proved == 0) {
+            return redirect()->route('delivery.register')
+                ->with('warning', 'Akun Anda sedang menunggu verifikasi dari admin.');
+        }
+
+        $delivery = $user->delivery;
         return view('delivery.edit-profile', compact('delivery'));
     }
 
-    /**
-     * Update profil delivery
-     */
     public function updateProfile(Request $request)
     {
-        if (!Auth::user()->delivery) {
-            return redirect()->route('delivery.register');
+        $user = Auth::user();
+
+        if (!$user->delivery) {
+            return redirect()->route('delivery.register')
+                ->with('info', 'Silakan daftar sebagai delivery terlebih dahulu.');
         }
 
-        $delivery = Auth::user()->delivery;
+        if ($user->delivery->is_proved == 0) {
+            return redirect()->route('delivery.register')
+                ->with('warning', 'Akun Anda sedang menunggu verifikasi dari admin.');
+        }
+
+        $delivery = $user->delivery;
 
         $request->validate([
             'nama' => 'required|string|max:255',
@@ -221,9 +242,7 @@ class DeliveryController extends Controller
             'email' => $request->email
         ];
 
-        // Upload foto profile baru jika ada
         if ($request->hasFile('foto_profile')) {
-            // Hapus foto lama jika ada
             if ($delivery->foto_profile) {
                 Storage::disk('public')->delete($delivery->foto_profile);
             }
@@ -240,16 +259,21 @@ class DeliveryController extends Controller
             ->with('success', 'Profil berhasil diperbarui');
     }
 
-    /**
-     * Riwayat pengiriman
-     */
     public function history()
     {
-        if (!Auth::user()->delivery) {
-            return redirect()->route('delivery.register');
+        $user = Auth::user();
+
+        if (!$user->delivery) {
+            return redirect()->route('delivery.register')
+                ->with('info', 'Silakan daftar sebagai delivery terlebih dahulu.');
         }
 
-        $delivery = Auth::user()->delivery;
+        if ($user->delivery->is_proved == 0) {
+            return redirect()->route('delivery.register')
+                ->with('warning', 'Akun Anda sedang menunggu verifikasi dari admin.');
+        }
+
+        $delivery = $user->delivery;
         
         $completedOrders = Purchase::with(['user', 'product', 'seller'])
             ->where('delivery_id', $delivery->id)

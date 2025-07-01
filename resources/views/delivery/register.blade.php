@@ -3,7 +3,7 @@
 @section('title', 'Daftar Sebagai Delivery')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 py-8">
+<div class="min-h-screen py-8">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header Card -->
         <div class="text-center mb-8">
@@ -37,6 +37,22 @@
                         </div>
                     </div>
                 @endif
+
+                @if(session('success'))
+                    <div class="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 p-6 mb-8 rounded-r-lg">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-green-800 font-medium">
+                                    {{ session('success') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
 
                 <form action="{{ route('delivery.register.store') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
                     @csrf

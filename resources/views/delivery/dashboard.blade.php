@@ -3,10 +3,9 @@
 @section('title', 'Dashboard Delivery')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50">
+<div class="min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <!-- Header Section -->
         <div class="mb-8">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                 <div class="mb-6 lg:mb-0">
@@ -50,9 +49,7 @@
             </div>
         </div>
 
-        <!-- Statistics Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Total Pengiriman -->
             <div class="group bg-white rounded-3xl shadow-lg p-6 border border-orange-50 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
                 <div class="relative">
@@ -77,7 +74,6 @@
                 </div>
             </div>
 
-            <!-- Pengiriman Selesai -->
             <div class="group bg-white rounded-3xl shadow-lg p-6 border border-green-50 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
                 <div class="relative">
@@ -102,7 +98,6 @@
                 </div>
             </div>
 
-            <!-- Pengiriman Pending -->
             <div class="group bg-white rounded-3xl shadow-lg p-6 border border-yellow-50 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-full -mr-16 -mt-16 opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
                 <div class="relative">
@@ -129,7 +124,6 @@
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            <!-- Pesanan Terbaru -->
             <div class="xl:col-span-2 bg-white rounded-3xl shadow-xl border border-orange-50 overflow-hidden">
                 <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-6">
                     <div class="flex items-center justify-between">
@@ -206,11 +200,9 @@
                 </div>
             </div>
 
-            <!-- Sidebar -->
             <div class="space-y-6">
                 @include('delivery.partials.sidebar')
 
-                <!-- Status Pengiriman Hari Ini -->
                 <div class="bg-white rounded-3xl shadow-xl p-6 border border-orange-50 overflow-hidden relative">
                     <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full -mr-12 -mt-12 opacity-20"></div>
                     <div class="relative">
@@ -256,7 +248,6 @@
                             </div>
                         </div>
                         
-                        <!-- Progress Bar -->
                         <div class="mt-8 pt-6 border-t border-orange-100">
                             <div class="flex justify-between text-sm font-semibold text-gray-700 mb-3">
                                 <span>Progress Hari Ini</span>
@@ -282,11 +273,9 @@
 </div>
 
 <script>
-    // Auto refresh setiap 30 detik untuk update real-time
     setInterval(() => {
         console.log('Auto refresh dashboard data...');
         
-        // Tambahkan efek visual saat refresh dengan animasi yang lebih smooth
         const cards = document.querySelectorAll('.group');
         cards.forEach((card, index) => {
             setTimeout(() => {
@@ -300,9 +289,7 @@
         });
     }, 30000);
 
-    // Enhanced smooth scrolling dan animasi
     document.addEventListener('DOMContentLoaded', function() {
-        // Animate cards on scroll dengan stagger effect
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -30px 0px'
@@ -319,7 +306,6 @@
             });
         }, observerOptions);
 
-        // Observe all animated elements
         document.querySelectorAll('.group, .transform').forEach((card, index) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(30px) scale(0.95)';
@@ -327,7 +313,6 @@
             observer.observe(card);
         });
 
-        // Add hover sound effect (optional)
         document.querySelectorAll('.group').forEach(card => {
             card.addEventListener('mouseenter', function() {
                 this.style.transform = 'translateY(-8px) scale(1.02)';
@@ -338,7 +323,6 @@
             });
         });
 
-        // Loading animation for statistics
         const numbers = document.querySelectorAll('.text-4xl.font-black');
         numbers.forEach(number => {
             const finalNumber = parseInt(number.textContent);
@@ -357,7 +341,6 @@
         });
     });
 
-    // Real-time notification simulation
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `fixed top-4 right-4 p-4 rounded-2xl shadow-2xl z-50 transform transition-all duration-500 translate-x-full ${
@@ -386,30 +369,27 @@
         }, 5000);
     }
 
-    // Simulate random notifications (demo purposes)
-    setTimeout(() => {
-        showNotification('Pesanan baru dari Jakarta telah masuk!', 'info');
-    }, 10000);
+    @if(session('info'))
+        setTimeout(() => {
+            showNotification('{{ session("info") }}', 'info');
+        }, 1000);
+    @endif
 </script>
 
 <style>
-    /* Custom gradient backgrounds */
     .from-orange-25 { --tw-gradient-from: #fffbf5; }
     .to-orange-25 { --tw-gradient-to: #fffbf5; }
     
-    /* Smooth transitions for all interactive elements */
     * {
         transition-property: transform, opacity, box-shadow, background-color, border-color;
         transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    /* Enhanced focus states */
     .group:focus-within {
         transform: translateY(-4px) scale(1.01);
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
     
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
     }

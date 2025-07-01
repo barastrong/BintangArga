@@ -5,9 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -23,7 +20,7 @@
                     <div class="flex justify-between items-center h-16">
                         <!-- Logo -->
                         <div class="flex-shrink-0">
-                            <a href="{{ route('products.index') }}" class="font-extrabold text-2xl tracking-tight text-gray-800">ARGABINTANG</a>
+                            <a href="{{ route('products.index') }}" class="font-extrabold text-2xl tracking-tight text-gray-800">FISTFASHION</a>
                         </div>
 
                         <!-- Desktop Navigation Links -->
@@ -161,7 +158,7 @@
             <footer class="bg-white border-t mt-auto">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div class="text-center text-gray-500 text-sm">
-                        © {{ date('Y') }} ARGABINTANG. All Rights Reserved.
+                        © {{ date('Y') }} FISTFASHION. All Rights Reserved.
                     </div>
                 </div>
             </footer>

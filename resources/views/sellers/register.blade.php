@@ -9,9 +9,14 @@
     <title>Document</title>
 </head>
 <body>
-<div class="flex items-center justify-center min-h-screen bg-gray-100 px-4 py-12">
-    <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 sm:p-10 space-y-6">
-
+    
+    <div class="flex items-center justify-center min-h-screen bg-gray-100 px-4 py-12">
+        <div class="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8 sm:p-10 space-y-6">
+            @if(session('success'))
+                <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 border border-green-300 rounded-lg" role="alert">
+                    <strong>Sukses!</strong> {{ session('success') }}
+                </div>
+            @endif
         <div class="text-center">
             <h2 class="text-3xl font-bold text-orange-500">Registrasi Penjual</h2>
             <p class="mt-2 text-sm text-gray-600">Lengkapi informasi untuk mendaftar sebagai penjual.</p>
