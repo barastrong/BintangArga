@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('no_telepon');
             $table->string('email')->unique();
             $table->text('foto_profile')->nullable();
+            $table->boolean('is_proved')->default(0);
             $table->timestamps();
         });
     }

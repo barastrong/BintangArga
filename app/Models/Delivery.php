@@ -16,6 +16,7 @@ class Delivery extends Model
         'email',
         'foto_profile',
         'user_id',
+        'is_proved',
     ];
 
     public function purchases()

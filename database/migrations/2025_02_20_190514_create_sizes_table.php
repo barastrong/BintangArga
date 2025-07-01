@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->enum('size', ['S', 'M', 'L', 'XL']);
             $table->string('gambar_size');
-            $table->decimal('harga', 10, 2); // Harga per ukuran
+            $table->decimal('harga', 10, 2);
             $table->integer('stock');
             $table->timestamps();
         });

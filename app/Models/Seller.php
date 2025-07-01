@@ -9,7 +9,7 @@ class Seller extends Model
     use HasFactory;
     
     protected $table = 'sellers';
-    protected $fillable = ['user_id', 'nama_penjual', 'email_penjual', 'foto_profil', 'nomor_seri','no_telepon'];
+    protected $fillable = ['user_id', 'nama_penjual', 'email_penjual', 'foto_profil', 'nomor_seri','no_telepon', 'is_proved'];
 
     /**
      * Boot method to automatically generate serial number when creating a new seller

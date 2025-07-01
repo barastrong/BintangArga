@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Mail\OtpVerification;
+use Illuminate\Support\Facades\Mail;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -28,7 +30,23 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('products.index', absolute: false));
+        $user = Auth::user();
+
+        if (!$user->email_verified) {
+            // Generate new OTP if not exists or expired
+            if (!$user->otp_code || now()->isAfter($user->otp_expires_at)) {
+                $otp = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $user->update([
+                    'otp_code' => $otp,
+                    'otp_expires_at' => now()->addMinutes(5)
+                ]);
+                Mail::to($user->email)->send(new OtpVerification($otp));
+            }
+            return redirect()->route('verify.otp.show')
+                ->with('warning', 'Silakan verifikasi email Anda terlebih dahulu.');
+        }
+
+        return redirect()->intended(route('products.index'));
     }
 
     /**
