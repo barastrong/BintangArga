@@ -118,7 +118,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::post('/approvals/delivery/{id}/approve', [AdminApprovalController::class, 'approveDelivery'])
         ->name('approvals.delivery.approve');
     
-    Route::post('/approvals/delivery/{id}/reject', [AdminAprovalController::class, 'rejectDelivery'])
+    Route::post('/approvals/delivery/{id}/reject', [AdminApprovalController::class, 'rejectDelivery'])
         ->name('approvals.delivery.reject');
 
     // Seller Approval Routes

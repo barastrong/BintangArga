@@ -237,7 +237,7 @@
                         <a href="{{ route('admin.index') }}" 
                            class="nav-link {{ request()->routeIs('admin.index') ? 'active bg-orange-50 text-orange-900 border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200">
                             <span class="nav-icon mr-4 {{ request()->routeIs('admin.index') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-user-group"></i>
                             </span>
                             <span class="font-medium">Users</span>
                         </a>
@@ -245,7 +245,7 @@
                         <a href="{{ route('admin.products') }}" 
                            class="nav-link {{ request()->routeIs('admin.products') ? 'active bg-orange-50 text-orange-900 border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200">
                             <span class="nav-icon mr-4 {{ request()->routeIs('admin.products') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                                <i class="fas fa-box"></i>
+                                <i class="fas fa-boxes-stacked"></i>
                             </span>
                             <span class="font-medium">Products</span>
                         </a>
@@ -269,23 +269,23 @@
                         <a href="{{ route('admin.deliveries') }}" 
                            class="nav-link {{ request()->routeIs('admin.deliveries') ? 'active bg-orange-50 text-orange-900 border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200">
                             <span class="nav-icon mr-4 {{ request()->routeIs('admin.deliveries') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                                <i class="fas fa-truck"></i>
+                                <i class="fas fa-truck-fast"></i>
                             </span>
                             <span class="font-medium">Delivery Panel</span>
                         </a>
                         <a href="{{ route('admin.approvals.deliveries') }}" 
                            class="nav-link {{ request()->routeIs('admin.approvals.deliveries') ? 'active bg-orange-50 text-orange-900 border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200">
                             <span class="nav-icon mr-4 {{ request()->routeIs('admin.approvals.deliveries') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                                <i class="fas fa-truck"></i>
+                                <i class="fas fa-clipboard-check"></i>
                             </span>
-                            <span class="font-medium">Delivery proved</span>
+                            <span class="font-medium">Delivery Approved</span>
                         </a>
                         <a href="{{ route('admin.approvals.sellers') }}" 
                            class="nav-link {{ request()->routeIs('admin.approvals.sellers') ? 'active bg-orange-50 text-orange-900 border-orange-200' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }} group flex items-center px-4 py-3 text-sm font-medium rounded-xl border transition-all duration-200">
                             <span class="nav-icon mr-4 {{ request()->routeIs('admin.approvals.sellers') ? 'text-orange-600' : 'text-gray-400 group-hover:text-gray-600' }}">
-                                <i class="fas fa-truck"></i>
+                                <i class="fas fa-user-check"></i>
                             </span>
-                            <span class="font-medium">Delivery Panel</span>
+                            <span class="font-medium">Seller Approved</span>
                         </a>
                     </nav>
                 </div>

@@ -7,12 +7,18 @@ use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use App\Mail\OtpVerification;
-use Illuminate\Support\Facades\Mail;
 
 class AuthenticatedSessionController extends Controller
 {
+    /**
+     * The path to redirect to after login.
+     */
+    private const HOME = '/';
+
     /**
      * Display the login view.
      */
@@ -46,7 +52,7 @@ class AuthenticatedSessionController extends Controller
                 ->with('warning', 'Silakan verifikasi email Anda terlebih dahulu.');
         }
 
-        return redirect()->intended(route('products.index'));
+        return redirect()->intended('/');
     }
 
     /**
