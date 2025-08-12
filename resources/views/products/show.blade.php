@@ -1,6 +1,16 @@
 @extends('layouts.app')
 
 @section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Checkout Pemesanan</title>
+</head>
+<body>
 <div class="py-12 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -56,7 +66,7 @@
                     <!-- Info Penjual -->
                     <div class="mt-6 pt-6 border-t">
                         <p class="text-sm text-gray-500 mb-2">Dijual oleh:</p>
-                        <a href="#" class="flex items-center gap-4 group">
+                        <a class="flex items-center gap-4 group">
                             <img src="{{ asset('storage/' . $product->seller->foto_profil) }}" alt="Profil Penjual" class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 group-hover:border-orange-500 transition">
                             <div>
                                 <p class="font-semibold text-gray-800 group-hover:text-orange-600 transition">{{ $product->seller->nama_penjual }}</p>
@@ -178,7 +188,10 @@
                     </div>
                 </div>
 
-                <div class="mb-4">
+                <input type="hidden" name="shipping_address" id="shipping_address" value="Will be filled at checkout">
+                <input type="hidden" name="phone_number" id="phone_number" value="Will be filled at checkout">
+                <input type="hidden" name="description" id="description" value="Direct purchase - details at checkout">
+                <!-- <div class="mb-4">
                     <label for="shipping_address" class="block text-sm font-medium text-gray-700 mb-2">Alamat Pengiriman</label>
                     <textarea name="shipping_address" id="shipping_address" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" required></textarea>
                 </div>
@@ -191,7 +204,7 @@
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Catatan Pembelian (opsional)</label>
                     <textarea name="description" id="description" rows="2" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"></textarea>
-                </div>
+                </div> -->
 
                 <div class="bg-orange-50 p-4 rounded-lg my-4">
                     <div class="flex justify-between font-bold text-lg">
@@ -208,9 +221,9 @@
         </div>
     </div>
 </div>
-
-{{-- Letakkan script di sini, di dalam section 'content' atau di @push('scripts') jika layoutmu mendukung --}}
+</body>
 <script>
+// Script to handle form submission validation and direct checkout
 function updateMainImage(imageUrl) {
     document.getElementById('mainImage').src = imageUrl;
 }
@@ -230,7 +243,6 @@ function openPurchaseModal(sizeId, sizeName, price, stock, productId) {
     document.getElementById('selectedPrice').textContent = formatPrice(price);
     document.getElementById('availableStock').textContent = stock;
     document.getElementById('quantity').value = 1;
-    document.getElementById('quantity').max = stock; // Set max value for input
     updateSubtotal();
     
     document.getElementById('purchaseModal').classList.remove('hidden');
@@ -238,6 +250,7 @@ function openPurchaseModal(sizeId, sizeName, price, stock, productId) {
 
 function closePurchaseModal() {
     document.getElementById('purchaseModal').classList.add('hidden');
+    document.getElementById('purchaseForm').reset();
 }
 
 function updateQuantity(delta) {
@@ -261,62 +274,123 @@ function formatPrice(price) {
     return new Intl.NumberFormat('id-ID').format(price);
 }
 
+// Close modal when clicking outside
 document.getElementById('purchaseModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closePurchaseModal();
     }
 });
 
+// Form validation before submit
+document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+    const requiredFields = ['shipping_address', 'phone_number', 'description'];
+    let isValid = true;
+
+    requiredFields.forEach(field => {
+        const element = document.getElementById(field);
+        if (!element.value.trim()) {
+            isValid = false;
+            element.classList.add('border-red-500');
+        } else {
+            element.classList.remove('border-red-500');
+        }
+    });
+
+    if (!isValid) {
+        e.preventDefault();
+        alert('Mohon lengkapi semua data yang diperlukan');
+    }
+});
+
 function addToCart() {
+    // Get form values
     const productId = document.getElementById('productId').value;
     const sizeId = document.getElementById('sizeId').value;
     const quantity = document.getElementById('quantity').value;
+    
+    // Validate required fields are present
+    if (!productId || !sizeId || !quantity) {
+        alert('Missing required product information');
+        return;
+    }
+    
+    // Get CSRF token from meta tag
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     
+    // Use FormData for a traditional form submit
     const formData = new FormData();
     formData.append('product_id', productId);
     formData.append('size_id', sizeId);
     formData.append('quantity', quantity);
+    formData.append('payment', 'Temporary');
     formData.append('status_pembelian', 'keranjang');
+    formData.append('payment_method', 'pending');
+    formData.append('shipping_address', 'Temporary'); 
+    formData.append('phone_number', 'Temporary');     
+    formData.append('description', 'Added to cart');
     formData.append('_token', csrfToken);
     
+    // Send AJAX request
     fetch('{{ route("purchases.store") }}', {
         method: 'POST',
         headers: {
-            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',  // Important to identify AJAX request
             'X-CSRF-TOKEN': csrfToken
         },
         body: formData
     })
-    .then(response => response.json().then(data => ({ ok: response.ok, status: response.status, data })))
-    .then(({ ok, status, data }) => {
-        if (!ok) {
-            // Jika ada error validasi dari Laravel (status 422)
-            if (status === 422) {
-                let errorMessages = Object.values(data.errors).flat().join('\n');
-                throw new Error(errorMessages);
-            }
-            throw new Error(data.message || 'Terjadi kesalahan.');
+    .then(response => {
+        // Check if the response is JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            return response.json().then(data => {
+                if (!response.ok) {
+                    return Promise.reject(data);
+                }
+                return data;
+            });
+        } else {
+            // If not JSON, there's an error - the server returned HTML
+            return Promise.reject({
+                message: 'Server returned an unexpected response format. Please try again later.'
+            });
         }
-
+    })
+    .then(data => {
+        // Success message
         const notification = document.createElement('div');
-        notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse';
-        notification.textContent = data.message || 'Item ditambahkan ke keranjang!';
+        notification.className = 'fixed bottom-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+        notification.textContent = 'Item ditambahkan ke keranjang!';
         document.body.appendChild(notification);
         
-        setTimeout(() => { notification.remove(); }, 3000);
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
         
-        // updateCartCount(); // Jika kamu punya fungsi ini di layout utama
+        updateCartCount();
+        
         closePurchaseModal();
     })
     .catch(error => {
         console.error('Error:', error);
-        if (error.message.includes('Unauthenticated')) {
+        if (error.message && error.message.includes('Unauthenticated')) {
             window.location.href = "{{ route('login') }}";
         } else {
-            alert('Gagal menambahkan ke keranjang: ' + error.message);
+            alert('Error menambahkan item ke keranjang: ' + (error.message || 'Unknown error'));
         }
     });
 }
+
+function updateCartCount() {
+    fetch('{{ route("cart.count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const cartCount = document.getElementById('cartCount');
+            if (cartCount) {
+                cartCount.textContent = data.count;
+            }
+        });
+}
 </script>
+</html>
 @endsection

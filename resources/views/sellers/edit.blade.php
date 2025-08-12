@@ -55,6 +55,13 @@
                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500">
                                 @error('email_penjual') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                             </div>
+
+                            <!-- Nomor Telepon -->
+                            <div>
+                                <label for="no_telepon" class="block text-sm font-medium text-gray-700">Nomor Telepon (Opsional)</label>
+                                <input type="text" name="no_telepon" id="no_telepon" value="{{ old('no_telepon', $seller->no_telepon) }}" 
+                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-orange-500 focus:ring-orange-500">
+                                @error('no_telepon') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div class="p-6 bg-gray-50 text-right">
                             <button type="submit" class="bg-orange-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-orange-600 transition-colors">

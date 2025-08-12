@@ -26,9 +26,6 @@ return new class extends Migration
             $table->dropForeign(['province_id']);
             $table->dropForeign(['city_id']);
             $table->dropColumn(['province_id', 'city_id']);
-            
-            // Add back old lokasi column
-            $table->string('lokasi')->nullable();
         });
     }
 };

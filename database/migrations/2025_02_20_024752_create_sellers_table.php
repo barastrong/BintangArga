@@ -17,6 +17,9 @@ return new class extends Migration
             $table->string('nama_penjual');
             $table->string('email_penjual')->unique();
             $table->string('foto_profil')->nullable();
+            $table->string('nomor_seri')->nullable();
+            $table->string('no_telepon', 15)->nullable();
+            $table->boolean('is_proved')->default(0);
             $table->timestamps();
         });
     }

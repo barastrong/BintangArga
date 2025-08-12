@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $category->nama }} - Products</title>
+</head>
+<body>
 <div class="bg-white">
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         
@@ -59,4 +67,6 @@
         @endif
     </div>
 </div>
+</body>
+</html>
 @endsection

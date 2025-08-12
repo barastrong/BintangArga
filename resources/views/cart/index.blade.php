@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
 <div class="bg-gray-50 py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-8">Keranjang Belanja</h1>
@@ -72,7 +80,7 @@
         @endif
     </div>
 </div>
-
+<!-- JavaScript untuk menangani checkout -->
 <script>
 // Kode JavaScript sederhana yang sudah terbukti
 document.addEventListener('DOMContentLoaded', function() {
@@ -103,4 +111,41 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleCheckoutButton();
 });
 </script>
+
+@if(session('success'))
+    <div class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            {{ session('success') }}
+        </div>
+    </div>
+    <script>
+        setTimeout(function() {
+            const successAlert = document.querySelector('.fixed.top-4.bg-green-500');
+            if (successAlert) {
+                successAlert.style.display = 'none';
+            }
+        }, 3000);
+    </script>
+@endif
+
+@if(session('error'))
+    <div class="fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            {{ session('error') }}
+        </div>
+    </div>
+    <script>
+        setTimeout(function() {
+            const errorAlert = document.querySelector('.fixed.top-4.bg-red-500');
+            if (errorAlert) {
+                errorAlert.style.display = 'none';
+            }
+        }, 3000);
+    </script>
+@endif
+
+</body>
+</html>
 @endsection

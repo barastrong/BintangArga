@@ -6,293 +6,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi Penjual</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>Document</title>
 </head>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    body {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        background-color: #f7f9fa;
-    }
-
-    .registration-container {
-        width: 100%;
-        max-width: 500px;
-        background-color: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-        padding: 40px;
-        position: relative;
-        overflow: hidden;
-        margin-left: 37%
-    }
-
-    .registration-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .registration-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: #FF6B35;
-        margin-bottom: 10px;
-    }
-
-    .registration-subtitle {
-        color: #6b7280;
-        font-size: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-        color: #333;
-    }
-
-    .input-wrapper {
-        position: relative;
-    }
-
-    .input-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #FF6B35;
-        opacity: 0.7;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 12px 12px 12px 40px;
-        border: 1.5px solid #e5e7eb;
-        border-radius: 10px;
-        font-size: 15px;
-        transition: all 0.3s ease;
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: #FF6B35;
-        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
-    }
-
-    .drag-drop-area {
-        border: 2px dashed #FF6B35;
-        border-radius: 12px;
-        padding: 40px 20px;
-        text-align: center;
-        background-color: #fff9f5;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .drag-drop-area.dragover {
-        background-color: #fff3e0;
-        border-color: #FF9800;
-    }
-
-    .upload-icon {
-        color: #FF6B35;
-        font-size: 48px;
-        margin-bottom: 15px;
-    }
-
-    .submit-btn {
-        width: 100%;
-        padding: 14px;
-        background: linear-gradient(135deg, #FF6B35, #FF9800);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.4s ease;
-    }
-
-    .submit-btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
-    }
-
-    .file-preview {
-        margin-top: 15px;
-        display: flex;
-        justify-content: center;
-    }
-
-    .file-preview img {
-        max-width: 200px;
-        max-height: 200px;
-        border-radius: 12px;
-        object-fit: cover;
-    }
-
-    .error-message {
-        color: #FF6B35;
-        font-size: 13px;
-        margin-top: 5px;
-    }
-</style>
-
 <body>
-    <div class="registration-container">
-        <div class="registration-header">
-            <h2 class="registration-title">Registrasi Penjual</h2>
-            <p class="registration-subtitle">Lengkapi informasi untuk mendaftar sebagai penjual</p>
+    
+    <div class="flex items-center justify-center min-h-screen bg-white px-4 py-12">
+        <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-orange-100 p-8 sm:p-10 space-y-6">
+            @if(session('success'))
+                <div class="p-4 mb-4 text-sm text-orange-700 bg-orange-50 border border-orange-200 rounded-lg" role="alert">
+                    <strong>Sukses!</strong> {{ session('success') }}
+                </div>
+            @endif
+        <div class="text-center">
+            <div class="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-store text-2xl text-orange-600"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-orange-600">Registrasi Penjual</h2>
+            <p class="mt-2 text-sm text-gray-600">Lengkapi informasi untuk mendaftar sebagai penjual.</p>
         </div>
 
-        <form method="POST" action="{{ route('seller.store') }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route('seller.store') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
 
-            <div class="form-group">
-                <label for="nama_penjual" class="form-label">Nama Penjual</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-user input-icon"></i>
+            <div>
+                <label for="nama_penjual" class="block text-sm font-medium text-gray-700 mb-2">Nama Penjual</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-user text-orange-400"></i>
+                    </div>
                     <input 
                         id="nama_penjual" 
                         type="text" 
-                        class="form-input @error('nama_penjual') is-invalid @enderror" 
                         name="nama_penjual" 
                         value="{{ old('nama_penjual') }}" 
                         required 
                         placeholder="Masukkan nama penjual"
+                        class="block w-full pl-10 pr-3 py-3 border-2 rounded-lg shadow-sm transition duration-150 ease-in-out
+                               @error('nama_penjual')
+                                   border-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50
+                               @else
+                                   border-orange-200 focus:ring-orange-500 focus:border-orange-500 hover:border-orange-300
+                               @enderror"
                     >
                 </div>
                 @error('nama_penjual')
-                    <span class="error-message">{{ $message }}</span>
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-group">
-                <label for="email_penjual" class="form-label">Email Penjual</label>
-                <div class="input-wrapper">
-                    <i class="fas fa-envelope input-icon"></i>
+            <div>
+                <label for="email_penjual" class="block text-sm font-medium text-gray-700 mb-2">Email Penjual</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-envelope text-orange-400"></i>
+                    </div>
                     <input 
                         id="email_penjual" 
                         type="email" 
-                        class="form-input @error('email_penjual') is-invalid @enderror" 
                         name="email_penjual" 
                         value="{{ old('email_penjual') }}" 
                         required 
                         placeholder="email@example.com"
+                        class="block w-full pl-10 pr-3 py-3 border-2 rounded-lg shadow-sm transition duration-150 ease-in-out
+                               @error('email_penjual')
+                                   border-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50
+                               @else
+                                   border-orange-200 focus:ring-orange-500 focus:border-orange-500 hover:border-orange-300
+                               @enderror"
                     >
                 </div>
                 @error('email_penjual')
-                    <span class="error-message">{{ $message }}</span>
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-group">
-                <label for="foto_profil" class="form-label">Foto Profil</label>
-                <div id="drag-drop-area" class="drag-drop-area">
-                    <input 
-                        type="file" 
-                        id="foto_profil" 
-                        name="foto_profil" 
-                        accept=".jpg,.jpeg,.png,.gif" 
-                        style="display:none;"
-                    >
-                    <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
+            <div>
+                <label for="no_telepon" class="block text-sm font-medium text-gray-700 mb-2">No Telepon (Opsional)</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-phone text-orange-400"></i>
                     </div>
-                    <p>Seret & lepas file di sini atau klik untuk memilih</p>
-                    <small>Format: JPG, PNG, atau GIF (Maks: 2MB)</small>
+                    <input 
+                        id="no_telepon" 
+                        type="text" 
+                        name="no_telepon" 
+                        value="{{ old('no_telepon') }}" 
+                        placeholder="Masukkan nomor telepon"
+                        class="block w-full pl-10 pr-3 py-3 border-2 rounded-lg shadow-sm transition duration-150 ease-in-out
+                               @error('no_telepon')
+                                   border-red-300 focus:ring-red-500 focus:border-red-500 bg-red-50
+                               @else
+                                   border-orange-200 focus:ring-orange-500 focus:border-orange-500 hover:border-orange-300
+                               @enderror"
+                    >
                 </div>
-                <div id="file-preview" class="file-preview"></div>
-                @error('foto_profil')
-                    <span class="error-message">{{ $message }}</span>
+                @error('no_telepon')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="form-group">
-                <button type="submit" class="submit-btn">
-                    <i class="fas fa-user-plus me-2"></i> Daftar Sebagai Penjual
+            <div>
+                <label for="foto_profil" class="block text-sm font-medium text-gray-700 mb-2">Foto Profil</label>
+                <div id="drag-drop-area" class="flex justify-center items-center flex-col px-6 pt-8 pb-8 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300
+                    @error('foto_profil')
+                        border-red-300 bg-red-50
+                    @else
+                        border-orange-300 hover:border-orange-400 hover:bg-orange-50
+                    @enderror"
+                >
+                    <input type="file" id="foto_profil" name="foto_profil" accept=".jpg,.jpeg,.png,.gif" class="sr-only">
+                    <div class="space-y-3 text-center">
+                        <div class="mx-auto w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-cloud-upload-alt text-xl text-orange-500"></i>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <p>Seret & lepas file atau <span class="font-medium text-orange-600 hover:text-orange-700 underline">klik untuk memilih</span></p>
+                        </div>
+                        <p class="text-xs text-gray-500">PNG, JPG, GIF hingga 2MB</p>
+                    </div>
+                </div>
+                <div id="file-preview" class="mt-4 flex justify-center"></div>
+                @error('foto_profil')
+                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" class="w-full flex justify-center items-center gap-3 py-4 px-6 border border-transparent rounded-lg shadow-lg text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-300 transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-xl">
+                    <i class="fas fa-user-plus text-lg"></i>
+                    Daftar Sebagai Penjual
                 </button>
             </div>
         </form>
     </div>
+</div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dragDropArea = document.getElementById('drag-drop-area');
-            const fileInput = document.getElementById('foto_profil');
-            const filePreview = document.getElementById('file-preview');
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dragDropArea = document.getElementById('drag-drop-area');
+    const fileInput = document.getElementById('foto_profil');
+    const filePreview = document.getElementById('file-preview');
 
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
-            });
+    // Prevent default browser behavior for drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dragDropArea.addEventListener(eventName, e => {
+            e.preventDefault();
+            e.stopPropagation();
+        }, false);
+    });
 
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, highlight, false);
-            });
+    // Highlight the drop zone on drag enter/over
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dragDropArea.addEventListener(eventName, () => {
+            dragDropArea.classList.add('bg-orange-100', 'border-orange-500', 'scale-105');
+        }, false);
+    });
 
-            ['dragleave', 'drop'].forEach(eventName => {
-                dragDropArea.addEventListener(eventName, unhighlight, false);
-            });
+    // Unhighlight the drop zone on drag leave/drop
+    ['dragleave', 'drop'].forEach(eventName => {
+        dragDropArea.addEventListener(eventName, () => {
+            dragDropArea.classList.remove('bg-orange-100', 'border-orange-500', 'scale-105');
+        }, false);
+    });
 
-            dragDropArea.addEventListener('click', () => fileInput.click());
-            dragDropArea.addEventListener('drop', handleDrop, false);
-            fileInput.addEventListener('change', handleFiles, false);
+    // Trigger file input click when the area is clicked
+    dragDropArea.addEventListener('click', () => fileInput.click());
 
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+    // Handle file drop
+    dragDropArea.addEventListener('drop', e => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        handleFiles(files);
+    }, false);
+    
+    // Handle file selection from file input
+    fileInput.addEventListener('change', e => {
+        handleFiles(e.target.files);
+    }, false);
 
-            function highlight() {
-                dragDropArea.classList.add('dragover');
-            }
+    function handleFiles(files) {
+        if (files.length === 0) {
+            filePreview.innerHTML = '';
+            return;
+        }
 
-            function unhighlight() {
-                dragDropArea.classList.remove('dragover');
-            }
+        const file = files[0];
+        
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+            alert('Format file tidak valid. Harap unggah JPG, PNG, atau GIF.');
+            fileInput.value = '';
+            filePreview.innerHTML = '';
+            return;
+        }
 
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                handleFiles(files);
-            }
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran file terlalu besar. Maksimal 2MB.');
+            fileInput.value = '';
+            filePreview.innerHTML = '';
+            return;
+        }
 
-            function handleFiles(files) {
-                files = files.target ? files.target.files : files;
-                
-                if (files.length > 0) {
-                    const file = files[0];
-                    
-                    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                    if (!validTypes.includes(file.type)) {
-                        alert('Hanya file JPG, PNG, atau GIF yang diperbolehkan');
-                        return;
-                    }
-
-                    if (file.size > 2 * 1024 * 1024) {
-                        alert('Ukuran file maksimal 2MB');
-                        return;
-                    }
-
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        filePreview.innerHTML = `<img src="${e.target.result}" alt="File Preview">`;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            }
-        });
-    </script>
+        // Generate and display preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            filePreview.innerHTML = `
+                <div class="relative">
+                    <img src="${e.target.result}" alt="Pratinjau File" class="max-h-48 rounded-lg object-cover shadow-lg border-2 border-orange-200">
+                    <div class="absolute top-2 right-2 bg-orange-500 text-white rounded-full p-1">
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                </div>
+            `;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 </body>
 </html>
 @endsection

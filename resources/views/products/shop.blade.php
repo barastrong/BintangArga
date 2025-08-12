@@ -1,6 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorasi UMKM</title>
+</head>
+<body>
 <div class="bg-gray-50">
     <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         
@@ -93,48 +101,33 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const provinceSelect = document.getElementById('provinceSelect');
-        const citySelect = document.getElementById('citySelect');
-        const selectedCityId = "{{ request('city_id') }}"; // Ambil city_id dari request
-
-        function fetchCities(provinceId) {
-            // Clear city options, keep the "Semua Kota"
+    <script>
+        // Handle province change to load cities
+        document.getElementById('provinceSelect').addEventListener('change', function() {
+            const provinceId = this.value;
+            const citySelect = document.getElementById('citySelect');
+            
+            // Clear city options
             citySelect.innerHTML = '<option value="">Semua Kota</option>';
             
             if (provinceId) {
+                // Fetch cities for the selected province
                 fetch(`/api/cities/${provinceId}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(cities => {
                         cities.forEach(city => {
                             const option = document.createElement('option');
                             option.value = city.id;
                             option.textContent = city.name;
-                            // Jika city.id sama dengan city_id dari request, set sebagai selected
-                            if (city.id == selectedCityId) {
-                                option.selected = true;
-                            }
                             citySelect.appendChild(option);
                         });
                     })
-                    .catch(error => console.error('Error fetching cities:', error));
+                    .catch(error => {
+                        console.error('Error fetching cities:', error);
+                    });
             }
-        }
-
-        // Event listener untuk saat provinsi diganti
-        provinceSelect.addEventListener('change', function() {
-            fetchCities(this.value);
         });
-
-        // Jika sudah ada provinsi yang terpilih saat halaman dimuat (misal setelah filter),
-        // panggil fetchCities untuk mengisi kota yang sesuai.
-        if (provinceSelect.value) {
-            fetchCities(provinceSelect.value);
-        }
-    });
-</script>
+    </script>
+</body>
+</html>
 @endsection

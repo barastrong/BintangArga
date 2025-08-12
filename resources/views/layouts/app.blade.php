@@ -5,9 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-        <title>{{ config('app.name', 'Laravel') }}</title>
-
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -18,13 +15,12 @@
     <body class="font-sans antialiased bg-gray-50">
         <div class="flex flex-col min-h-screen">
             <!-- Navigation -->
-            {{-- Menambahkan x-data untuk state burger menu --}}
             <nav x-data="{ open: false }" class="bg-white shadow-sm sticky top-0 z-50">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
                         <!-- Logo -->
                         <div class="flex-shrink-0">
-                            <a href="{{ route('products.index') }}" class="font-extrabold text-2xl tracking-tight text-gray-800">ARGABINTANG</a>
+                            <a href="{{ route('products.index') }}" class="font-extrabold text-2xl tracking-tight text-gray-800">FISTFASHION</a>
                         </div>
 
                         <!-- Desktop Navigation Links -->
@@ -54,13 +50,18 @@
                                     <!-- Icons -->
                                     <a href="{{ route('cart.index') }}" class="text-gray-600 hover:text-gray-900 relative">
                                         <i class="fas fa-shopping-cart text-xl"></i>
-                                        @if(Auth::check() && Auth::user()->purchases()->where('status', 'keranjang')->count() > 0)
                                         <span class="absolute -top-2 -right-2 bg-orange-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                                            {{ Auth::user()->purchases()->where('status', 'keranjang')->count() }}
+                                            {{ Auth::check() ? Auth::user()->purchases()->where('status', 'keranjang')->count(): '0' }}
                                         </span>
-                                        @endif
                                     </a>
-                                    <a href="{{ route('seller.dashboard') }}" class="text-gray-600 hover:text-gray-900"><i class="fas fa-store text-xl"></i></a>
+                                    <a href="{{ route('seller.dashboard') }}" class="text-gray-600 hover:text-gray-900"> <i class="fas fa-store text-xl"></i> </a>
+
+                                    @if(Auth::user()->role === 'user' || Auth::user()->role === 'admin')
+                                        <a href="{{ route('delivery.dashboard') }}" class="text-gray-600 hover:text-gray-900" title="Delivery Dashboard">
+                                            <i class="fas fa-truck text-xl"></i>
+                                        </a>
+                                    @endif
+
                                     @if (Auth::user()->role === 'admin')
                                         <a href="{{ route('admin.index') }}" class="text-gray-600 hover:text-gray-900"><i class="fas fa-user-shield text-xl"></i></a>
                                     @endif
@@ -157,7 +158,7 @@
             <footer class="bg-white border-t mt-auto">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     <div class="text-center text-gray-500 text-sm">
-                        © {{ date('Y') }} ARGABINTANG. All Rights Reserved.
+                        © {{ date('Y') }} FISTFASHION. All Rights Reserved.
                     </div>
                 </div>
             </footer>

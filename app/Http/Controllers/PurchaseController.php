@@ -6,6 +6,7 @@ use App\Models\Purchase;
 use App\Models\Product;
 use App\Models\Size;
 use App\Models\Rating;
+use App\Models\Delivery; // Tambahkan ini
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class PurchaseController extends Controller
     public function index()
     {
         $purchases = Auth::user()->purchases()
-        ->with(['product', 'size'])
+        ->with(['product', 'size', 'delivery']) // Tambahkan delivery
         ->orderBy('created_at', 'desc')
         ->get();
             
@@ -114,8 +115,7 @@ class PurchaseController extends Controller
                 $successMessage = 'Item berhasil ditambahkan ke keranjang';
                 
             } else {
-                // Direct purchase logic
-                // Create a new purchase record
+                // Direct purchase logic - CREATE AS CART ITEM FIRST
                 $purchase = Purchase::create([
                     'user_id' => Auth::id(),
                     'seller_id' => $seller_id,
@@ -123,30 +123,18 @@ class PurchaseController extends Controller
                     'size_id' => $request->size_id,
                     'quantity' => $request->quantity,
                     'total_price' => $total_price,
-                    'description' => $request->description,
-                    'shipping_address' => $request->shipping_address,
-                    'phone_number' => $request->phone_number,
-                    'status_pembelian' => 'beli',
-                    'status' => 'pending',
+                    'description' => $request->description ?? 'Direct purchase',
+                    'shipping_address' => $request->shipping_address ?? 'Temporary',
+                    'phone_number' => $request->phone_number ?? 'Temporary',
+                    'status_pembelian' => 'beli', // Create as cart item first
+                    'status' => 'beli', // Create as cart item first
                     'payment_status' => 'unpaid',
                     'payment_method' => $request->payment_method ?? 'pending'
                 ]);
                 
-                // Update stock for direct purchase
-                $size->update([
-                    'stock' => $size->stock - $request->quantity
-                ]);
+                // DON'T update stock here - let checkout handle it
                 
-                // Create array of cart items for checkout
-                $selectedItems = [$purchase];
-                $totalPrice = $total_price;
-                
-                // Direct purchase should go to checkout
-                $redirectRoute = 'cart.checkout';
-                $successMessage = 'Pesanan berhasil dibuat';
-                
-                // Store these items in the session for checkout
-                session(['selected_items' => [$purchase->id]]);
+                $successMessage = 'Produk siap untuk checkout';
             }
     
             DB::commit();
@@ -159,13 +147,14 @@ class PurchaseController extends Controller
                 ]);
             }
     
-            // For direct purchase, redirect to checkout instead of purchase show
+            // For direct purchase, redirect to checkout with the item
             if ($request->status_pembelian === 'beli') {
-                // Pass the purchase ID as a cart item to checkout
-                return redirect()->route('cart.checkout', ['cart_items' => [$purchase->id]])
+                return redirect()->route('cart.checkout')
+                    ->with('selectedItems', collect([$purchase]))
+                    ->with('totalPrice', $total_price)
                     ->with('success', $successMessage);
             } else {
-                return redirect()->route($redirectRoute)
+                return redirect()->route('cart.index')
                     ->with('success', $successMessage);
             }
     
@@ -190,6 +179,8 @@ class PurchaseController extends Controller
         if (Auth::id() !== $purchase->user_id) {
             abort(403, 'Unauthorized action.');
         }
+        $purchase->load('delivery');
+        
         return view('purchases.show', compact('purchase'));
     }
 
@@ -230,22 +221,102 @@ class PurchaseController extends Controller
         }
     }
 
+    /**
+     * Complete purchase when user confirms delivery
+     */
+    public function complete(Purchase $purchase)
+    {
+        // Check authorization
+        if (Auth::id() !== $purchase->user_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Only allow completion if status is 'dikirim'
+        if ($purchase->status !== 'dikirim') {
+            return back()->with('error', 'Pesanan hanya dapat diselesaikan jika statusnya "Dikirim".');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Update status to completed
+            $purchase->update([
+                'status' => 'completed',
+                'delivered_at' => now()
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Pesanan telah berhasil diselesaikan. Anda dapat memberikan rating dan ulasan sekarang.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Cancel direct purchase items when user clicks back button in checkout
+     */
+    public function cancelDirectPurchase(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'item_ids' => 'required|array',
+            'item_ids.*' => 'exists:purchases,id'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Get the purchases that belong to the current user and have status 'beli'
+            $purchases = Purchase::whereIn('id', $request->item_ids)
+                ->where('user_id', Auth::id())
+                ->where('status_pembelian', 'beli')
+                ->where('status', 'beli')
+                ->with(['size'])
+                ->get();
+
+            if ($purchases->isEmpty()) {
+                throw new \Exception('Tidak ada item yang dapat dibatalkan');
+            }
+
+            foreach ($purchases as $purchase) {
+                // Return stock to the size if stock was reduced
+                // (In your current implementation, stock is not reduced until checkout, 
+                // but this is a safety measure)
+                if ($purchase->size) {
+                    $purchase->size->update([
+                        'stock' => $purchase->size->stock + $purchase->quantity
+                    ]);
+                }
+
+                // Delete the purchase record
+                $purchase->delete();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Item pembelian langsung berhasil dibatalkan'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function rate(Request $request, Purchase $purchase)
     {
         // Authorize - only the purchaser can rate
         if ($purchase->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');
-        }
-        
-        // Validate only completed purchases can be rated
-        if ($purchase->status !== 'completed') {
-            return redirect()->back()
-                ->with('error', 'Hanya pembelian yang telah selesai yang dapat diberi rating.');
-        }
-        
-        if (isset($purchase->rating)) {
-            return redirect()->back()
-                ->with('error', 'Anda sudah memberikan rating untuk pesanan ini.');
         }
         
         // Validate input
@@ -289,9 +360,6 @@ class PurchaseController extends Controller
             ->where('status_pembelian', 'keranjang')
             ->where('status', 'keranjang')
             ->with(['product', 'size'])
-            ->with([
-                'size'
-            ])
             ->get();
             
         return view('cart.index', compact('cartItems'));
@@ -315,6 +383,17 @@ class PurchaseController extends Controller
 
     public function checkoutFromCart(Request $request)
     {
+        // Check if we have selectedItems from session (direct purchase)
+        $selectedItems = session('selectedItems');
+        $totalPrice = session('totalPrice');
+        
+        if ($selectedItems && $totalPrice) {
+            // Clear the session data
+            session()->forget(['selectedItems', 'totalPrice']);
+            return view('cart.checkout', compact('selectedItems', 'totalPrice'));
+        }
+
+        // Regular cart checkout
         $request->validate([
             'cart_items' => 'required|array',
             'cart_items.*' => 'exists:purchases,id',
@@ -388,7 +467,7 @@ class PurchaseController extends Controller
             'shipping_address' => 'required|string',
             'phone_number' => 'required|string',
             'description' => 'nullable|string',
-            'payment_method' => 'required|in:gopay,qris,nyicil',
+            'payment_method' => 'required|in:gopay,qris,dana,bank_transfer,',
             'total_with_tax' => 'nullable|numeric'
         ]);
         
@@ -412,11 +491,16 @@ class PurchaseController extends Controller
                 
                 $seller_id = $item->product->seller_id;
                 
-                if ($item->status_pembelian === 'keranjang' && $item->status === 'keranjang') {
-                    $item->size->update([
-                        'stock' => $item->size->stock - $newQuantity
-                    ]);
+                // Assign random delivery (Tambahan ini)
+                $randomDelivery = Delivery::getRandomDelivery();
+                if (!$randomDelivery) {
+                    throw new \Exception("Tidak ada delivery yang tersedia saat ini");
                 }
+                
+                // Reduce stock when processing checkout
+                $item->size->update([
+                    'stock' => $item->size->stock - $newQuantity
+                ]);
                 
                 $basePrice = (int)($item->size->harga * $newQuantity);
                 
@@ -433,7 +517,10 @@ class PurchaseController extends Controller
                     'quantity' => $newQuantity,
                     'total_price' => $totalWithTax, // Now includes tax
                     'payment_method' => $request->payment_method,
-                    'seller_id' => $seller_id
+                    'payment_status' => 'paid',
+                    'seller_id' => $seller_id,
+                    'delivery_id' => $randomDelivery->id, // Assign random delivery
+                    'assigned_to_delivery_at' => now()
                 ]);
                 
                 // Store the first item for redirection
@@ -446,7 +533,7 @@ class PurchaseController extends Controller
             
             if ($firstProcessedItem) {
                 return redirect()->route('purchases.show', $firstProcessedItem)
-                    ->with('success', 'Pesanan berhasil diproses');
+                    ->with('success', 'Pesanan berhasil diproses dan telah ditetapkan delivery: ' . $firstProcessedItem->delivery->nama);
             } else {
                 return redirect()->route('purchases.index')
                     ->with('success', 'Pesanan berhasil diproses');
