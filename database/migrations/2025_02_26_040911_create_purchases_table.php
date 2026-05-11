@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('size_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('total_price', 12, 2);
-            $table->enum('status', ['pending', 'process', 'dikirim'])->default('pending');
+            $table->enum('status', ['pending', 'process', 'dikirim', 'completed' ,'selesai' , 'cancelled'])->default('pending');
             $table->enum('status_pengiriman', ['pending', 'picked_up', 'shipping', 'delivered'])->default('pending');
             $table->enum('payment_method', ['dana', 'gopay', 'bank_transfer', 'qris']);
             $table->enum('payment_status', ['paid', 'unpaid'])->default('unpaid');

@@ -104,7 +104,7 @@ class PurchaseController extends Controller
                         'shipping_address' => $request->shipping_address ?? 'Temporary',
                         'phone_number' => $request->phone_number ?? 'Temporary',
                         'status_pembelian' => 'keranjang',
-                        'status' => 'keranjang',
+                        'status' => 'pending',
                         'payment_status' => 'unpaid',
                         'payment_method' => $request->payment_method ?? 'pending'
                     ]);
@@ -127,7 +127,7 @@ class PurchaseController extends Controller
                     'shipping_address' => $request->shipping_address ?? 'Temporary',
                     'phone_number' => $request->phone_number ?? 'Temporary',
                     'status_pembelian' => 'beli', // Create as cart item first
-                    'status' => 'beli', // Create as cart item first
+                    'status' => 'pending', // Create as cart item first
                     'payment_status' => 'unpaid',
                     'payment_method' => $request->payment_method ?? 'pending'
                 ]);
@@ -208,6 +208,8 @@ class PurchaseController extends Controller
             $purchase->update([
                 'status' => 'cancelled',
                 'payment_status' => 'cancelled',
+                'status_pengiriman' => 'cancelled',
+                'status_pembelian' => 'cancelled'
             ]);
 
             DB::commit();
@@ -358,7 +360,7 @@ class PurchaseController extends Controller
     {
         $cartItems = Auth::user()->purchases()
             ->where('status_pembelian', 'keranjang')
-            ->where('status', 'keranjang')
+            ->where('status', 'pending')
             ->with(['product', 'size'])
             ->get();
             

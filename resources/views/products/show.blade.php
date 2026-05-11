@@ -130,7 +130,9 @@
                                     <img class="h-10 w-10 rounded-full object-cover" src="{{ $rating->user->profile_image ? asset('storage/' . $rating->user->profile_image) : 'https://ui-avatars.com/api/?name='.urlencode($rating->user->name).'&color=FFFFFF&background=F97316' }}" alt="{{ $rating->user->name }}">
                                     <div>
                                         <p class="font-semibold text-gray-800">{{ $rating->user->name ?? 'Anonymous' }}</p>
-                                        <p class="text-xs text-gray-400">{{ $rating->created_at->diffForHumans() }}</p>
+                                        <p class="text-xs text-gray-400">
+                                            {{ $rating->created_at ? $rating->created_at->diffForHumans() : '-' }}
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex text-yellow-400">
